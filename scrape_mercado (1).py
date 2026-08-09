@@ -23,9 +23,11 @@ histórico en histórico.csv (para Google Sheets) y, si configuraste Telegram,
 te envía un resumen al chat.
 """
 
+import io
 import os
 import re
 import sys
+import unicodedata
 from datetime import date
 from pathlib import Path
 
@@ -44,6 +46,32 @@ POSITIONS = ["PT", "DF", "MC", "DL"]
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 TOP_N = 10  # cuántos jugadores mostrar por categoría en el mensaje
+
+
+MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
+
+
+def normaliza(texto: str) -> str:
+    """Quita tildes/mayúsculas para comparar nombres de forma flexible."""
+    texto = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
+    return texto.lower().strip()
+
+
+def carga_mis_jugadores() -> list:
+    if not MIS_JUGADORES_FILE.exists():
+        return []
+    with open(MIS_JUGADORES_FILE, encoding="utf-8") as f:
+        return [line.strip() for line in f if line.strip()]
+
+
+def filtra_mi_equipo(df: pd.DataFrame, nombres: list) -> pd.DataFrame:
+    """Coincidencia flexible: 'Yamal' encuentra 'Lamine Yamal', ignora tildes/mayúsculas."""
+    if not nombres:
+        return df.iloc[0:0]
+    nombres_norm = [normaliza(n) for n in nombres]
+    jugador_norm = df["jugador"].apply(normaliza)
+    mask = jugador_norm.apply(lambda j: any(n in j or j in n for n in nombres_norm))
+    return df[mask]
 
 
 def send_telegram_message(text: str):
@@ -89,6 +117,23 @@ def build_telegram_summary(df: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
+def build_telegram_summary_mi_equipo(df: pd.DataFrame) -> str:
+    hoy = date.today().isoformat()
+    lines = [f"<b>⚽ Mi equipo — {hoy}</b>", ""]
+    df = df.copy()
+    df["cambio_eur_num"] = pd.to_numeric(df["cambio_eur"], errors="coerce")
+    df = df.sort_values("cambio_eur_num", ascending=False)
+    for _, r in df.iterrows():
+        cambio = r["cambio_eur_num"]
+        flecha = "↑" if r["tipo"] == "Subidas" else "↓"
+        signo = "+" if r["tipo"] == "Subidas" else ""
+        cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
+        lines.append(f"{flecha} <b>{r['jugador']}</b> ({r['equipo']}): {cambio_txt} ({r['cambio_pct']}%) — precio: {r['precio_eur']} €")
+    if len(df) == 0:
+        lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado de hoy)")
+    return "\n".join(lines)
+
+
 def split_jugador_cell(text: str):
     """La celda 'Jugador' viene como 'NombreDFEquipo' pegado.
     Buscamos el código de posición para separar nombre / posición / equipo."""
@@ -130,7 +175,7 @@ def scrape_tab(page, tab_label: str, rows: list):
         page.wait_for_timeout(800)
         html = page.content()
         try:
-            tables = pd.read_html(html)
+            tables = pd.read_html(io.StringIO(html))
         except ValueError:
             break
 
@@ -213,7 +258,28 @@ def main():
     print("\nAhora sube 'historico.csv' a Google Sheets (Archivo > Importar > Reemplazar datos,")
     print("o simplemente arrastra el archivo cada día y elige 'Reemplazar la hoja actual').")
 
-    resumen = build_telegram_summary(df)
+    mis_jugadores = carga_mis_jugadores()
+    if mis_jugadores:
+        mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
+        mi_equipo_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
+        mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
+        print(f"Mi equipo ({len(mi_equipo_df)}/{len(mis_jugadores)} encontrados): {mi_equipo_file}")
+
+        historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
+        if historico_equipo_file.exists():
+            hist_eq = pd.read_csv(historico_equipo_file, dtype=str)
+            hist_eq = hist_eq[hist_eq["fecha"] != date.today().isoformat()]
+            combinado_eq = pd.concat([hist_eq, mi_equipo_df], ignore_index=True)
+        else:
+            combinado_eq = mi_equipo_df
+        combinado_eq.to_csv(historico_equipo_file, index=False, encoding="utf-8-sig")
+        print(f"Histórico de mi equipo actualizado: {historico_equipo_file}")
+
+        resumen = build_telegram_summary_mi_equipo(mi_equipo_df)
+    else:
+        print("No hay 'mis_jugadores.txt' (o está vacío) — se envía el resumen general del mercado.")
+        resumen = build_telegram_summary(df)
+
     send_telegram_message(resumen)
 
 
