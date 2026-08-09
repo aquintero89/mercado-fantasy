@@ -2,10 +2,10 @@ name: Mercado Fantasy diario
 
 on:
   schedule:
-    # 05:30 UTC = 07:30 en España (horario de verano) / 06:30 (horario de invierno)
+    # 04:30 UTC = 06:30 en España (verano) / 05:30 (invierno)
     # La web se actualiza a las 00:16 hora España, así que dejamos margen.
     # Ajusta la hora si quieres recibirlo más temprano o más tarde.
-    - cron: "30 5 * * *"
+    - cron: "30 4 * * *"
   workflow_dispatch: {}  # permite lanzarlo a mano desde GitHub también
 
 permissions:
