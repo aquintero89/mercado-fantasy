@@ -200,9 +200,14 @@ def scrape_tab(page, tab_label: str, rows: list):
             if not nombre:
                 continue
 
+            # El signo real lo decide el valor numérico, no la pestaña de origen
+            # (ambas pestañas muestran la tabla completa, solo cambia el orden).
+            valor_num = float(valor) if valor not in (None, "") else 0.0
+            tipo_real = "Subidas" if valor_num >= 0 else "Bajadas"
+
             rows.append({
                 "fecha": date.today().isoformat(),
-                "tipo": tab_label,
+                "tipo": tipo_real,
                 "jugador": nombre,
                 "posicion": posicion,
                 "equipo": equipo,
@@ -231,9 +236,10 @@ def main():
         page.goto(URL, wait_until="networkidle", timeout=60000)
         page.wait_for_timeout(2000)
 
-        for tab in ["Subidas", "Bajadas"]:
-            print(f"Extrayendo pestaña: {tab}")
-            scrape_tab(page, tab, rows)
+        # Basta con una pestaña: la tabla ya incluye tanto subidas como bajadas,
+        # solo cambia el orden en que se muestran.
+        print("Extrayendo mercado completo...")
+        scrape_tab(page, "Subidas", rows)
 
         browser.close()
 
@@ -241,7 +247,7 @@ def main():
         print("No se extrajeron datos. La estructura de la web pudo haber cambiado.")
         sys.exit(1)
 
-    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "tipo", "jugador", "equipo"])
+    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
     today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
     df.to_csv(today_file, index=False, encoding="utf-8-sig")
     print(f"\nGuardado: {today_file} ({len(df)} filas)")
