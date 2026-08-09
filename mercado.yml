@@ -1,0 +1,43 @@
+name: Mercado Fantasy diario
+
+on:
+  schedule:
+    # 05:30 UTC = 07:30 en España (horario de verano) / 06:30 (horario de invierno)
+    # La web se actualiza a las 00:16 hora España, así que dejamos margen.
+    # Ajusta la hora si quieres recibirlo más temprano o más tarde.
+    - cron: "30 5 * * *"
+  workflow_dispatch: {}  # permite lanzarlo a mano desde GitHub también
+
+permissions:
+  contents: write  # necesario para que el workflow pueda subir el historico.csv actualizado
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          pip install playwright pandas requests lxml
+          playwright install --with-deps chromium
+
+      - name: Ejecutar scraper
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python3 scrape_mercado.py
+
+      - name: Guardar los CSV actualizados en el repositorio
+        run: |
+          git config user.name "mercado-bot"
+          git config user.email "mercado-bot@users.noreply.github.com"
+          git add historico.csv historico_mi_equipo.csv mercado_*.csv mi_equipo_*.csv 2>/dev/null || true
+          git commit -m "Actualización diaria del mercado $(date +'%Y-%m-%d')" || echo "Sin cambios que subir"
+          git push
