@@ -125,10 +125,12 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame) -> str:
     df = df.sort_values("cambio_eur_num", ascending=False)
     for _, r in df.iterrows():
         cambio = r["cambio_eur_num"]
-        flecha = "↑" if r["tipo"] == "Subidas" else "↓"
-        signo = "+" if r["tipo"] == "Subidas" else ""
+        es_subida = r["tipo"] == "Subidas"
+        punto = "🟢" if es_subida else "🔴"
+        flecha = "↑" if es_subida else "↓"
+        signo = "+" if es_subida else ""
         cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
-        lines.append(f"{flecha} <b>{r['jugador']}</b> ({r['equipo']}): {cambio_txt} ({r['cambio_pct']}%) — precio: {r['precio_eur']} €")
+        lines.append(f"{punto} {flecha} <b>{r['jugador']}</b> ({r['equipo']}): {cambio_txt} ({r['cambio_pct']}%) — precio: {r['precio_eur']} €")
     if len(df) == 0:
         lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado de hoy)")
     return "\n".join(lines)
