@@ -60,6 +60,24 @@ def normaliza(texto: str) -> str:
     return texto.lower().strip()
 
 
+def parse_entrada_jugador(linea: str):
+    """Permite 'Nombre' o 'Nombre (Equipo)' para desambiguar nombres genéricos."""
+    m = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", linea.strip())
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return linea.strip(), None
+
+
+def coincide_por_palabras(nombre_lista: str, nombre_mercado: str) -> bool:
+    """Compara por palabras completas, no por subcadena de caracteres, para
+    evitar falsos positivos como 'Rodri' encontrado dentro de 'Rodríguez'."""
+    palabras_lista = normaliza(nombre_lista).split()
+    palabras_mercado = normaliza(nombre_mercado).split()
+    cortas, largas = (palabras_lista, palabras_mercado) if len(palabras_lista) <= len(palabras_mercado) else (palabras_mercado, palabras_lista)
+    # Todas las palabras del nombre más corto deben aparecer, completas, en el más largo
+    return all(p in largas for p in cortas)
+
+
 def carga_mis_jugadores() -> list:
     if not MIS_JUGADORES_FILE.exists():
         return []
@@ -67,14 +85,26 @@ def carga_mis_jugadores() -> list:
         return [line.strip() for line in f if line.strip()]
 
 
-def filtra_mi_equipo(df: pd.DataFrame, nombres: list) -> pd.DataFrame:
-    """Coincidencia flexible: 'Yamal' encuentra 'Lamine Yamal', ignora tildes/mayúsculas."""
-    if not nombres:
+def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
+    """Coincidencia por palabras completas (evita que 'Rodri' matchee con
+    'Rodríguez'). Si una entrada incluye equipo entre paréntesis, ej.
+    'Marcos Alonso (Celta)', solo acepta filas de ese equipo."""
+    if not entradas:
         return df.iloc[0:0]
-    nombres_norm = [normaliza(n) for n in nombres]
-    jugador_norm = df["jugador"].apply(normaliza)
-    mask = jugador_norm.apply(lambda j: any(n in j or j in n for n in nombres_norm))
-    return df[mask]
+
+    partes = [parse_entrada_jugador(n) for n in entradas]
+    indices_encontrados = []
+
+    for idx, row in df.iterrows():
+        for nombre, equipo_hint in partes:
+            if not coincide_por_palabras(nombre, row["jugador"]):
+                continue
+            if equipo_hint and normaliza(equipo_hint) not in normaliza(row["equipo"]):
+                continue
+            indices_encontrados.append(idx)
+            break
+
+    return df.loc[indices_encontrados]
 
 
 def send_telegram_message(text: str):
@@ -263,7 +293,7 @@ def scrape_tab(page, tab_label: str, rows: list):
             break
         siguiente.first.click()
         page_num += 1
-        if page_num > 45:  # límite de seguridad
+        if page_num > 65:  # límite de seguridad (el mercado ronda las 52 páginas)
             print("  Límite de seguridad de páginas alcanzado.")
             break
 
@@ -315,7 +345,7 @@ def main():
         encontrados_norm = set(mi_equipo_df["jugador"].apply(normaliza))
         no_encontrados = [
             n for n in mis_jugadores
-            if not any(normaliza(n) in j or j in normaliza(n) for j in encontrados_norm)
+            if not any(coincide_por_palabras(parse_entrada_jugador(n)[0], j) for j in mi_equipo_df["jugador"])
         ]
         if no_encontrados:
             print(f"  No encontrados en el mercado de hoy: {', '.join(no_encontrados)}")
