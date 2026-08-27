@@ -14,10 +14,11 @@ URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
 POSITIONS = ["PT", "DF", "MC", "DL", "DT"]  # DT = entrenador
 
-# --- Configuración de Telegram (opcional) ---
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-TOP_N = 10  # cuántos jugadores mostrar por categoría en el mensaje general
+# --- Configuración de Telegram ---
+# Si no usas variables de entorno en la terminal, puedes colocar tu TOKEN y CHAT_ID directamente entre comillas:
+TELEGRAM_TOKEN = os.environ.get("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", "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")
+TELEGRAM_CHAT_ID = os.environ.get("1788566096", "1788566096")
+TOP_N = 10
 
 MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
@@ -29,7 +30,7 @@ def normaliza(texto: str) -> str:
 
 
 def carga_mis_jugadores() -> list:
-    """Carga los jugadores desde el archivo y soporta la sintaxis 'Jugador, Equipo'."""
+    """Carga los jugadores desde el archivo apoyando la sintaxis 'Jugador, Equipo'."""
     if not MIS_JUGADORES_FILE.exists():
         return []
     jugadores = []
@@ -47,7 +48,7 @@ def carga_mis_jugadores() -> list:
 
 
 def coincide_jugador(nombre_target: str, equipo_target: str, nombre_df: str, equipo_df: str) -> bool:
-    """Verifica la coincidencia de nombre (por tokens completos) y opcionalmente de equipo."""
+    """Verifica coincidencia evitando dividir nombres compuestos."""
     n_target_norm = normaliza(nombre_target)
     n_df_norm = normaliza(nombre_df)
 
@@ -57,18 +58,13 @@ def coincide_jugador(nombre_target: str, equipo_target: str, nombre_df: str, equ
     if not tokens_target or not tokens_df:
         return False
 
-    # Si se especificó solo una palabra muy corta (ej. "Rodri") y NO se especificó equipo,
-    # exigimos coincidencia exacta para evitar que "Guido Rodríguez" haga match con "Rodri".
-    if len(tokens_target) == 1 and len(tokens_target[0]) <= 3 and not equipo_target:
-        match_nombre = (n_target_norm == n_df_norm)
-    else:
-        # Comprobar si todas las palabras buscadas están en el nombre de la web (o viceversa)
-        match_nombre = all(t in tokens_df for t in tokens_target) or all(t in tokens_target for t in tokens_df)
+    # Para nombres compuestos como "Marcos Alonso", obligamos a que TODOS los tokens estén juntos en el nombre
+    match_nombre = all(t in tokens_df for t in tokens_target)
 
     if not match_nombre:
         return False
 
-    # Validar equipo si se especificó en mis_jugadores.txt
+    # Si se especificó el equipo en mis_jugadores.txt, comprobar que concuerde
     if equipo_target:
         eq_target_norm = normaliza(equipo_target)
         eq_df_norm = normaliza(equipo_df)
@@ -79,7 +75,6 @@ def coincide_jugador(nombre_target: str, equipo_target: str, nombre_df: str, equ
 
 
 def filtra_mi_equipo(df: pd.DataFrame, mis_jugadores: list) -> pd.DataFrame:
-    """Filtra el DataFrame haciendo coincidir nombre y equipo según mis_jugadores.txt."""
     if not mis_jugadores or df.empty:
         return df.iloc[0:0]
 
@@ -97,8 +92,8 @@ def filtra_mi_equipo(df: pd.DataFrame, mis_jugadores: list) -> pd.DataFrame:
 
 
 def send_telegram_message(text: str):
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("Telegram no configurado (falta TELEGRAM_TOKEN o TELEGRAM_CHAT_ID). Omitido.")
+    if not TELEGRAM_TOKEN or TELEGRAM_TOKEN == "TU_TELEGRAM_TOKEN_AQUI":
+        print("❌ Error: Telegram no configurado (TELEGRAM_TOKEN está vacío).")
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     resp = requests.post(url, data={
@@ -108,35 +103,9 @@ def send_telegram_message(text: str):
         "disable_web_page_preview": True,
     })
     if resp.status_code == 200:
-        print("Resumen enviado a Telegram.")
+        print("✅ Resumen enviado con éxito a Telegram.")
     else:
-        print(f"Error enviando a Telegram: {resp.status_code} {resp.text}")
-
-
-def build_telegram_summary(df: pd.DataFrame) -> str:
-    hoy = date.today().isoformat()
-    lines = [f"<b>📊 Mercado Fantasy — {hoy}</b>", ""]
-
-    subidas = df[df["tipo"] == "Subidas"].copy()
-    if not subidas.empty:
-        subidas["cambio_eur_num"] = pd.to_numeric(subidas["cambio_eur"], errors="coerce")
-        subidas = subidas.sort_values("cambio_eur_num", ascending=False).head(TOP_N)
-        lines.append("<b>🟢 Top subidas</b>")
-        for _, r in subidas.iterrows():
-            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
-            lines.append(f"↑ {r['jugador']} ({r['equipo']}): +{cambio:,} € ({r['cambio_pct']}%)".replace(",", "."))
-        lines.append("")
-
-    bajadas = df[df["tipo"] == "Bajadas"].copy()
-    if not bajadas.empty:
-        bajadas["cambio_eur_num"] = pd.to_numeric(bajadas["cambio_eur"], errors="coerce")
-        bajadas = bajadas.sort_values("cambio_eur_num", ascending=True).head(TOP_N)
-        lines.append("<b>🔴 Top bajadas</b>")
-        for _, r in bajadas.iterrows():
-            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
-            lines.append(f"↓ {r['jugador']} ({r['equipo']}): {cambio:,} € ({r['cambio_pct']}%)".replace(",", "."))
-
-    return "\n".join(lines)
+        print(f"❌ Error enviando a Telegram: {resp.status_code} {resp.text}")
 
 
 def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: int) -> str:
@@ -320,53 +289,11 @@ def main():
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
     print(f"\nTotal de jugadores únicos capturados hoy: {len(df)}")
 
-    today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
-    df.to_csv(today_file, index=False, encoding="utf-8-sig")
-    print(f"Guardado: {today_file} ({len(df)} filas)")
-
-    historico_file = OUT_DIR / "historico.csv"
-    if historico_file.exists():
-        hist = pd.read_csv(historico_file, dtype=str)
-        hist = hist[hist["fecha"] != date.today().isoformat()]
-        combinado = pd.concat([hist, df], ignore_index=True)
-    else:
-        combinado = df
-    combinado.to_csv(historico_file, index=False, encoding="utf-8-sig")
-    print(f"Histórico actualizado: {historico_file} ({len(combinado)} filas totales)")
-
     mis_jugadores = carga_mis_jugadores()
     if mis_jugadores:
         mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
-        mi_equipo_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
-        mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
-        print(f"Mi equipo ({len(mi_equipo_df)}/{len(mis_jugadores)} encontrados): {mi_equipo_file}")
-
-        no_encontrados = []
-        for n_target, e_target in mis_jugadores:
-            encontrado = any(
-                coincide_jugador(n_target, e_target, row["jugador"], row["equipo"])
-                for _, row in mi_equipo_df.iterrows()
-            )
-            if not encontrado:
-                txt = f"{n_target} ({e_target})" if e_target else n_target
-                no_encontrados.append(txt)
-
-        if no_encontrados:
-            print(f"  No encontrados en el mercado de hoy: {', '.join(no_encontrados)}")
-
-        historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
-        if historico_equipo_file.exists():
-            hist_eq = pd.read_csv(historico_equipo_file, dtype=str)
-            hist_eq = hist_eq[hist_eq["fecha"] != date.today().isoformat()]
-            combinado_eq = pd.concat([hist_eq, mi_equipo_df], ignore_index=True)
-        else:
-            combinado_eq = mi_equipo_df
-        combinado_eq.to_csv(historico_equipo_file, index=False, encoding="utf-8-sig")
-        print(f"Histórico de mi equipo actualizado: {historico_equipo_file}")
-
         resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
     else:
-        print("No hay 'mis_jugadores.txt' (o está vacío) — se envía el resumen general del mercado.")
         resumen = build_telegram_summary(df)
 
     send_telegram_message(resumen)
