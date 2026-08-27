@@ -47,7 +47,7 @@ def carga_mis_jugadores() -> list:
 
 
 def coincide_jugador(nombre_target: str, equipo_target: str, nombre_df: str, equipo_df: str) -> bool:
-    """Verifica la coincidencia estricta de nombre (por tokens completos) y opcionalmente de equipo."""
+    """Verifica la coincidencia de nombre (por tokens completos) y opcionalmente de equipo."""
     n_target_norm = normaliza(nombre_target)
     n_df_norm = normaliza(nombre_df)
 
@@ -57,19 +57,18 @@ def coincide_jugador(nombre_target: str, equipo_target: str, nombre_df: str, equ
     if not tokens_target or not tokens_df:
         return False
 
-    # 1. Si en mis_jugadores.txt pones una sola palabra (ej. "Rodri") sin equipo,
-    # exigimos coincidencia exacta del nombre para evitar falsos positivos con otros "Rodri".
-    if len(tokens_target) == 1 and not equipo_target:
+    # Si se especificó solo una palabra muy corta (ej. "Rodri") y NO se especificó equipo,
+    # exigimos coincidencia exacta para evitar que "Guido Rodríguez" haga match con "Rodri".
+    if len(tokens_target) == 1 and len(tokens_target[0]) <= 3 and not equipo_target:
         match_nombre = (n_target_norm == n_df_norm)
     else:
-        # 2. Si es un nombre compuesto (ej. "Marcos Alonso"),
-        # TODOS los tokens buscados deben estar en el nombre del mercado.
-        match_nombre = all(t in tokens_df for t in tokens_target)
+        # Comprobar si todas las palabras buscadas están en el nombre de la web (o viceversa)
+        match_nombre = all(t in tokens_df for t in tokens_target) or all(t in tokens_target for t in tokens_df)
 
     if not match_nombre:
         return False
 
-    # 3. Validar equipo si se especificó en mis_jugadores.txt
+    # Validar equipo si se especificó en mis_jugadores.txt
     if equipo_target:
         eq_target_norm = normaliza(equipo_target)
         eq_df_norm = normaliza(equipo_df)
@@ -144,18 +143,42 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     hoy = date.today().isoformat()
     lines = [f"<b>⚽ Mi equipo — {hoy}</b> ({encontrados}/{total} encontrados)", ""]
     df = df.copy()
-    df["cambio_eur_num"] = pd.to_numeric(df["cambio_eur"], errors="coerce")
+    df["cambio_eur_num"] = pd.to_numeric(df["cambio_eur"], errors="coerce").fillna(0)
     df = df.sort_values("cambio_eur_num", ascending=False)
+
+    total_subidas = 0.0
+    total_bajadas = 0.0
+
     for _, r in df.iterrows():
         cambio = r["cambio_eur_num"]
         es_subida = r["tipo"] == "Subidas"
         punto = "🟢" if es_subida else "🔴"
         flecha = "↑" if es_subida else "↓"
         signo = "+" if es_subida else ""
-        cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
+        cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if cambio != 0 else "0 €"
         lines.append(f"{punto} {flecha} <b>{r['jugador']}</b> ({r['equipo']}): {cambio_txt} ({r['cambio_pct']}%) — precio: {r['precio_eur']} €")
+
+        if es_subida:
+            total_subidas += cambio
+        else:
+            total_bajadas += cambio
+
     if len(df) == 0:
         lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado de hoy)")
+    else:
+        balance_neto = total_subidas + total_bajadas
+        signo_balance = "+" if balance_neto > 0 else ""
+
+        txt_subidas = f"+{int(total_subidas):,} €".replace(",", ".")
+        txt_bajadas = f"{int(total_bajadas):,} €".replace(",", ".")
+        txt_balance = f"{signo_balance}{int(balance_neto):,} €".replace(",", ".")
+
+        lines.append("")
+        lines.append("<b>📈 Totales Mi Equipo:</b>")
+        lines.append(f"🟢 Total subidas: {txt_subidas}")
+        lines.append(f"🔴 Total bajadas: {txt_bajadas}")
+        lines.append(f"📊 <b>Balance neto: {txt_balance}</b>")
+
     return "\n".join(lines)
 
 
