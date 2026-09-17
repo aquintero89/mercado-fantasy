@@ -62,15 +62,31 @@ def parse_entrada_jugador(linea: str):
     return linea.strip(), None
 
 
+def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
+    """Devuelve una puntuación de calidad de coincidencia, o None si no hay
+    coincidencia válida. Compara por palabras completas para no confundir
+    'Rodri' con 'Rodríguez'.
+      3 = nombre idéntico            ('Marcos Alonso' == 'Marcos Alonso')
+      2 = tú abreviaste             ('Yamal' dentro de 'Lamine Yamal')
+      1 = el mercado abrevió        ('Antonio Blanco' -> aparece 'Blanco')
+    """
+    palabras_lista = set(normaliza(nombre_lista).split())
+    palabras_mercado = set(normaliza(nombre_mercado).split())
+
+    if not palabras_lista or not palabras_mercado:
+        return None
+    if palabras_lista == palabras_mercado:
+        return 3
+    if palabras_lista <= palabras_mercado:
+        return 2
+    if palabras_mercado <= palabras_lista:
+        return 1
+    return None  # sin relación de subconjunto: no lo consideramos coincidencia
+
+
 def coincide_por_palabras(nombre_lista: str, nombre_mercado: str) -> bool:
-    """Exige que TODAS las palabras de tu entrada en la lista aparezcan,
-    completas, en el nombre del mercado (no al revés). Esto permite
-    abreviaturas como 'Yamal' -> 'Lamine Yamal', pero evita que un jugador
-    distinto con nombre más corto (ej. 'Iñigo' de otro jugador) se cuele
-    como coincidencia de 'Iñigo Vicente'."""
-    palabras_lista = normaliza(nombre_lista).split()
-    palabras_mercado = normaliza(nombre_mercado).split()
-    return all(p in palabras_mercado for p in palabras_lista)
+    """Compatibilidad: True si hay algún tipo de coincidencia válida."""
+    return puntua_coincidencia(nombre_lista, nombre_mercado) is not None
 
 
 def carga_mis_jugadores() -> list:
@@ -81,24 +97,48 @@ def carga_mis_jugadores() -> list:
 
 
 def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
-    """Coincidencia direccional por palabras completas + desambiguación
-    opcional por equipo con 'Nombre (Equipo)'."""
+    """Para cada jugador de tu lista busca TODOS los candidatos del mercado
+    y se queda con el mejor (exacto > tú abreviaste > el mercado abrevió).
+    Si una entrada incluye equipo entre paréntesis, ej. 'M. Román (Celta)',
+    solo considera candidatos de ese equipo."""
     if not entradas:
         return df.iloc[0:0]
 
-    partes = [parse_entrada_jugador(n) for n in entradas]
-    indices_encontrados = []
+    indices_elegidos = []
+    ambiguos = []
 
-    for idx, row in df.iterrows():
-        for nombre, equipo_hint in partes:
-            if not coincide_por_palabras(nombre, row["jugador"]):
-                continue
+    for linea in entradas:
+        nombre, equipo_hint = parse_entrada_jugador(linea)
+        candidatos = []
+
+        for idx, row in df.iterrows():
             if equipo_hint and normaliza(equipo_hint) not in normaliza(row["equipo"]):
                 continue
-            indices_encontrados.append(idx)
-            break
+            score = puntua_coincidencia(nombre, row["jugador"])
+            if score is not None:
+                candidatos.append((score, idx, row["jugador"], row["equipo"]))
 
-    return df.loc[indices_encontrados]
+        if not candidatos:
+            continue
+
+        mejor_score = max(c[0] for c in candidatos)
+        mejores = [c for c in candidatos if c[0] == mejor_score]
+
+        if len(mejores) > 1:
+            nombres = ", ".join(f"{c[2]} ({c[3]})" for c in mejores)
+            ambiguos.append(f"{linea} -> {nombres}")
+
+        indices_elegidos.append(mejores[0][1])
+
+    if ambiguos:
+        print("  Coincidencias ambiguas (añade el equipo entre paréntesis para fijarlas):")
+        for a in ambiguos:
+            print(f"    {a}")
+
+    # Quitamos duplicados manteniendo el orden
+    vistos = set()
+    unicos = [i for i in indices_elegidos if not (i in vistos or vistos.add(i))]
+    return df.loc[unicos]
 
 
 def send_telegram_message(text: str):
