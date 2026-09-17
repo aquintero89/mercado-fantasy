@@ -13,6 +13,7 @@ Qué hace:
   (filtrado a los jugadores de mis_jugadores.txt).
 - Envía un resumen a Telegram si TELEGRAM_TOKEN y TELEGRAM_CHAT_ID están
   configurados.
+- Limpia los CSV del día anterior, dejando solo el más reciente.
 
 Cómo usarlo:
     1. pip install playwright pandas requests lxml --break-system-packages
@@ -21,9 +22,7 @@ Cómo usarlo:
        (o como variables de entorno) si quieres recibir el resumen por Telegram.
     4. python3 scrape_mercado.py
 
-Cada día, simplemente vuelve a ejecutar el script. Va acumulando el
-histórico en histórico.csv (para Google Sheets) y, si configuraste Telegram,
-te envía un resumen al chat.
+Cada día, simplemente vuelve a ejecutar el script.
 """
 
 import io
@@ -42,14 +41,9 @@ URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
 POSITIONS = ["PT", "DF", "MC", "DL", "DT"]  # DT = entrenador
 
-# --- Configuración de Telegram (opcional) ---
-# Pega aquí tu token y chat_id, o déjalo así y usa variables de entorno:
-#   export TELEGRAM_TOKEN="123456:ABC..."
-#   export TELEGRAM_CHAT_ID="987654321"
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-TOP_N = 10  # cuántos jugadores mostrar por categoría en el mensaje general
-
+TOP_N = 10
 
 MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
@@ -69,13 +63,14 @@ def parse_entrada_jugador(linea: str):
 
 
 def coincide_por_palabras(nombre_lista: str, nombre_mercado: str) -> bool:
-    """Compara por palabras completas, no por subcadena de caracteres, para
-    evitar falsos positivos como 'Rodri' encontrado dentro de 'Rodríguez'."""
+    """Exige que TODAS las palabras de tu entrada en la lista aparezcan,
+    completas, en el nombre del mercado (no al revés). Esto permite
+    abreviaturas como 'Yamal' -> 'Lamine Yamal', pero evita que un jugador
+    distinto con nombre más corto (ej. 'Iñigo' de otro jugador) se cuele
+    como coincidencia de 'Iñigo Vicente'."""
     palabras_lista = normaliza(nombre_lista).split()
     palabras_mercado = normaliza(nombre_mercado).split()
-    cortas, largas = (palabras_lista, palabras_mercado) if len(palabras_lista) <= len(palabras_mercado) else (palabras_mercado, palabras_lista)
-    # Todas las palabras del nombre más corto deben aparecer, completas, en el más largo
-    return all(p in largas for p in cortas)
+    return all(p in palabras_mercado for p in palabras_lista)
 
 
 def carga_mis_jugadores() -> list:
@@ -86,9 +81,8 @@ def carga_mis_jugadores() -> list:
 
 
 def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
-    """Coincidencia por palabras completas (evita que 'Rodri' matchee con
-    'Rodríguez'). Si una entrada incluye equipo entre paréntesis, ej.
-    'Marcos Alonso (Celta)', solo acepta filas de ese equipo."""
+    """Coincidencia direccional por palabras completas + desambiguación
+    opcional por equipo con 'Nombre (Equipo)'."""
     if not entradas:
         return df.iloc[0:0]
 
@@ -189,10 +183,6 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
 
 
 def limpia_prefijo_duplicado(nombre: str) -> str:
-    """A veces la web devuelve el nombre con 1-3 letras mayúsculas duplicadas
-    delante (p.ej. 'SSSaba Sazonov' o 'FAFacu'). Si detectamos ese patrón
-    (letras mayúsculas seguidas de Mayúscula+minúscula que coincide con el
-    resto), las quitamos."""
     m = re.match(r"^([A-ZÁÉÍÓÚÑ]{1,3})([A-ZÁÉÍÓÚÑ][a-záéíóúñ].*)$", nombre)
     if m:
         return m.group(2)
@@ -200,8 +190,6 @@ def limpia_prefijo_duplicado(nombre: str) -> str:
 
 
 def split_jugador_cell(text: str):
-    """La celda 'Jugador' viene como 'NombreDFEquipo' pegado.
-    Buscamos el código de posición para separar nombre / posición / equipo."""
     for pos in POSITIONS:
         idx = text.find(pos)
         if idx != -1:
@@ -212,7 +200,6 @@ def split_jugador_cell(text: str):
 
 
 def parse_change_cell(text: str):
-    """'+2.645.168 €+3,6%' o '-993.000 €-2,1%' -> (valor_eur, pct)"""
     text = text.replace("\xa0", " ")
     m_val = re.search(r"([+-]?[\d.]+)\s*€", text)
     m_pct = re.search(r"([+-]?[\d,]+)\s*%", text)
@@ -227,7 +214,6 @@ def parse_precio_cell(text: str):
 
 
 def leer_tabla_actual(page):
-    """Lee la tabla más grande visible en la página actual."""
     html = page.content()
     try:
         tables = pd.read_html(io.StringIO(html))
@@ -239,8 +225,6 @@ def leer_tabla_actual(page):
 
 
 def scrape_tab(page, tab_label: str, rows: list):
-    """Hace clic en la pestaña y recorre todas las páginas, con reintentos
-    para evitar cortar el scraping por una carga lenta de la página."""
     try:
         page.get_by_text(tab_label, exact=True).click()
         page.wait_for_timeout(1500)
@@ -260,8 +244,6 @@ def scrape_tab(page, tab_label: str, rows: list):
 
         first_row_sig = tuple(table.iloc[0].astype(str))
 
-        # Si parece que no avanzó, esperamos un poco más y reintentamos
-        # antes de rendirnos (puede que la página aún estuviera cargando).
         if first_row_sig == seen_first_row:
             paginas_sin_avanzar += 1
             if paginas_sin_avanzar <= 3:
@@ -271,7 +253,7 @@ def scrape_tab(page, tab_label: str, rows: list):
                     break
                 first_row_sig = tuple(table.iloc[0].astype(str))
                 if first_row_sig == seen_first_row:
-                    continue  # seguimos reintentando (hasta el límite de arriba)
+                    continue
             else:
                 break
         else:
@@ -289,7 +271,7 @@ def scrape_tab(page, tab_label: str, rows: list):
             precio = parse_precio_cell(precio_raw)
 
             if not nombre or not posicion:
-                continue  # fila corrupta/no reconocida, la descartamos
+                continue
 
             valor_num = float(valor) if valor not in (None, "") else 0.0
             tipo_real = "Subidas" if valor_num >= 0 else "Bajadas"
@@ -312,9 +294,19 @@ def scrape_tab(page, tab_label: str, rows: list):
             break
         siguiente.first.click()
         page_num += 1
-        if page_num > 65:  # límite de seguridad (el mercado ronda las 52 páginas)
+        if page_num > 65:
             print("  Límite de seguridad de páginas alcanzado.")
             break
+
+
+def limpia_csv_antiguos():
+    """Borra los CSV con fecha de días anteriores, deja solo los de hoy."""
+    hoy = date.today().isoformat()
+    for patron in ["mercado_*.csv", "mi_equipo_*.csv"]:
+        for f in OUT_DIR.glob(patron):
+            if hoy not in f.name:
+                f.unlink()
+                print(f"  Borrado archivo antiguo: {f.name}")
 
 
 def main():
@@ -326,8 +318,6 @@ def main():
         page.goto(URL, wait_until="networkidle", timeout=60000)
         page.wait_for_timeout(2000)
 
-        # Basta con una pestaña: la tabla ya incluye tanto subidas como bajadas,
-        # solo cambia el orden en que se muestran.
         print("Extrayendo mercado completo...")
         scrape_tab(page, "Subidas", rows)
 
@@ -361,7 +351,6 @@ def main():
         mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
         print(f"Mi equipo ({len(mi_equipo_df)}/{len(mis_jugadores)} encontrados): {mi_equipo_file}")
 
-        encontrados_norm = set(mi_equipo_df["jugador"].apply(normaliza))
         no_encontrados = [
             n for n in mis_jugadores
             if not any(coincide_por_palabras(parse_entrada_jugador(n)[0], j) for j in mi_equipo_df["jugador"])
@@ -383,6 +372,8 @@ def main():
     else:
         print("No hay 'mis_jugadores.txt' (o está vacío) — se envía el resumen general del mercado.")
         resumen = build_telegram_summary(df)
+
+    limpia_csv_antiguos()
 
     send_telegram_message(resumen)
 
