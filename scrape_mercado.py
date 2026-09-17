@@ -315,8 +315,14 @@ def main():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         print(f"Abriendo {URL} ...")
-        page.goto(URL, wait_until="networkidle", timeout=60000)
-        page.wait_for_timeout(2000)
+        # Ojo: no usamos "networkidle" porque la página carga anuncios y
+        # analítica de forma continua y ese evento nunca se dispara.
+        page.goto(URL, wait_until="domcontentloaded", timeout=90000)
+        try:
+            page.wait_for_selector("table", timeout=30000)
+        except Exception:
+            print("Aviso: no apareció la tabla en 30s, sigo de todas formas.")
+        page.wait_for_timeout(3000)
 
         print("Extrayendo mercado completo...")
         scrape_tab(page, "Subidas", rows)
