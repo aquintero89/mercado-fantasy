@@ -81,7 +81,7 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
         return 2
     if palabras_mercado <= palabras_lista:
         return 1
-    return None  # sin relación de subconjunto: no lo consideramos coincidencia
+    return None
 
 
 def coincide_por_palabras(nombre_lista: str, nombre_mercado: str) -> bool:
@@ -135,7 +135,6 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
         for a in ambiguos:
             print(f"    {a}")
 
-    # Quitamos duplicados manteniendo el orden
     vistos = set()
     unicos = [i for i in indices_elegidos if not (i in vistos or vistos.add(i))]
     return df.loc[unicos]
@@ -223,6 +222,10 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
 
 
 def limpia_prefijo_duplicado(nombre: str) -> str:
+    """A veces la web devuelve el nombre con basura delante: un número de
+    ranking pegado (ej. '16Koski') o 1-3 letras mayúsculas duplicadas
+    (ej. 'SSSaba Sazonov', 'FAFacu'). Limpiamos ambos casos."""
+    nombre = re.sub(r"^\d+", "", nombre).strip()
     m = re.match(r"^([A-ZÁÉÍÓÚÑ]{1,3})([A-ZÁÉÍÓÚÑ][a-záéíóúñ].*)$", nombre)
     if m:
         return m.group(2)
@@ -355,8 +358,6 @@ def main():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         print(f"Abriendo {URL} ...")
-        # Ojo: no usamos "networkidle" porque la página carga anuncios y
-        # analítica de forma continua y ese evento nunca se dispara.
         page.goto(URL, wait_until="domcontentloaded", timeout=90000)
         try:
             page.wait_for_selector("table", timeout=30000)
@@ -425,4 +426,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    
