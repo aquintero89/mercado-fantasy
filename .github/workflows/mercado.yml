@@ -25,8 +25,9 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install playwright pandas requests lxml html5lib beautifulsoup4
-          playwright install --with-deps chromium
+        pip install playwright pandas requests lxml html5lib beautifulsoup4
+        playwright install --with-deps chromium
+
 
       - name: Ejecutar scraper
         env:
