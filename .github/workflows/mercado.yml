@@ -28,7 +28,6 @@ jobs:
           pip install playwright pandas requests lxml html5lib beautifulsoup4
           playwright install --with-deps chromium
 
-
       - name: Ejecutar scraper
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
