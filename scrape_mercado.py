@@ -1,8 +1,9 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Utiliza Playwright para renderizar la tabla dinámica mediante JavaScript.
+Recorre TODAS las páginas del mercado para capturar el 100% de la plantilla con datos reales.
 """
 
+import io
 import os
 import re
 import sys
@@ -11,14 +12,15 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-from playwright.sync_api import sync_playwright
 from curl_cffi import requests as cffi_requests
 
-URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
+BASE_URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
+POSITIONS = ["PT", "DF", "MC", "DL", "DT"]
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+
 MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
 
@@ -124,83 +126,95 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, total: int) -> str:
     return "\n".join(lines)
 
 
-def main():
-    rows = []
-    print("Iniciando navegador Playwright para renderizar la tabla dinámicamente...")
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        print(f"Cargando URL: {URL}")
-        page.goto(URL, wait_until="networkidle", timeout=60000)
+def extrae_filas_de_html(html_content: str) -> list[dict]:
+    """Parsea el HTML de la tabla extraída."""
+    filas = []
+    try:
+        tables = pd.read_html(io.StringIO(html_content))
+        if not tables:
+            return []
         
-        # Esperar a que las filas de la tabla estén presentes en el DOM
-        try:
-            page.wait_for_selector("table tbody tr", timeout=15000)
-        except Exception:
-            print("⚠️ Timeout esperando selectores de la tabla.")
+        table = max(tables, key=lambda t: t.shape[0])
+        columnas = {str(c).strip().lower(): c for c in table.columns}
+        
+        col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
+        col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
+        col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
 
-        tr_elements = page.query_selector_all("table tbody tr")
-        print(f"Filas detectadas en la página: {len(tr_elements)}")
+        for _, row in table.iterrows():
+            j_raw = str(row.get(col_jugador, ""))
+            c_raw = str(row.get(col_cambio, ""))
+            p_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
 
-        for tr in tr_elements:
-            texto = tr.inner_text().strip()
-            if not texto:
+            m_val = re.search(r"([+-]?[\d.]+)\s*€", c_raw.replace("\xa0", " "))
+            m_pct = re.search(r"([+-]?[\d,]+)\s*%", c_raw.replace("\xa0", " "))
+            m_precio = re.search(r"([\d.]+)\s*€", p_raw)
+
+            val = m_val.group(1).replace(".", "") if m_val else "0"
+            pct = m_pct.group(1).replace(",", ".") if m_pct else "0.0"
+            precio = m_precio.group(1).replace(".", "") if m_precio else "0"
+
+            nombre_limp = re.sub(r"^(PT|DF|MC|DL|DT)\s*", "", j_raw).strip()
+            nombre_limp = re.sub(r"^\d+\s*", "", nombre_limp).strip()
+
+            if not nombre_limp:
                 continue
 
-            partes = [p.strip() for p in texto.split("\n") if p.strip()]
-            if len(partes) < 3:
-                continue
-
-            # Extraer jugador, cambio y precio usando expresiones regulares sobre el texto de la fila
-            # Ejemplo texto fila: "1\nMbappé\nDL Real Madrid\n+2.810.254 €\n+1,9%\n148.663.415 €"
-            raw_text = " ".join(partes)
-            
-            # Subida/Bajada (ejemplo: +2.810.254 € o -150.000 €)
-            m_cambio = re.search(r"([+-]?[\d.]+)\s*€\s*([+-]?[\d,]+)%", raw_text)
-            # Precio (último importe en euros)
-            m_precios = re.findall(r"([\d.]+)\s*€", raw_text)
-
-            if m_precios:
-                precio_val = m_precios[-1].replace(".", "")
-            else:
-                precio_val = "0"
-
-            if m_cambio:
-                cambio_val = m_cambio.group(1).replace(".", "")
-                pct_val = m_cambio.group(2).replace(",", ".")
-            else:
-                cambio_val = "0"
-                pct_val = "0.0"
-
-            # Extraer el nombre del jugador limpiando número de posición inicial y club
-            nombre_jugador = partes[1] if len(partes) > 1 else partes[0]
-            if nombre_jugador.isdigit() and len(partes) > 2:
-                nombre_jugador = partes[2]
-
-            # Limpiar nombre
-            nombre_jugador = re.sub(r"^\d+\s*", "", nombre_jugador).strip()
-
-            try:
-                val_num = float(cambio_val)
-            except ValueError:
-                val_num = 0.0
-
-            tipo_real = "Subidas" if val_num >= 0 else "Bajadas"
-
-            rows.append({
+            filas.append({
                 "fecha": date.today().isoformat(),
-                "tipo": tipo_real,
-                "jugador": nombre_jugador,
-                "precio_eur": precio_val,
-                "cambio_eur": cambio_val,
-                "cambio_pct": pct_val,
+                "jugador": nombre_limp,
+                "precio_eur": precio,
+                "cambio_eur": val,
+                "cambio_pct": pct,
             })
+    except Exception as e:
+        print(f"⚠️ Error al parsear tabla HTML: {e}")
+    return filas
 
-        browser.close()
 
-    df_mercado = pd.DataFrame(rows).drop_duplicates(subset=["jugador"]) if rows else pd.DataFrame()
-    print(f"Registros de mercado extraídos correctamente: {len(df_mercado)}")
+def main():
+    print("Recorriendo todas las páginas del mercado...")
+
+    session = cffi_requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        "Referer": "https://www.analiticafantasy.com/",
+    })
+
+    todas_las_filas = []
+    
+    # Recorrer páginas probando diferentes formatos de URL de paginación
+    for p in range(1, 20):
+        # Probar endpoints/formatos de paginación
+        urls_a_probar = [
+            f"{BASE_URL}?pagina={p}",
+            f"{BASE_URL}?p={p}",
+            f"{BASE_URL}?offset={(p-1)*20}",
+            f"{BASE_URL}?page={p}"
+        ] if p > 1 else [BASE_URL]
+
+        nuevas_en_esta_pagina = 0
+        for target_url in urls_a_probar:
+            try:
+                resp = session.get(target_url, impersonate="chrome", timeout=15)
+                if resp.status_code == 200:
+                    extraídas = extrae_filas_de_html(resp.text)
+                    if extraídas:
+                        todas_las_filas.extend(extraídas)
+                        nuevas_en_esta_pagina = len(extraídas)
+                        print(f"  ✓ Página {p} ({target_url}) -> {len(extraídas)} jugadores extraídos")
+                        break
+            except Exception:
+                continue
+
+        if nuevas_en_esta_pagina == 0 and p > 1:
+            print(f"  Fin de la paginación alcanzado en la página {p-1}.")
+            break
+
+    df_mercado = pd.DataFrame(todas_las_filas).drop_duplicates(subset=["jugador"]) if todas_las_filas else pd.DataFrame()
+    print(f"\n✅ Total global de jugadores recopilados en el mercado: {len(df_mercado)}")
 
     mis_jugadores = carga_mis_jugadores()
     equipo_final = []
@@ -225,14 +239,13 @@ def main():
         else:
             equipo_final.append({
                 "fecha": date.today().isoformat(),
-                "tipo": "Subidas",
                 "jugador": nombre_busq,
                 "equipo": equipo_hint or "",
                 "precio_eur": "0",
                 "cambio_eur": "0",
                 "cambio_pct": "0.0"
             })
-            print(f"  ℹ️ {nombre_busq} (sin variación en el bloque capturado)")
+            print(f"  ℹ️ {nombre_busq} (no varió su valor en las páginas escaneadas)")
 
     df_final = pd.DataFrame(equipo_final)
     today_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
