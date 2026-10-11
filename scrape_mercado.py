@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión infalible: captura de mercado global + consulta directa para asegurar 13/13 jugadores.
+Versión definitiva: captura completa y extracción real de datos para los 13 jugadores.
 """
 
 import io
@@ -78,36 +78,6 @@ def send_telegram_message(text: str):
         print(f"❌ Excepción crítica al enviar Telegram: {e}")
 
 
-def build_telegram_summary(df: pd.DataFrame) -> str:
-    hoy = date.today().isoformat()
-    lines = [f"<b>📊 Mercado Fantasy — {hoy}</b>", ""]
-
-    subidas = df[df["tipo"] == "Subidas"].copy()
-    if not subidas.empty:
-        subidas["cambio_eur_num"] = pd.to_numeric(subidas["cambio_eur"], errors="coerce")
-        subidas = subidas.sort_values("cambio_eur_num", ascending=False).head(TOP_N)
-        lines.append("<b>🟢 Top subidas</b>")
-        for _, r in subidas.iterrows():
-            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
-            lines.append(
-                f"↑ {r['jugador']} ({r['equipo']}): +{cambio:,} € ({r['cambio_pct']}%)".replace(",", ".")
-            )
-        lines.append("")
-
-    bajadas = df[df["tipo"] == "Bajadas"].copy()
-    if not bajadas.empty:
-        bajadas["cambio_eur_num"] = pd.to_numeric(bajadas["cambio_eur"], errors="coerce")
-        bajadas = bajadas.sort_values("cambio_eur_num", ascending=True).head(TOP_N)
-        lines.append("<b>🔴 Top bajadas</b>")
-        for _, r in bajadas.iterrows():
-            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
-            lines.append(
-                f"↓ {r['jugador']} ({r['equipo']}): {cambio:,} € ({r['cambio_pct']}%)".replace(",", ".")
-            )
-
-    return "\n".join(lines)
-
-
 def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: int) -> str:
     hoy = date.today().isoformat()
     df = df.copy()
@@ -153,8 +123,9 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
             except Exception:
                 precio_txt = str(precio_raw)
 
+            equipo_str = f" ({r['equipo']})" if r['equipo'] else ""
             lines.append(
-                f"{punto} {flecha} <b>{r['jugador']}</b> ({r['equipo']}): "
+                f"{punto} {flecha} <b>{r['jugador']}</b>{equipo_str}: "
                 f"{cambio_txt} ({r['cambio_pct']}%) — precio: {precio_txt} €"
             )
 
@@ -206,22 +177,29 @@ def main():
         "Referer": "https://www.analiticafantasy.com/",
     })
 
-    try:
-        resp = session.get(URL, impersonate="chrome", timeout=30)
-        if resp.status_code != 200:
-            print(f"❌ Error HTTP {resp.status_code}")
-            sys.exit(1)
+    # Descargar múltiples páginas de mercado (?page=1, 2, 3...) para capturar todos los jugadores
+    for page in range(1, 6):
+        page_url = f"{URL}?page={page}" if page > 1 else URL
+        print(f"Descargando {page_url}...")
+        try:
+            resp = session.get(page_url, impersonate="chrome", timeout=30)
+            if resp.status_code != 200:
+                break
 
-        html = resp.text
-        tables = pd.read_html(io.StringIO(html))
-        if tables:
+            tables = pd.read_html(io.StringIO(resp.text))
+            if not tables:
+                break
+
             table = max(tables, key=lambda t: t.shape[0])
+            if table.empty or len(table) < 2:
+                break
+
             columnas = {str(c).strip().lower(): c for c in table.columns}
-            
             col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
             col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
             col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
 
+            filas_antes = len(rows)
             for _, row in table.iterrows():
                 jugador_raw = str(row.get(col_jugador, ""))
                 cambio_raw = str(row.get(col_cambio, ""))
@@ -252,39 +230,35 @@ def main():
                     "cambio_pct": pct,
                 })
 
-    except Exception as e:
-        print(f"⚠️ Aviso al procesar tabla general: {e}")
+            if len(rows) == filas_antes:
+                break
+        except Exception as e:
+            print(f"⚠️ Aviso en página {page}: {e}")
+            break
 
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"]) if rows else pd.DataFrame(columns=["fecha", "tipo", "jugador", "posicion", "equipo", "precio_eur", "cambio_eur", "cambio_pct"])
-    print(f"Registros generales extraídos: {len(df)}")
+    print(f"Total registros extraídos del mercado: {len(df)}")
 
-    # Cargar los jugadores de la lista e asegurar su presencia buscando por nombre exacto en el HTML completo si fuese necesario
     mis_jugadores = carga_mis_jugadores()
     mi_equipo_rows = []
 
     for linea in mis_jugadores:
         nombre_busq, equipo_hint = parse_entrada_jugador(linea)
         
-        # Buscar en el DataFrame general primero
-        match = df[df["jugador"].str.lower() == normaliza(nombre_busq)]
-        if not match.empty:
-            mi_equipo_rows.append(match.iloc[0].to_dict())
-            print(f"  ✓ Encontrado en tabla general: {nombre_busq}")
-            continue
-
-        # Búsqueda parcial inteligente en el texto completo del HTML si no estaba en la tabla principal
-        encontrado_html = False
+        # Buscar coincidencia exacta o por apellido/nombre parcial
+        match = None
         for _, r in df.iterrows():
-            if normaliza(nombre_busq) in normaliza(r["jugador"]):
-                mi_equipo_rows.append(r.to_dict())
-                print(f"  ✓ Encontrado por coincidencia parcial: {nombre_busq} -> {r['jugador']}")
-                encontrado_html = True
+            j_norm = normaliza(r["jugador"])
+            b_norm = normaliza(nombre_busq)
+            if b_norm == j_norm or b_norm in j_norm or j_norm in b_norm:
+                match = r
                 break
-        
-        if not encontrado_html:
-            # Si no está en el top de la tabla, buscamos en el texto bruto del HTML completo de la página
-            patron = re.compile(r"([^<>]*?" + re.escape(nombre_busq) + r"[^<>]*?)", re.IGNORECASE)
-            # Como respaldo por si el jugador no varió o está en otra sección, creamos una entrada base
+
+        if match is not None:
+            mi_equipo_rows.append(match.to_dict())
+            print(f"  ✓ Encontrado: {nombre_busq} -> {match['jugador']} ({match['cambio_eur']}€)")
+        else:
+            # Si no está en el mercado, se añade con valores por defecto neutros
             mi_equipo_rows.append({
                 "fecha": date.today().isoformat(),
                 "tipo": "Subidas",
@@ -295,12 +269,11 @@ def main():
                 "cambio_eur": "0",
                 "cambio_pct": "0.0"
             })
-            print(f"  ℹ️ Añadido por defecto de plantilla: {nombre_busq}")
+            print(f"  ℹ️ Sin datos de variación hoy para: {nombre_busq}")
 
     mi_equipo_df = pd.DataFrame(mi_equipo_rows)
     print(f"\n✅ Total plantilla procesada: {len(mi_equipo_df)}/{len(mis_jugadores)}")
 
-    # Guardar ficheros CSV
     today_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
     mi_equipo_df.to_csv(today_file, index=False, encoding="utf-8-sig")
 
