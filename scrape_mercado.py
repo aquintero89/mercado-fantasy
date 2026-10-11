@@ -253,7 +253,7 @@ def main():
     })
 
     page = 1
-    max_pages = 15  safety limit
+    max_pages = 15  # Límite de seguridad
 
     while page <= max_pages:
         url = f"{BASE_URL}?page={page}" if page > 1 else BASE_URL
@@ -312,7 +312,6 @@ def main():
                     "cambio_pct": pct,
                 })
 
-            # Si la página no aportó nuevos registros, terminamos
             if len(rows) == filas_antes:
                 print("  -> No hay más registros nuevos. Fin de la paginación.")
                 break
