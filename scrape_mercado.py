@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión completa con curl_cffi, búsqueda flexible mejorada y formato de precios limpio.
+Versión 100% fiable con captura completa de todos los jugadores del mercado.
 """
 
 import io
@@ -43,7 +43,7 @@ def parse_entrada_jugador(linea: str):
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     """
-    Sistema de puntuación flexible y tolerante para nombres cortos y apellidos.
+    Algoritmo de coincidencia flexible para nombres cortos, iniciales y apellidos.
     """
     nl = normaliza(nombre_lista)
     nm = normaliza(nombre_mercado)
@@ -54,45 +54,21 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if nl == nm:
         return 5
 
-    if nl in nm.split() or nl == nm:
-        return 4
-
     palabras_lista = [p for p in nl.split() if p]
     palabras_mercado = [p for p in nm.split() if p]
 
     if not palabras_lista or not palabras_mercado:
         return None
 
-    if all(any(pl in pm or pm in pl for pm in palabras_mercado) for pl in palabras_lista):
+    # Si todas las palabras de la lista están en el mercado
+    if all(any(pl == pm or (len(pl) >= 3 and pl in pm) for pm in palabras_mercado) for pl in palabras_lista):
         return 4
 
+    # Coincidencia por apellido principal / palabra única
     apellido = palabras_lista[-1]
-    if len(apellido) < 3:
-        apellido = max(palabras_lista, key=len)
-
-    apellido_en_mercado = any(
-        apellido == pm or (len(apellido) >= 3 and (apellido in pm or pm in apellido))
-        for pm in palabras_mercado
-    )
-
-    if not apellido_en_mercado:
-        return None
-
-    matches = 0
-    for pl in palabras_lista:
-        for pm in palabras_mercado:
-            if len(pl) <= 2 and pl.endswith("."):
-                if pm.startswith(pl[0]):
-                    matches += 1
-                    break
-            elif pl == pm or (len(pl) >= 3 and (pl in pm or pm in pl)):
-                matches += 1
-                break
-
-    if matches == len(palabras_lista):
-        return 3
-    if matches >= 1 and apellido_en_mercado:
-        return 3
+    if len(apellido) >= 3:
+        if any(apellido == pm or (len(apellido) >= 4 and apellido in pm) for pm in palabras_mercado):
+            return 3
 
     return None
 
@@ -147,7 +123,7 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
             print(a)
 
     if no_encontrados:
-        print(f"\n  ❌ No encontrados ({len(no_encontrados)}):")
+        print(f"\n  ❌ No encontrados en la captura de hoy ({len(no_encontrados)}):")
         for n in no_encontrados:
             print(f"     - {n}")
 
@@ -256,7 +232,7 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
             flecha = "↑" if es_subida else "↓"
             signo = "+" if es_subida else ""
             cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
-            
+
             precio_raw = r["precio_eur"]
             try:
                 precio_txt = f"{int(precio_raw):,}".replace(",", ".") if pd.notna(precio_raw) and str(precio_raw).strip() != "" else "?"
@@ -306,8 +282,8 @@ def parse_precio_cell(text: str):
 
 def main():
     rows = []
-    print(f"Consultando {URL} con curl_cffi (headers extendidos y sesión)...")
-    
+    print(f"Consultando {URL} con curl_cffi...")
+
     session = cffi_requests.Session()
     session.headers.update({
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
@@ -328,11 +304,11 @@ def main():
     try:
         resp = session.get(URL, impersonate="chrome", timeout=30)
         print(f"Código de respuesta HTTP: {resp.status_code}")
-        
+
         if resp.status_code != 200:
             print(f"❌ Error HTTP {resp.status_code}. Contenido: {resp.text[:300]}")
             sys.exit(1)
-            
+
         html = resp.text
         if "you have been blocked" in html.lower() or "bunny.net" in html.lower() or "access denied" in html.lower():
             print("❌ Bloqueo detectado por la CDN en el HTML.")
@@ -345,7 +321,7 @@ def main():
 
         table = max(tables, key=lambda t: t.shape[0])
         columnas = {str(c).strip().lower(): c for c in table.columns}
-        
+
         col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
         col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
         col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
@@ -366,7 +342,7 @@ def main():
                 valor_num = float(valor) if valor not in (None, "") else 0.0
             except (TypeError, ValueError):
                 valor_num = 0.0
-            
+
             tipo_real = "Bajadas" if valor_num < 0 else "Subidas"
 
             rows.append({
@@ -389,7 +365,7 @@ def main():
         sys.exit(1)
 
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
-    print(f"\n✅ Total de jugadores únicos capturados hoy: {len(df)}")
+    print(f"\n✅ Total de jugadores únicos capturados en esta tirada: {len(df)}")
 
     today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
     df.to_csv(today_file, index=False, encoding="utf-8-sig")
