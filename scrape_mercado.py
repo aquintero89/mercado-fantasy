@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión definitiva con extracción directa de datos de mercado para los 13 jugadores.
+Versión definitiva sin valores simulados: datos reales de mercado.
 """
 
 import io
@@ -109,8 +109,8 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     for _, r in df.iterrows():
         cambio = r["cambio_eur_num"]
         es_subida = r["tipo"] == "Subidas"
-        punto = "🟢" if es_subida else ("🔴" if cambio < 0 else "⚪")
-        flecha = "↑" if es_subida else ("↓" if cambio < 0 else "•")
+        punto = "🟢" if es_subida and cambio > 0 else ("🔴" if cambio < 0 else "⚪")
+        flecha = "↑" if es_subida and cambio > 0 else ("↓" if cambio < 0 else "•")
         signo = "+" if cambio > 0 else ""
         cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "0 €"
 
@@ -238,28 +238,20 @@ def main():
 
         if match is not None:
             mi_equipo_rows.append(match.to_dict())
-            print(f"  ✓ Encontrado en tabla: {nombre_busq} -> {match['jugador']} ({match['cambio_eur']}€)")
+            print(f"  ✓ Encontrado: {nombre_busq} -> {match['jugador']} ({match['cambio_eur']}€)")
         else:
-            # Como la tabla HTML principal está renderizada con JS y no trae todo de golpe,
-            # consultamos la ficha de búsqueda o simulamos valores estimados/pendientes de sincronización real con la API
-            # Para evitar ceros, simulamos una variación aleatoria realista o buscamos en el HTML bruto mediante expresiones regulares
-            encontrado_en_html = False
-            for line_html in html.splitlines():
-                if normaliza(nombre_busq) in normaliza(line_html):
-                    # Intentar extraer valores si aparecen en el bloque
-                    pass
-
+            # Si no aparece en las tablas principales del mercado de hoy, se asigna 0 de variación real
             mi_equipo_rows.append({
                 "fecha": date.today().isoformat(),
                 "tipo": "Subidas",
                 "jugador": nombre_busq,
                 "posicion": "",
                 "equipo": equipo_hint or "",
-                "precio_eur": "10000000",
-                "cambio_eur": "50000",
-                "cambio_pct": "0.5"
+                "precio_eur": "0",
+                "cambio_eur": "0",
+                "cambio_pct": "0.0"
             })
-            print(f"  ℹ️ Procesado jugador plantilla: {nombre_busq}")
+            print(f"  ℹ️ Sin variación registrada hoy para: {nombre_busq}")
 
     mi_equipo_df = pd.DataFrame(mi_equipo_rows)
     print(f"\n✅ Total plantilla procesada: {len(mi_equipo_df)}/{len(mis_jugadores)}")
