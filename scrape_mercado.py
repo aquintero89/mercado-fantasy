@@ -1,7 +1,7 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
 =====================================================================
-Versión completa y robusta — recorre TODAS las páginas del mercado.
+Versión completa y robusta con camuflaje anti-bot mejorado.
 """
 
 import io
@@ -48,7 +48,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
 
     match_count = 0
     for pl in palabras_lista:
-        # Manejo de iniciales (ej. "d." o "d" para "Diego")
         if (len(pl) <= 2 and pl.endswith('.')) or len(pl) == 1:
             letra = pl[0]
             if any(pm.startswith(letra) for pm in palabras_mercado):
@@ -244,11 +243,12 @@ def abrir_pagina_con_reintentos(page, intentos=3):
     for intento in range(1, intentos + 1):
         print(f"Abriendo {URL} (intento {intento}/{intentos}) ...")
         try:
-            page.goto(URL, wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_timeout(1500 * intento)
+            page.goto(URL, wait_until="networkidle", timeout=60000)
         except Exception as e:
             print(f"  Error de navegación: {e}")
             if intento < intentos:
-                page.wait_for_timeout(3000 * intento)
+                page.wait_for_timeout(4000 * intento)
             continue
 
         content = page.content().lower()
@@ -330,7 +330,6 @@ def scrape_tab(page, tab_label: str, rows: list):
 
         columnas = {str(c).strip().lower(): c for c in table.columns}
         
-        # Búsqueda flexible de columnas por nombre o fallback por posición
         col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), None)
         col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
         col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), None)
@@ -409,19 +408,26 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(
             headless=True,
-            args=["--no-sandbox", "--disable-dev-shm-usage"],
+            args=[
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-blink-features=AutomationControlled",
+            ],
         )
         context = browser.new_context(
             user_agent=(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/129.0.0.0 Safari/537.36"
+                "Chrome/131.0.0.0 Safari/537.36"
             ),
             viewport={"width": 1920, "height": 1080},
             locale="es-ES",
             timezone_id="Europe/Madrid",
             java_script_enabled=True,
         )
+        # Ocultar rastro de automatización estrictamente
+        context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        
         page = context.new_page()
 
         if not abrir_pagina_con_reintentos(page):
