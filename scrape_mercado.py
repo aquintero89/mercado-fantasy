@@ -1,6 +1,3 @@
-Aquí tienes el código completo y actualizado:
-
-```python
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
 =====================================================================
@@ -62,7 +59,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if not nl or not nm:
         return None
 
-    # Coincidencia exacta
     if nl == nm:
         return 5
 
@@ -72,14 +68,11 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if not palabras_lista or not palabras_mercado:
         return None
 
-    # Todas las palabras de la lista están contenidas
     if all(any(pl in pm or pm in pl for pm in palabras_mercado) for pl in palabras_lista):
         return 4
 
-    # Apellido principal (última palabra significativa de la lista)
     apellido = palabras_lista[-1]
     if len(apellido) < 3:
-        # Si el último es muy corto, cogemos el más largo
         apellido = max(palabras_lista, key=len)
 
     apellido_en_mercado = any(
@@ -90,11 +83,9 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if not apellido_en_mercado:
         return None
 
-    # Contamos cuántas palabras de la lista coinciden
     matches = 0
     for pl in palabras_lista:
         for pm in palabras_mercado:
-            # Abreviatura tipo "D." o "J."
             if len(pl) <= 2 and pl.endswith("."):
                 if pm.startswith(pl[0]):
                     matches += 1
@@ -106,7 +97,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if matches == len(palabras_lista):
         return 3
     if matches >= 1 and apellido_en_mercado:
-        # Solo apellido → score 2 (muy habitual en fantasy)
         if matches == 1:
             return 2
         return 3
@@ -137,7 +127,6 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
         candidatos = []
 
         for idx, row in df.iterrows():
-            # Filtro opcional por equipo
             if equipo_hint and normaliza(equipo_hint) not in normaliza(str(row["equipo"])):
                 continue
 
@@ -149,7 +138,6 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
             no_encontrados.append(linea)
             continue
 
-        # Nos quedamos con el mejor score
         mejor_score = max(c[0] for c in candidatos)
         mejores = [c for c in candidatos if c[0] == mejor_score]
 
@@ -170,7 +158,6 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
         for n in no_encontrados:
             print(f"     - {n}")
 
-    # Eliminar duplicados manteniendo orden
     vistos = set()
     unicos = []
     for i in indices_elegidos:
@@ -283,7 +270,6 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
 
 def limpia_prefijo_duplicado(nombre: str) -> str:
     nombre = re.sub(r"^\d+\s*", "", nombre).strip()
-    # Quita posibles códigos de posición pegados al principio
     m = re.match(r"^([A-ZÁÉÍÓÚÑ]{1,3})([A-ZÁÉÍÓÚÑ][a-záéíóúñ].*)$", nombre)
     if m:
         return m.group(2)
@@ -524,7 +510,6 @@ def main():
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
             },
         )
-        # Ocultar webdriver
         context.add_init_script(
             """
             Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
@@ -541,7 +526,16 @@ def main():
             browser.close()
             sys.exit(1)
 
-        # Eliminar banner de cookies de forma agresiva
+        try:
+            for texto in ["Aceptar", "Accept", "Acepto", "Agree", "Consentir", "OK"]:
+                btn = page.get_by_role("button", name=texto)
+                if btn.count() > 0:
+                    btn.first.click(force=True, timeout=3000)
+                    page.wait_for_timeout(1000)
+                    break
+        except Exception:
+            pass
+
         try:
             page.evaluate(
                 """
@@ -549,20 +543,31 @@ def main():
                     const selectors = [
                         '#qc-cmp2-container',
                         '.qc-cmp2-container',
+                        '#qc-cmp2-ui',
+                        '[id*="qc-cmp"]',
+                        '[class*="qc-cmp"]',
                         '[id*="cookie"]',
                         '[class*="cookie"]',
                         '[id*="consent"]',
-                        '[class*="consent"]'
+                        '[class*="consent"]',
+                        'div[role="dialog"]'
                     ];
                     selectors.forEach(sel => {
-                        document.querySelectorAll(sel).forEach(el => el.remove());
+                        document.querySelectorAll(sel).forEach(el => {
+                            el.remove();
+                        });
+                    });
+                    document.querySelectorAll('div[style*="z-index"]').forEach(el => {
+                        if (parseInt(window.getComputedStyle(el).zIndex) > 1000) {
+                            el.remove();
+                        }
                     });
                 }
                 """
             )
-            page.wait_for_timeout(800)
-        except Exception:
-            pass
+            page.wait_for_timeout(1200)
+        except Exception as e:
+            print(f"  Aviso al limpiar cookies: {e}")
 
         print("Extrayendo mercado...")
         scrape_tab(page, "Subidas", rows)
@@ -577,12 +582,10 @@ def main():
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
     print(f"\n✅ Total de jugadores únicos capturados hoy: {len(df)}")
 
-    # Guardar mercado del día
     today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
     df.to_csv(today_file, index=False, encoding="utf-8-sig")
     print(f"  Guardado: {today_file.name}")
 
-    # Histórico general
     historico_file = OUT_DIR / "historico.csv"
     if historico_file.exists():
         hist = pd.read_csv(historico_file, dtype=str)
@@ -592,7 +595,6 @@ def main():
         combinado = df
     combinado.to_csv(historico_file, index=False, encoding="utf-8-sig")
 
-    # Mi equipo
     mis_jugadores = carga_mis_jugadores()
     if mis_jugadores:
         print("\nBuscando jugadores de mi equipo...")
@@ -602,7 +604,6 @@ def main():
         mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
         print(f"\n✅ Mi equipo: {len(mi_equipo_df)}/{len(mis_jugadores)} encontrados → {mi_equipo_file.name}")
 
-        # Histórico de mi equipo
         historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
         if historico_equipo_file.exists():
             hist_eq = pd.read_csv(historico_equipo_file, dtype=str)
@@ -624,6 +625,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
-Cópialo y pégalo en tu archivo `scrape_mercado.py`.
