@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión 100% fiable con curl_cffi y cabeceras extendidas para GitHub Actions.
+Versión completa con curl_cffi, cabeceras extendidas y depuración detallada de Telegram.
 """
 
 import io
@@ -168,9 +168,10 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
 
 def send_telegram_message(text: str):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("Telegram no configurado (faltan TELEGRAM_TOKEN o TELEGRAM_CHAT_ID). Omitido.")
+        print("❌ Telegram no configurado (faltan TELEGRAM_TOKEN o TELEGRAM_CHAT_ID).")
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    print(f"Enviando mensaje a Telegram (Chat ID: {TELEGRAM_CHAT_ID})...")
     try:
         resp = cffi_requests.post(
             url,
@@ -182,12 +183,14 @@ def send_telegram_message(text: str):
             },
             timeout=20,
         )
+        print(f"Respuesta API Telegram - Código: {resp.status_code}")
+        print(f"Respuesta API Telegram - Cuerpo: {resp.text}")
         if resp.status_code == 200:
-            print("✅ Resumen enviado a Telegram.")
+            print("✅ Resumen enviado a Telegram correctamente.")
         else:
-            print(f"❌ Error enviando a Telegram: {resp.status_code} → {resp.text}")
+            print(f"❌ Error de Telegram: {resp.status_code} → {resp.text}")
     except Exception as e:
-        print(f"❌ Excepción al enviar Telegram: {e}")
+        print(f"❌ Excepción crítica al enviar Telegram: {e}")
 
 
 def build_telegram_summary(df: pd.DataFrame) -> str:
@@ -249,3 +252,62 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
 
     if len(df) == 0:
         lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado de hoy)")
+    else:
+        df = df.sort_values("cambio_eur_num", ascending=False)
+        for _, r in df.iterrows():
+            cambio = r["cambio_eur_num"]
+            es_subida = r["tipo"] == "Subidas"
+            punto = "🟢" if es_subida else "🔴"
+            flecha = "↑" if es_subida else "↓"
+            signo = "+" if es_subida else ""
+            cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
+            lines.append(
+                f"{punto} {flecha} <b>{r['jugador']}</b> ({r['equipo']}): "
+                f"{cambio_txt} ({r['cambio_pct']}%) — precio: {r['precio_eur']} €"
+            )
+
+    return "\n".join(lines)
+
+
+def limpia_prefijo_duplicado(nombre: str) -> str:
+    nombre = re.sub(r"^\d+\s*", "", nombre).strip()
+    m = re.match(r"^([A-ZÁÉÍÓÚÑ]{1,3})([A-ZÁÉÍÓÚÑ][a-záéíóúñ].*)$", nombre)
+    if m:
+        return m.group(2)
+    return nombre
+
+
+def split_jugador_cell(text: str):
+    text = str(text).strip()
+    for pos in POSITIONS:
+        idx = text.find(pos)
+        if idx != -1:
+            nombre = limpia_prefijo_duplicado(text[:idx].strip())
+            equipo = text[idx + len(pos) :].strip()
+            return nombre, pos, equipo
+    return limpia_prefijo_duplicado(text), "", ""
+
+
+def parse_change_cell(text: str):
+    text = str(text).replace("\xa0", " ")
+    m_val = re.search(r"([+-]?[\d.]+)\s*€", text)
+    m_pct = re.search(r"([+-]?[\d,]+)\s*%", text)
+    valor = m_val.group(1).replace(".", "") if m_val else None
+    pct = m_pct.group(1).replace(",", ".") if m_pct else None
+    return valor, pct
+
+
+def parse_precio_cell(text: str):
+    m = re.search(r"([\d.]+)\s*€", str(text))
+    return m.group(1).replace(".", "") if m else None
+
+
+def main():
+    rows = []
+    print(f"Consultando {URL} con curl_cffi (headers extendidos y sesión)...")
+    
+    session = cffi_requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "es-ES,es;q=0.9,en
