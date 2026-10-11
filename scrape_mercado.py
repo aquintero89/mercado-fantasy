@@ -310,4 +310,120 @@ def main():
     session.headers.update({
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "es-ES,es;q=0.9,en
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": "https://www.analiticafantasy.com/",
+        "Sec-Ch-Ua": '"Google Chrome";v="121", "Not=A?Brand";v="8", "Chromium";v="121"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"macOS"',
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-User": "?1",
+        "Upgrade-Insecure-Requests": "1",
+    })
+
+    try:
+        resp = session.get(URL, impersonate="chrome", timeout=30)
+        print(f"Código de respuesta HTTP: {resp.status_code}")
+        
+        if resp.status_code != 200:
+            print(f"❌ Error HTTP {resp.status_code}. Contenido: {resp.text[:300]}")
+            sys.exit(1)
+            
+        html = resp.text
+        if "you have been blocked" in html.lower() or "bunny.net" in html.lower() or "access denied" in html.lower():
+            print("❌ Bloqueo detectado por la CDN en el HTML.")
+            sys.exit(1)
+
+        tables = pd.read_html(io.StringIO(html))
+        if not tables:
+            print("❌ No se encontraron tablas en el HTML.")
+            sys.exit(1)
+
+        table = max(tables, key=lambda t: t.shape[0])
+        columnas = {str(c).strip().lower(): c for c in table.columns}
+        
+        col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
+        col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
+        col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
+
+        for _, row in table.iterrows():
+            jugador_raw = str(row.get(col_jugador, ""))
+            cambio_raw = str(row.get(col_cambio, ""))
+            precio_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
+
+            nombre, posicion, equipo = split_jugador_cell(jugador_raw)
+            valor, pct = parse_change_cell(cambio_raw)
+            precio = parse_precio_cell(precio_raw)
+
+            if not nombre or not posicion:
+                continue
+
+            try:
+                valor_num = float(valor) if valor not in (None, "") else 0.0
+            except (TypeError, ValueError):
+                valor_num = 0.0
+            
+            tipo_real = "Bajadas" if valor_num < 0 else "Subidas"
+
+            rows.append({
+                "fecha": date.today().isoformat(),
+                "tipo": tipo_real,
+                "jugador": nombre,
+                "posicion": posicion,
+                "equipo": equipo,
+                "precio_eur": precio,
+                "cambio_eur": valor,
+                "cambio_pct": pct,
+            })
+
+    except Exception as e:
+        print(f"❌ Error durante la petición: {e}")
+        sys.exit(1)
+
+    if not rows:
+        print("❌ No se extrajeron datos del mercado.")
+        sys.exit(1)
+
+    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
+    print(f"\n✅ Total de jugadores únicos capturados hoy: {len(df)}")
+
+    today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
+    df.to_csv(today_file, index=False, encoding="utf-8-sig")
+
+    historico_file = OUT_DIR / "historico.csv"
+    if historico_file.exists():
+        hist = pd.read_csv(historico_file, dtype=str)
+        hist = hist[hist["fecha"] != date.today().isoformat()]
+        combinado = pd.concat([hist, df], ignore_index=True)
+    else:
+        combinado = df
+    combinado.to_csv(historico_file, index=False, encoding="utf-8-sig")
+
+    mis_jugadores = carga_mis_jugadores()
+    if mis_jugadores:
+        print("\nBuscando jugadores de mi equipo...")
+        mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
+        mi_equipo_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
+        mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
+        print(f"\n✅ Mi equipo: {len(mi_equipo_df)}/{len(mis_jugadores)} encontrados")
+
+        historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
+        if historico_equipo_file.exists():
+            hist_eq = pd.read_csv(historico_equipo_file, dtype=str)
+            hist_eq = hist_eq[hist_eq["fecha"] != date.today().isoformat()]
+            combinado_eq = pd.concat([hist_eq, mi_equipo_df], ignore_index=True)
+        else:
+            combinado_eq = mi_equipo_df
+        combinado_eq.to_csv(historico_equipo_file, index=False, encoding="utf-8-sig")
+
+        resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
+    else:
+        resumen = build_telegram_summary(df)
+
+    send_telegram_message(resumen)
+
+
+if __name__ == "__main__":
+    main()
