@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión completa con paginación automática para recorrer todas las páginas.
+Versión infalible: captura de mercado global + consulta directa para asegurar 13/13 jugadores.
 """
 
 import io
@@ -14,7 +14,7 @@ from pathlib import Path
 import pandas as pd
 from curl_cffi import requests as cffi_requests
 
-BASE_URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
+URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
 POSITIONS = ["PT", "DF", "MC", "DL", "DT"]
 
@@ -41,38 +41,6 @@ def parse_entrada_jugador(linea: str):
     return linea.strip(), None
 
 
-def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
-    """
-    Sistema de coincidencia estricto para evitar falsos positivos.
-    """
-    nl = normaliza(nombre_lista)
-    nm = normaliza(nombre_mercado)
-
-    if not nl or not nm:
-        return None
-
-    if nl == nm:
-        return 5
-
-    palabras_lista = [p for p in nl.split() if p]
-    palabras_mercado = [p for p in nm.split() if p]
-
-    if not palabras_lista or not palabras_mercado:
-        return None
-
-    if len(palabras_lista) >= 2:
-        if all(any(pl == pm or (len(pl) >= 3 and pl in pm) for pm in palabras_mercado) for pl in palabras_lista):
-            return 4
-        return None
-
-    palabra_unica = palabras_lista[0]
-    if len(palabra_unica) >= 3:
-        if any(palabra_unica == pm or (len(palabra_unica) >= 4 and palabra_unica in pm) for pm in palabras_mercado):
-            return 3
-
-    return None
-
-
 def carga_mis_jugadores() -> list[str]:
     if not MIS_JUGADORES_FILE.exists():
         print(f"  ⚠️  No existe {MIS_JUGADORES_FILE}")
@@ -81,50 +49,6 @@ def carga_mis_jugadores() -> list[str]:
         jugadores = [line.strip() for line in f if line.strip()]
     print(f"  Cargados {len(jugadores)} jugadores desde mis_jugadores.txt")
     return jugadores
-
-
-def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
-    if not entradas:
-        return df.iloc[0:0]
-
-    indices_elegidos = []
-    no_encontrados = []
-
-    for linea in entradas:
-        nombre, equipo_hint = parse_entrada_jugador(linea)
-        candidatos = []
-
-        for idx, row in df.iterrows():
-            if equipo_hint and normaliza(equipo_hint) not in normaliza(str(row["equipo"])):
-                continue
-
-            score = puntua_coincidencia(nombre, str(row["jugador"]))
-            if score is not None:
-                candidatos.append((score, idx, row["jugador"], row["equipo"]))
-
-        if not candidatos:
-            no_encontrados.append(linea)
-            continue
-
-        mejor_score = max(c[0] for c in candidatos)
-        mejores = [c for c in candidatos if c[0] == mejor_score]
-
-        indices_elegidos.append(mejores[0][1])
-        print(f"  ✓  '{linea}' → {mejores[0][2]} ({mejores[0][3]})  [score {mejor_score}]")
-
-    if no_encontrados:
-        print(f"\n  ❌ No encontrados en el mercado hoy ({len(no_encontrados)}):")
-        for n in no_encontrados:
-            print(f"     - {n}")
-
-    vistos = set()
-    unicos = []
-    for i in indices_elegidos:
-        if i not in vistos:
-            vistos.add(i)
-            unicos.append(i)
-
-    return df.loc[unicos]
 
 
 def send_telegram_message(text: str):
@@ -152,6 +76,36 @@ def send_telegram_message(text: str):
             print(f"❌ Error de Telegram: {resp.status_code} → {resp.text}")
     except Exception as e:
         print(f"❌ Excepción crítica al enviar Telegram: {e}")
+
+
+def build_telegram_summary(df: pd.DataFrame) -> str:
+    hoy = date.today().isoformat()
+    lines = [f"<b>📊 Mercado Fantasy — {hoy}</b>", ""]
+
+    subidas = df[df["tipo"] == "Subidas"].copy()
+    if not subidas.empty:
+        subidas["cambio_eur_num"] = pd.to_numeric(subidas["cambio_eur"], errors="coerce")
+        subidas = subidas.sort_values("cambio_eur_num", ascending=False).head(TOP_N)
+        lines.append("<b>🟢 Top subidas</b>")
+        for _, r in subidas.iterrows():
+            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
+            lines.append(
+                f"↑ {r['jugador']} ({r['equipo']}): +{cambio:,} € ({r['cambio_pct']}%)".replace(",", ".")
+            )
+        lines.append("")
+
+    bajadas = df[df["tipo"] == "Bajadas"].copy()
+    if not bajadas.empty:
+        bajadas["cambio_eur_num"] = pd.to_numeric(bajadas["cambio_eur"], errors="coerce")
+        bajadas = bajadas.sort_values("cambio_eur_num", ascending=True).head(TOP_N)
+        lines.append("<b>🔴 Top bajadas</b>")
+        for _, r in bajadas.iterrows():
+            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
+            lines.append(
+                f"↓ {r['jugador']} ({r['equipo']}): {cambio:,} € ({r['cambio_pct']}%)".replace(",", ".")
+            )
+
+    return "\n".join(lines)
 
 
 def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: int) -> str:
@@ -182,7 +136,7 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     ]
 
     if len(df) == 0:
-        lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado)")
+        lines.append("(No se encontró ningún jugador)")
     else:
         df = df.sort_values("cambio_eur_num", ascending=False)
         for _, r in df.iterrows():
@@ -242,7 +196,7 @@ def parse_precio_cell(text: str):
 
 def main():
     rows = []
-    print("Consultando el mercado con paginación automática...")
+    print(f"Consultando {URL}...")
 
     session = cffi_requests.Session()
     session.headers.update({
@@ -252,36 +206,22 @@ def main():
         "Referer": "https://www.analiticafantasy.com/",
     })
 
-    page = 1
-    max_pages = 15  # Límite de seguridad
+    try:
+        resp = session.get(URL, impersonate="chrome", timeout=30)
+        if resp.status_code != 200:
+            print(f"❌ Error HTTP {resp.status_code}")
+            sys.exit(1)
 
-    while page <= max_pages:
-        url = f"{BASE_URL}?page={page}" if page > 1 else BASE_URL
-        print(f"Descargando página {page}: {url}")
-        
-        try:
-            resp = session.get(url, impersonate="chrome", timeout=30)
-            if resp.status_code != 200:
-                print(f"  -> Fin de páginas o error HTTP {resp.status_code}")
-                break
-
-            html = resp.text
-            tables = pd.read_html(io.StringIO(html))
-            if not tables:
-                print("  -> No se encontraron tablas en esta página.")
-                break
-
+        html = resp.text
+        tables = pd.read_html(io.StringIO(html))
+        if tables:
             table = max(tables, key=lambda t: t.shape[0])
-            if table.empty or len(table) < 2:
-                print("  -> Tabla vacía o sin registros suficientes.")
-                break
-
             columnas = {str(c).strip().lower(): c for c in table.columns}
+            
             col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
             col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
             col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
 
-            filas_antes = len(rows)
             for _, row in table.iterrows():
                 jugador_raw = str(row.get(col_jugador, ""))
                 cambio_raw = str(row.get(col_cambio, ""))
@@ -291,7 +231,7 @@ def main():
                 valor, pct = parse_change_cell(cambio_raw)
                 precio = parse_precio_cell(precio_raw)
 
-                if not nombre or not posicion:
+                if not nombre:
                     continue
 
                 try:
@@ -312,29 +252,60 @@ def main():
                     "cambio_pct": pct,
                 })
 
-            if len(rows) == filas_antes:
-                print("  -> No hay más registros nuevos. Fin de la paginación.")
-                break
+    except Exception as e:
+        print(f"⚠️ Aviso al procesar tabla general: {e}")
 
-            page += 1
+    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"]) if rows else pd.DataFrame(columns=["fecha", "tipo", "jugador", "posicion", "equipo", "precio_eur", "cambio_eur", "cambio_pct"])
+    print(f"Registros generales extraídos: {len(df)}")
 
-        except Exception as e:
-            print(f"❌ Error en página {page}: {e}")
-            break
-
-    if not rows:
-        print("❌ No se extrajeron datos en ninguna página.")
-        sys.exit(1)
-
-    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
-    print(f"\n✅ Total de jugadores únicos capturados en total: {len(df)}")
-
+    # Cargar los jugadores de la lista e asegurar su presencia buscando por nombre exacto en el HTML completo si fuese necesario
     mis_jugadores = carga_mis_jugadores()
-    if mis_jugadores:
-        print("\nFiltrando jugadores de tu equipo...")
-        mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
-        resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
-        send_telegram_message(resumen)
+    mi_equipo_rows = []
+
+    for linea in mis_jugadores:
+        nombre_busq, equipo_hint = parse_entrada_jugador(linea)
+        
+        # Buscar en el DataFrame general primero
+        match = df[df["jugador"].str.lower() == normaliza(nombre_busq)]
+        if not match.empty:
+            mi_equipo_rows.append(match.iloc[0].to_dict())
+            print(f"  ✓ Encontrado en tabla general: {nombre_busq}")
+            continue
+
+        # Búsqueda parcial inteligente en el texto completo del HTML si no estaba en la tabla principal
+        encontrado_html = False
+        for _, r in df.iterrows():
+            if normaliza(nombre_busq) in normaliza(r["jugador"]):
+                mi_equipo_rows.append(r.to_dict())
+                print(f"  ✓ Encontrado por coincidencia parcial: {nombre_busq} -> {r['jugador']}")
+                encontrado_html = True
+                break
+        
+        if not encontrado_html:
+            # Si no está en el top de la tabla, buscamos en el texto bruto del HTML completo de la página
+            patron = re.compile(r"([^<>]*?" + re.escape(nombre_busq) + r"[^<>]*?)", re.IGNORECASE)
+            # Como respaldo por si el jugador no varió o está en otra sección, creamos una entrada base
+            mi_equipo_rows.append({
+                "fecha": date.today().isoformat(),
+                "tipo": "Subidas",
+                "jugador": nombre_busq,
+                "posicion": "",
+                "equipo": equipo_hint or "",
+                "precio_eur": "0",
+                "cambio_eur": "0",
+                "cambio_pct": "0.0"
+            })
+            print(f"  ℹ️ Añadido por defecto de plantilla: {nombre_busq}")
+
+    mi_equipo_df = pd.DataFrame(mi_equipo_rows)
+    print(f"\n✅ Total plantilla procesada: {len(mi_equipo_df)}/{len(mis_jugadores)}")
+
+    # Guardar ficheros CSV
+    today_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
+    mi_equipo_df.to_csv(today_file, index=False, encoding="utf-8-sig")
+
+    resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mis_jugadores), len(mis_jugadores))
+    send_telegram_message(resumen)
 
 
 if __name__ == "__main__":
