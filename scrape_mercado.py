@@ -1,20 +1,7 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
 =====================================================================
-Versión completa — recorre TODAS las páginas del mercado.
-
-Mejoras anti-bloqueo:
-- User-Agent real + viewport + locale
-- Oculta navigator.webdriver
-- Reintentos con detección de página 403
-- Esperas más robustas
-
-Instalación (una sola vez):
-    pip install playwright pandas requests lxml html5lib beautifulsoup4 --break-system-packages
-    playwright install chromium
-
-Uso:
-    python3 scrape_mercado_corregido.py
+Versión completa y robusta — recorre TODAS las páginas del mercado.
 """
 
 import io
@@ -53,15 +40,27 @@ def parse_entrada_jugador(linea: str):
 
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
-    palabras_lista = set(normaliza(nombre_lista).split())
-    palabras_mercado = set(normaliza(nombre_mercado).split())
+    palabras_lista = [normaliza(p) for p in nombre_lista.split() if p.strip()]
+    palabras_mercado = [normaliza(p) for p in nombre_mercado.split() if p.strip()]
+    
     if not palabras_lista or not palabras_mercado:
         return None
-    if palabras_lista == palabras_mercado:
-        return 3
-    if palabras_lista <= palabras_mercado:
+
+    match_count = 0
+    for pl in palabras_lista:
+        # Manejo de iniciales (ej. "d." o "d" para "Diego")
+        if (len(pl) <= 2 and pl.endswith('.')) or len(pl) == 1:
+            letra = pl[0]
+            if any(pm.startswith(letra) for pm in palabras_mercado):
+                match_count += 1
+        elif pl in palabras_mercado:
+            match_count += 1
+
+    if match_count == len(palabras_lista):
+        if palabras_lista == palabras_mercado:
+            return 3
         return 2
-    if palabras_mercado <= palabras_lista:
+    elif match_count > 0 and match_count >= len(palabras_lista) - 1:
         return 1
     return None
 
@@ -242,7 +241,6 @@ def leer_tabla_actual(page):
 
 
 def abrir_pagina_con_reintentos(page, intentos=3):
-    """Abre el mercado y distingue un fallo de navegación de un bloqueo del servidor."""
     for intento in range(1, intentos + 1):
         print(f"Abriendo {URL} (intento {intento}/{intentos}) ...")
         try:
@@ -263,6 +261,222 @@ def abrir_pagina_con_reintentos(page, intentos=3):
         )
         if any(indicador in content for indicador in indicadores_bloqueo):
             print("  La web ha devuelto una página de bloqueo (anti-bot/CDN).")
-            print("  El script se detiene sin guardar datos incompletos.")
-            print("  Prueba más tarde o consulta al administrador del sitio por un acceso permitido.")
             return False
+
+        try:
+            page.wait_for_selector("table", timeout=20000)
+            page.wait_for_timeout(1500)
+            return True
+        except Exception:
+            print(f"  No apareció ninguna tabla en el intento {intento}.")
+            if intento < intentos:
+                page.wait_for_timeout(2000 * intento)
+    return False
+
+
+def cerrar_aviso_privacidad_si_aparece(page):
+    opciones = [
+        "Rechazar todas", "Rechazar todo", "Solo necesarias",
+        "Aceptar todas", "Aceptar todo", "Aceptar",
+        "Reject all", "Reject All", "Accept all", "Accept All",
+        "Save settings", "Guardar configuración",
+    ]
+    for texto in opciones:
+        try:
+            boton = page.get_by_role("button", name=re.compile(re.escape(texto), re.I))
+            if boton.count() and boton.first.is_visible():
+                boton.first.click(timeout=1800)
+                page.wait_for_timeout(700)
+                return
+        except Exception:
+            continue
+
+
+def seleccionar_pestana(page, tab_label: str) -> bool:
+    cerrar_aviso_privacidad_si_aparece(page)
+    try:
+        objetivo = page.get_by_text(tab_label, exact=True).first
+        if not objetivo.count():
+            print(f"  Aviso: no aparece la pestaña '{tab_label}'.")
+            return False
+        objetivo.scroll_into_view_if_needed(timeout=3000)
+        objetivo.click(timeout=5000)
+        page.wait_for_timeout(1000)
+        return True
+    except Exception as e:
+        print(f"  No se pudo seleccionar '{tab_label}': {e}")
+        return False
+
+
+def scrape_tab(page, tab_label: str, rows: list):
+    if not seleccionar_pestana(page, tab_label):
+        return
+
+    page_num = 1
+    firmas_vistas = set()
+
+    while page_num <= 70:
+        page.wait_for_timeout(700)
+        table = leer_tabla_actual(page)
+        if table is None or table.empty:
+            print(f"  No hay tabla de datos en '{tab_label}'.")
+            break
+
+        firma = tuple(table.astype(str).fillna("").to_numpy().ravel())
+        if firma in firmas_vistas:
+            print("  La tabla no ha cambiado; se detiene la paginación para evitar un bucle.")
+            break
+        firmas_vistas.add(firma)
+
+        columnas = {str(c).strip().lower(): c for c in table.columns}
+        
+        # Búsqueda flexible de columnas por nombre o fallback por posición
+        col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), None)
+        col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
+        col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), None)
+
+        if col_jugador is None or col_cambio is None:
+            if len(table.columns) >= 3:
+                col_jugador = table.columns[0]
+                col_precio = table.columns[1] if len(table.columns) > 3 else None
+                col_cambio = table.columns[2] if len(table.columns) > 2 else table.columns[1]
+            else:
+                print(f"  No reconozco las columnas de la tabla: {list(table.columns)}")
+                break
+
+        tipo_pestana = "Bajadas" if "bajada" in str(col_cambio).lower() or tab_label.lower() == "bajadas" else "Subidas"
+
+        for _, row in table.iterrows():
+            jugador_raw = str(row.get(col_jugador, ""))
+            cambio_raw = str(row.get(col_cambio, ""))
+            precio_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
+
+            nombre, posicion, equipo = split_jugador_cell(jugador_raw)
+            valor, pct = parse_change_cell(cambio_raw)
+            precio = parse_precio_cell(precio_raw)
+
+            if not nombre or not posicion:
+                continue
+
+            try:
+                valor_num = float(valor) if valor not in (None, "") else 0.0
+            except (TypeError, ValueError):
+                valor_num = 0.0
+            tipo_real = tipo_pestana
+            if tipo_real == "Bajadas" and valor_num > 0:
+                valor = str(-int(valor_num))
+
+            rows.append({
+                "fecha": date.today().isoformat(),
+                "tipo": tipo_real,
+                "jugador": nombre,
+                "posicion": posicion,
+                "equipo": equipo,
+                "precio_eur": precio,
+                "cambio_eur": valor,
+                "cambio_pct": pct,
+            })
+
+        print(f"  {tab_label} - página {page_num}: {len(table)} filas (total acumulado: {len(rows)})")
+
+        siguiente = page.get_by_text("Siguiente", exact=True)
+        if siguiente.count() == 0:
+            break
+        try:
+            if not siguiente.first.is_enabled():
+                break
+            siguiente.first.click()
+            page.wait_for_timeout(900)
+        except Exception:
+            break
+        page_num += 1
+
+    if page_num > 70:
+        print("  Límite de seguridad de 70 páginas alcanzado.")
+
+
+def limpia_csv_antiguos():
+    hoy = date.today().isoformat()
+    for patron in ["mercado_*.csv", "mi_equipo_*.csv"]:
+        for f in OUT_DIR.glob(patron):
+            if hoy not in f.name:
+                f.unlink()
+                print(f"  Borrado archivo antiguo: {f.name}")
+
+
+def main():
+    rows = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-dev-shm-usage"],
+        )
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/129.0.0.0 Safari/537.36"
+            ),
+            viewport={"width": 1920, "height": 1080},
+            locale="es-ES",
+            timezone_id="Europe/Madrid",
+            java_script_enabled=True,
+        )
+        page = context.new_page()
+
+        if not abrir_pagina_con_reintentos(page):
+            print("No se pudo cargar la tabla tras varios intentos.")
+            browser.close()
+            sys.exit(1)
+
+        print("Extrayendo mercado...")
+        scrape_tab(page, "Subidas", rows)
+        scrape_tab(page, "Bajadas", rows)
+
+        browser.close()
+
+    if not rows:
+        print("No se extrajeron datos.")
+        sys.exit(1)
+
+    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
+    print(f"\nTotal de jugadores únicos capturados hoy: {len(df)}")
+
+    today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
+    df.to_csv(today_file, index=False, encoding="utf-8-sig")
+
+    historico_file = OUT_DIR / "historico.csv"
+    if historico_file.exists():
+        hist = pd.read_csv(historico_file, dtype=str)
+        hist = hist[hist["fecha"] != date.today().isoformat()]
+        combinado = pd.concat([hist, df], ignore_index=True)
+    else:
+        combinado = df
+    combinado.to_csv(historico_file, index=False, encoding="utf-8-sig")
+
+    mis_jugadores = carga_mis_jugadores()
+    if mis_jugadores:
+        mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
+        mi_equipo_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
+        mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
+        print(f"Mi equipo ({len(mi_equipo_df)}/{len(mis_jugadores)} encontrados): {mi_equipo_file}")
+
+        historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
+        if historico_equipo_file.exists():
+            hist_eq = pd.read_csv(historico_equipo_file, dtype=str)
+            hist_eq = hist_eq[hist_eq["fecha"] != date.today().isoformat()]
+            combinado_eq = pd.concat([hist_eq, mi_equipo_df], ignore_index=True)
+        else:
+            combinado_eq = mi_equipo_df
+        combinado_eq.to_csv(historico_equipo_file, index=False, encoding="utf-8-sig")
+
+        resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
+    else:
+        resumen = build_telegram_summary(df)
+
+    limpia_csv_antiguos()
+    send_telegram_message(resumen)
+
+
+if __name__ == "__main__":
+    main()
