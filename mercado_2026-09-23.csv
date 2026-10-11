@@ -1,0 +1,576 @@
+﻿fecha,tipo,jugador,posicion,equipo,precio_eur,cambio_eur,cambio_pct
+2026-09-23,Subidas,Raphinha,DL,Barcelona,154517801,+3318969,+2.2
+2026-09-23,Subidas,Lamine Yamal,DL,Barcelona,155798310,+3063642,+2.0
+2026-09-23,Subidas,Grimaldo,DF,Atlético,43207194,+2454874,+6.0
+2026-09-23,Subidas,Adeyemi,DL,Barcelona,66076420,+2383778,+3.7
+2026-09-23,Subidas,Moleiro,MC,Villarreal,42857206,+2131620,+5.2
+2026-09-23,Subidas,J. David,DL,Atlético,39307610,+1935931,+5.2
+2026-09-23,Subidas,Kang-In Lee,MC,Atlético,67836543,+1812668,+2.7
+2026-09-23,Subidas,Camello,DL,Rayo Vallecano,28378497,+1797924,+6.8
+2026-09-23,Subidas,Natan,DF,Real Betis,38984210,+1786511,+4.8
+2026-09-23,Subidas,Á. Valles,PT,Real Betis,58482115,+1608742,+2.8
+2026-09-23,Subidas,Mbappé,DL,Real Madrid,151772002,+1518777,+1.0
+2026-09-23,Subidas,Rodri,MC,Barcelona,72859771,+1512917,+2.1
+2026-09-23,Subidas,Cuti Romero,DF,Atlético,39074921,+1475574,+3.9
+2026-09-23,Subidas,Álex Baena,MC,Atlético,67216363,+1313085,+2.0
+2026-09-23,Subidas,Ez Abde,DL,Real Betis,33179200,+1203591,+3.8
+2026-09-23,Subidas,Giuliano,DL,Atlético,40309507,+1165312,+3.0
+2026-09-23,Subidas,Roberto,DL,Espanyol,41739824,+1154325,+2.8
+2026-09-23,Subidas,Fer Niño,DL,Elche CF,16686427,+1124791,+7.2
+2026-09-23,Subidas,Marcos Llorente,DF,Atlético,46414576,+1106556,+2.4
+2026-09-23,Subidas,Arda Güler,MC,Real Madrid,103676258,+1098522,+1.1
+2026-09-23,Subidas,Koski,DF,Alavés,17772561,+1071603,+6.4
+2026-09-23,Subidas,Diomande,DL,Real Madrid,53584305,+1050844,+2.0
+2026-09-23,Subidas,Xavi Espart,DF,Barcelona,40717013,+1018919,+2.6
+2026-09-23,Subidas,Zaid Romero,DF,Getafe,26827813,+915829,+3.5
+2026-09-23,Subidas,Cancelo,DF,Barcelona,32240390,+893770,+2.9
+2026-09-23,Subidas,C. Soler,MC,Real Sociedad,31231808,+872543,+2.9
+2026-09-23,Subidas,M. Román,MC,Celta,15593660,+854110,+5.8
+2026-09-23,Subidas,Laporte,DF,Athletic Club,43279281,+804040,+1.9
+2026-09-23,Subidas,Y. Zabiri,DL,Racing,18509325,+759756,+4.3
+2026-09-23,Subidas,Sivera,PT,Alavés,43500929,+716404,+1.7
+2026-09-23,Subidas,Ángel Pérez,DL,Alavés,26774369,+694968,+2.7
+2026-09-23,Subidas,Ionut Radu,PT,Celta,43268024,+686304,+1.6
+2026-09-23,Subidas,Navarro,MC,Athletic Club,11787488,+670832,+6.0
+2026-09-23,Subidas,Fofana,MC,Sevilla,17030597,+651612,+4.0
+2026-09-23,Subidas,Ilaix Moriba,MC,Celta,9891272,+632686,+6.8
+2026-09-23,Subidas,Ayoze,DL,Villarreal,16686344,+624176,+3.9
+2026-09-23,Subidas,Sucic,MC,Real Sociedad,13372229,+608368,+4.8
+2026-09-23,Subidas,Juan Iglesias,DF,Sevilla,17664620,+603267,+3.5
+2026-09-23,Subidas,Oblak,PT,Atlético,47667142,+589102,+1.3
+2026-09-23,Subidas,Djene,DF,Getafe,18956633,+584962,+3.2
+2026-09-23,Subidas,Antony,DL,Real Betis,59328164,+577425,+1.0
+2026-09-23,Subidas,Yoel Lago,DF,Celta,8650965,+569425,+7.0
+2026-09-23,Subidas,Nico Williams,DL,Athletic Club,57709962,+555993,+1.0
+2026-09-23,Subidas,Mario Soriano,MC,Deportivo,29563169,+522900,+1.8
+2026-09-23,Subidas,Marc Roca,MC,Real Betis,16189451,+516777,+3.3
+2026-09-23,Subidas,Jonny Otto,DF,Alavés,16004814,+513223,+3.3
+2026-09-23,Subidas,Giménez,DF,Deportivo,12185855,+504459,+4.3
+2026-09-23,Subidas,R. Terrats,MC,Getafe,9960157,+499567,+5.3
+2026-09-23,Subidas,David Soria,PT,Getafe,37357161,+492577,+1.3
+2026-09-23,Subidas,Miguel Sierra,DL,Sevilla,8384717,+470657,+5.9
+2026-09-23,Subidas,Lucas Boyé,DL,Alavés,31995705,+461577,+1.5
+2026-09-23,Subidas,Agirrezabala,PT,Racing,24098012,+446538,+1.9
+2026-09-23,Subidas,Renato Veiga,DF,Villarreal,23834635,+445069,+1.9
+2026-09-23,Subidas,Deossa,MC,Real Betis,4627368,+412539,+9.8
+2026-09-23,Subidas,Paredes,DF,Athletic Club,13958356,+402700,+3.0
+2026-09-23,Subidas,Hancko,DF,Atlético,39862751,+391376,+1.0
+2026-09-23,Subidas,Agoumé,MC,Sevilla,12816244,+370381,+3.0
+2026-09-23,Subidas,Pepelu,MC,Valencia,11854071,+358361,+3.1
+2026-09-23,Subidas,Yuri,DF,Athletic Club,16254848,+352986,+2.2
+2026-09-23,Subidas,Ibañez,MC,Alavés,13046011,+339203,+2.7
+2026-09-23,Subidas,Mariano,DL,Alavés,21348249,+331775,+1.6
+2026-09-23,Subidas,A. Castrín,DF,Sevilla,6971968,+319786,+4.8
+2026-09-23,Subidas,Kike Salas,DF,Sevilla,11602406,+312772,+2.8
+2026-09-23,Subidas,Cucho,DL,Real Betis,34274154,+293026,+0.9
+2026-09-23,Subidas,A. Herrero,PT,Málaga,18856589,+289162,+1.6
+2026-09-23,Subidas,Budimir,DL,Osasuna,60733378,+287453,+0.5
+2026-09-23,Subidas,Vlachodimos,PT,Sevilla,32178189,+284333,+0.9
+2026-09-23,Subidas,Gueye,MC,Villarreal,34270145,+272685,+0.8
+2026-09-23,Subidas,Barrenetxea,MC,Real Sociedad,20478346,+241740,+1.2
+2026-09-23,Subidas,Unai Lopez,MC,Rayo Vallecano,16923663,+227039,+1.4
+2026-09-23,Subidas,Bellerín,DF,Real Betis,17697446,+220944,+1.3
+2026-09-23,Subidas,I. Akhomach,DL,Villarreal,2821643,+216764,+8.3
+2026-09-23,Subidas,Gulácsi,PT,Villarreal,4146298,+215596,+5.5
+2026-09-23,Subidas,Suazo,DF,Sevilla,6662039,+203012,+3.1
+2026-09-23,Subidas,Rüdiger,DF,Real Madrid,19255207,+179698,+0.9
+2026-09-23,Subidas,Ferran Jutglà,DL,Celta,9635696,+171912,+1.8
+2026-09-23,Subidas,De Galarreta,MC,Athletic Club,17117096,+169583,+1.0
+2026-09-23,Subidas,H. González,MC,Celta,2269681,+165432,+7.9
+2026-09-23,Subidas,Johnny,MC,Atlético,3390871,+163695,+5.1
+2026-09-23,Subidas,Luismi Cruz,DL,Deportivo,10885482,+158825,+1.5
+2026-09-23,Subidas,Aubameyang,DL,Deportivo,104370353,+152667,+0.1
+2026-09-23,Subidas,Olmo,MC,Barcelona,48263152,+149202,+0.3
+2026-09-23,Subidas,T. Morente,DL,Elche CF,3174724,+119231,+3.9
+2026-09-23,Subidas,Valentín Gómez,DF,Real Betis,1997705,+114075,+6.1
+2026-09-23,Subidas,Mojica,DF,Getafe,14675006,+109892,+0.8
+2026-09-23,Subidas,Quagliata,DF,Deportivo,4236087,+100576,+2.4
+2026-09-23,Subidas,Hugo Alvarez,MC,Celta,2078225,+100013,+5.1
+2026-09-23,Subidas,Germán V.,MC,Elche CF,13274830,+90406,+0.7
+2026-09-23,Subidas,Satriano,DL,Getafe,18532977,+87355,+0.5
+2026-09-23,Subidas,Freeman,DF,Villarreal,1525800,+85992,+6.0
+2026-09-23,Subidas,Marc Bernal,MC,Barcelona,27658307,+83870,+0.3
+2026-09-23,Subidas,Danjuma,DL,Valencia,4579236,+82932,+1.8
+2026-09-23,Subidas,M. Dituro,PT,Elche CF,9704707,+70789,+0.7
+2026-09-23,Subidas,I. Romero,DL,Levante,6279135,+66205,+1.1
+2026-09-23,Subidas,Iván Azón,DL,Getafe,4106822,+65591,+1.6
+2026-09-23,Subidas,Cepeda,DL,Elche CF,1559754,+57339,+3.8
+2026-09-23,Subidas,Andrés Garcia,MC,Getafe,7570369,+56850,+0.8
+2026-09-23,Subidas,Livakovic,PT,Barcelona,2602757,+55676,+2.2
+2026-09-23,Subidas,Recio,DF,Málaga,2427862,+52766,+2.2
+2026-09-23,Subidas,Dotor,MC,Málaga,4975525,+49142,+1.0
+2026-09-23,Subidas,R. Brugué,DL,Levante,5540319,+44966,+0.8
+2026-09-23,Subidas,Ochieng,DL,Real Sociedad,1258900,+41089,+3.4
+2026-09-23,Subidas,Mayol,MC,Valencia,768599,+38908,+5.3
+2026-09-23,Subidas,Pablo Durán,DL,Celta,778767,+37808,+5.1
+2026-09-23,Subidas,Pedrosa,DF,Rayo Vallecano,2588305,+30861,+1.2
+2026-09-23,Subidas,Álvaro Núñez,DF,Celta,2895145,+27856,+1.0
+2026-09-23,Subidas,Revivo,DF,Elche CF,3593078,+25488,+0.7
+2026-09-23,Subidas,Aitor Fdez,PT,Osasuna,546991,+23698,+4.5
+2026-09-23,Subidas,Javi Rueda,DF,Celta,5406391,+21386,+0.4
+2026-09-23,Subidas,Marcos,DL,Espanyol,1366955,+15414,+1.1
+2026-09-23,Subidas,Valentini,DF,Alavés,661021,+13122,+2.0
+2026-09-23,Subidas,Lemar,MC,Elche CF,4080565,+11751,+0.3
+2026-09-23,Subidas,Herrera,MC,Real Sociedad,5239933,+9845,+0.2
+2026-09-23,Subidas,Morcillo,MC,Elche CF,762985,+5532,+0.7
+2026-09-23,Subidas,Pastor,DF,Málaga,420543,+1501,+0.4
+2026-09-23,Subidas,Carlos Lopez,PT,Málaga,422542,+1417,+0.3
+2026-09-23,Subidas,Egiluz,DF,Athletic Club,428360,+1175,+0.3
+2026-09-23,Subidas,Haitam,DL,Málaga,429382,+1132,+0.3
+2026-09-23,Subidas,Otorbi,DL,Valencia,612393,+943,+0.2
+2026-09-23,Subidas,Maroan,DL,Athletic Club,434941,+901,+0.2
+2026-09-23,Subidas,Denis Suárez,MC,Alavés,2934144,+818,0.0
+2026-09-23,Subidas,Rubén S.,DF,Elche CF,437682,+786,+0.2
+2026-09-23,Subidas,Julio Díaz,DF,Sevilla,438457,+754,+0.2
+2026-09-23,Subidas,C. Rivero,PT,Valencia,444500,+503,+0.1
+2026-09-23,Subidas,Tenés,DL,Valencia,446754,+408,+0.1
+2026-09-23,Subidas,Nordin Al-Lal,DL,Elche CF,447942,+359,+0.1
+2026-09-23,Subidas,Mañas,DL,Alavés,454473,+87,0.0
+2026-09-23,Subidas,Beitia,DF,Real Sociedad,454823,+73,0.0
+2026-09-23,Subidas,A. Fortuño,PT,Espanyol,454840,+72,0.0
+2026-09-23,Subidas,Y. Santiago,MC,Elche CF,454833,+72,0.0
+2026-09-23,Subidas,A. Osambela,MC,Osasuna,455939,+26,0.0
+2026-09-23,Bajadas,Diatta,MC,Villarreal,457677,-47,0.0
+2026-09-23,Bajadas,Alonso,DL,Rayo Vallecano,460056,-146,0.0
+2026-09-23,Bajadas,Llorenç,PT,Espanyol,460075,-146,0.0
+2026-09-23,Bajadas,Ruben,PT,Villarreal,460975,-184,0.0
+2026-09-23,Bajadas,Juanmi,DL,Getafe,462150,-232,-0.1
+2026-09-23,Bajadas,Odriozola,DF,Real Sociedad,465727,-382,-0.1
+2026-09-23,Bajadas,Germán,PT,Deportivo,466450,-412,-0.1
+2026-09-23,Bajadas,J. Ives Valou,DF,Getafe,468133,-482,-0.1
+2026-09-23,Bajadas,De Las Sias,DF,Rayo Vallecano,468133,-482,-0.1
+2026-09-23,Bajadas,Iker Muñoz,DF,Sevilla,468133,-482,-0.1
+2026-09-23,Bajadas,Edu Altozano,MC,Sevilla,468133,-482,-0.1
+2026-09-23,Bajadas,Swiderski,PT,Alavés,468503,-498,-0.1
+2026-09-23,Bajadas,Xanet Olaiz,DF,Alavés,469338,-532,-0.1
+2026-09-23,Bajadas,F. Garcés,DF,Alavés,469537,-541,-0.1
+2026-09-23,Bajadas,Mauro,MC,Osasuna,473651,-712,-0.2
+2026-09-23,Bajadas,Marcao,DF,Sevilla,473957,-725,-0.2
+2026-09-23,Bajadas,Cestero,MC,Real Madrid,483108,-1106,-0.2
+2026-09-23,Bajadas,A. Vallecillo,MC,Racing,484165,-1150,-0.2
+2026-09-23,Bajadas,Timera,DF,Espanyol,484618,-1169,-0.2
+2026-09-23,Bajadas,Caste,MC,Racing,484618,-1169,-0.2
+2026-09-23,Bajadas,Ibra Drj,DL,Getafe,484618,-1169,-0.2
+2026-09-23,Bajadas,Lozano,DF,Rayo Vallecano,484618,-1169,-0.2
+2026-09-23,Bajadas,Jose Angel,DF,Espanyol,484618,-1169,-0.2
+2026-09-23,Bajadas,Galdin,PT,Levante,484688,-1172,-0.2
+2026-09-23,Bajadas,Santos,DF,Osasuna,485399,-1202,-0.2
+2026-09-23,Bajadas,Panach,DF,Valencia,485518,-1207,-0.2
+2026-09-23,Bajadas,Fran González,PT,Sevilla,487764,-1300,-0.3
+2026-09-23,Bajadas,Letacek,PT,Getafe,488181,-1318,-0.3
+2026-09-23,Bajadas,Risco,MC,Getafe,489386,-1368,-0.3
+2026-09-23,Bajadas,Ferrer,PT,Getafe,490536,-1416,-0.3
+2026-09-23,Bajadas,Comas,DF,Deportivo,490633,-1420,-0.3
+2026-09-23,Bajadas,F. Mendy,DF,Real Madrid,495703,-1631,-0.3
+2026-09-23,Bajadas,Iñigo,DF,Racing,499596,-1793,-0.4
+2026-09-23,Bajadas,D. Martínez,DF,Atlético,500614,-1836,-0.4
+2026-09-23,Bajadas,Joselu,DL,Getafe,503821,-1969,-0.4
+2026-09-23,Bajadas,Adrián Molina,PT,Rayo Vallecano,503821,-1969,-0.4
+2026-09-23,Bajadas,Lobete,DL,Málaga,504804,-2010,-0.4
+2026-09-23,Bajadas,Arana,DL,Racing,507149,-2108,-0.4
+2026-09-23,Bajadas,Fran Pérez,MC,Rayo Vallecano,507365,-2117,-0.4
+2026-09-23,Bajadas,Manel Usedo,MC,Levante,509180,-2193,-0.4
+2026-09-23,Bajadas,Marco Román,MC,Rayo Vallecano,509180,-2193,-0.4
+2026-09-23,Bajadas,Ibra,DL,Sevilla,509180,-2193,-0.4
+2026-09-23,Bajadas,Esquivel,PT,Atlético,511127,-2274,-0.4
+2026-09-23,Bajadas,Gorka Carrera,DL,Real Sociedad,511391,-2285,-0.4
+2026-09-23,Bajadas,Barzic,DF,Elche CF,511629,-2295,-0.4
+2026-09-23,Bajadas,Manu Bueno,MC,Sevilla,513187,-2360,-0.5
+2026-09-23,Bajadas,Paco Cortes,DL,Levante,513757,-2383,-0.5
+2026-09-23,Bajadas,Cabello,DF,Levante,514240,-2403,-0.5
+2026-09-23,Bajadas,Ramon,MC,Málaga,514685,-2422,-0.5
+2026-09-23,Bajadas,A. Iturbe,PT,Elche CF,517593,-2543,-0.5
+2026-09-23,Bajadas,Obed Vargas,MC,Atlético,517729,-2549,-0.5
+2026-09-23,Bajadas,Luis García,DT,Sevilla,521642,-2712,-0.5
+2026-09-23,Bajadas,Sánchez Flores,DT,Alavés,521642,-2712,-0.5
+2026-09-23,Bajadas,Cardoso,DF,Sevilla,523070,-2771,-0.5
+2026-09-23,Bajadas,Nico Serrano,DL,Athletic Club,527333,-2949,-0.6
+2026-09-23,Bajadas,Marc Santos,DF,Levante,533744,-3216,-0.6
+2026-09-23,Bajadas,Bauza,MC,Espanyol,533744,-3216,-0.6
+2026-09-23,Bajadas,Novoa,DF,Alavés,535983,-3309,-0.6
+2026-09-23,Bajadas,Kevin,DL,Deportivo,537011,-3352,-0.6
+2026-09-23,Bajadas,Becerra,MC,Rayo Vallecano,538525,-3415,-0.6
+2026-09-23,Bajadas,Antañón,MC,Celta,538525,-3415,-0.6
+2026-09-23,Bajadas,Salinas,DF,Málaga,926421,-3486,-0.4
+2026-09-23,Bajadas,José Alberto,DT,Racing,543273,-3612,-0.7
+2026-09-23,Bajadas,Iván Villar,PT,Celta,547756,-3800,-0.7
+2026-09-23,Bajadas,Marchal,MC,Real Sociedad,550696,-3922,-0.7
+2026-09-23,Bajadas,Monreal,DF,Athletic Club,552177,-3984,-0.7
+2026-09-23,Bajadas,Burcio,MC,Celta,552177,-3984,-0.7
+2026-09-23,Bajadas,Diallo,MC,Alavés,552891,-4014,-0.7
+2026-09-23,Bajadas,Le Normand,DF,Atlético,10478406,-4062,0.0
+2026-09-23,Bajadas,Riki,MC,Deportivo,554296,-4072,-0.7
+2026-09-23,Bajadas,Alberto Calatrava,MC,Levante,558305,-4240,-0.8
+2026-09-23,Bajadas,Cheikh Thiam,MC,Villarreal,559352,-4283,-0.8
+2026-09-23,Bajadas,A. Rodriguez,PT,Alavés,559985,-4310,-0.8
+2026-09-23,Bajadas,Djalo,DL,Athletic Club,561510,-4373,-0.8
+2026-09-23,Bajadas,Zakharyan,MC,Real Sociedad,563971,-4477,-0.8
+2026-09-23,Bajadas,Rayane,DL,Rayo Vallecano,564155,-4483,-0.8
+2026-09-23,Bajadas,Diaby,DF,Elche CF,568366,-4659,-0.8
+2026-09-23,Bajadas,P. Campos,PT,Levante,571113,-4773,-0.8
+2026-09-23,Bajadas,Alexis Ciria,DL,Real Madrid,572535,-4832,-0.8
+2026-09-23,Bajadas,Josan,MC,Elche CF,574527,-4915,-0.8
+2026-09-23,Bajadas,Manolo González,DT,Espanyol,577652,-5046,-0.9
+2026-09-23,Bajadas,Guevara,MC,Alavés,578819,-5094,-0.9
+2026-09-23,Bajadas,Brian Fariñas,MC,Barcelona,585312,-5365,-0.9
+2026-09-23,Bajadas,Balliu,DF,Rayo Vallecano,585668,-5380,-0.9
+2026-09-23,Bajadas,Carlos Macià,MC,Villarreal,589733,-5549,-0.9
+2026-09-23,Bajadas,Grady Diangana,DL,Elche CF,589948,-5558,-0.9
+2026-09-23,Bajadas,Jofre,DL,Espanyol,590759,-5592,-0.9
+2026-09-23,Bajadas,Pelayo,DF,Rayo Vallecano,594487,-5747,-1.0
+2026-09-23,Bajadas,Á. Padilla,DL,Elche CF,601016,-6019,-1.0
+2026-09-23,Bajadas,Otu Jr,MC,Málaga,606054,-6229,-1.0
+2026-09-23,Bajadas,Luís Castro,DT,Levante,608540,-6333,-1.0
+2026-09-23,Bajadas,Funes,DT,Málaga,611752,-6466,-1.0
+2026-09-23,Bajadas,J. Vertrouwd,DF,Rayo Vallecano,612685,-6505,-1.1
+2026-09-23,Bajadas,Costa,DF,Villarreal,616895,-6681,-1.1
+2026-09-23,Bajadas,BOA. Bonel,DL,Osasuna,619252,-6779,-1.1
+2026-09-23,Bajadas,Jauregi,DL,Málaga,621125,-6856,-1.1
+2026-09-23,Bajadas,Dani Barcia,DF,Deportivo,623630,-6961,-1.1
+2026-09-23,Bajadas,O. Rey,MC,Levante,2298375,-7696,-0.3
+2026-09-23,Bajadas,Ramis,DT,Osasuna,644514,-7832,-1.2
+2026-09-23,Bajadas,Aihen,DF,Real Sociedad,656444,-8329,-1.3
+2026-09-23,Bajadas,Cardona,DF,Villarreal,1950195,-8348,-0.4
+2026-09-23,Bajadas,Prados,MC,Athletic Club,658909,-8431,-1.3
+2026-09-23,Bajadas,Hugo Pérez,MC,Racing,671502,-8956,-1.3
+2026-09-23,Bajadas,Marín,MC,Real Sociedad,675118,-9107,-1.3
+2026-09-23,Bajadas,Saba Sazonov,DF,Getafe,678805,-9260,-1.3
+2026-09-23,Bajadas,Beñat,DT,Rayo Vallecano,681857,-9388,-1.4
+2026-09-23,Bajadas,Martín Anselmi,DT,Elche CF,681857,-9388,-1.4
+2026-09-23,Bajadas,Antonio Hidalgo,DT,Deportivo,686014,-9561,-1.4
+2026-09-23,Bajadas,Raba,DL,Valencia,690684,-9755,-1.4
+2026-09-23,Bajadas,Padilla,PT,Athletic Club,691277,-9780,-1.4
+2026-09-23,Bajadas,J. Berrocal,DF,Málaga,698547,-10083,-1.4
+2026-09-23,Bajadas,Nizar El Jmili,DL,Villarreal,699360,-10117,-1.4
+2026-09-23,Bajadas,Óscar López,MC,Getafe,699360,-10117,-1.4
+2026-09-23,Bajadas,Jaume Durà,MC,Valencia,699360,-10117,-1.4
+2026-09-23,Bajadas,Youssef,DF,Alavés,939555,-10413,-1.1
+2026-09-23,Bajadas,Osorio,DL,Elche CF,708991,-10518,-1.5
+2026-09-23,Bajadas,Copete,DF,Valencia,739038,-11770,-1.6
+2026-09-23,Bajadas,D. Villares,MC,Deportivo,1046661,-11829,-1.1
+2026-09-23,Bajadas,Marrero,PT,Real Sociedad,741380,-11868,-1.6
+2026-09-23,Bajadas,A. Rebbach,DL,Alavés,5172574,-12016,-0.2
+2026-09-23,Bajadas,El Abdellaoui,DL,Celta,751997,-12310,-1.6
+2026-09-23,Bajadas,Hugo Sotelo,MC,Levante,756485,-12496,-1.6
+2026-09-23,Bajadas,Guliashvili,DL,Racing,774246,-13237,-1.7
+2026-09-23,Bajadas,Rockson,DF,Osasuna,775993,-13310,-1.7
+2026-09-23,Bajadas,Murillo,DF,Málaga,778937,-13433,-1.7
+2026-09-23,Bajadas,Saliba,MC,Villarreal,6486975,-13513,-0.2
+2026-09-23,Bajadas,Diego López,DL,Valencia,786595,-13752,-1.7
+2026-09-23,Bajadas,G. Bouaré,MC,Rayo Vallecano,794072,-14063,-1.7
+2026-09-23,Bajadas,E. Ponce,DL,Elche CF,809673,-14713,-1.8
+2026-09-23,Bajadas,Arnau Ortiz,DL,Atlético,822187,-15235,-1.8
+2026-09-23,Bajadas,Requena,MC,Levante,824676,-15338,-1.8
+2026-09-23,Bajadas,Aitor Ruibal,DL,Real Betis,839384,-15951,-1.9
+2026-09-23,Bajadas,Iñigo Perez,DT,Villarreal,839387,-15951,-1.9
+2026-09-23,Bajadas,Claudio Giraldez,DT,Celta,841670,-16046,-1.9
+2026-09-23,Bajadas,Foulquier,DF,Valencia,842773,-16092,-1.9
+2026-09-23,Bajadas,Johaneko,DF,Athletic Club,1150334,-16133,-1.4
+2026-09-23,Bajadas,Víctor G.,DF,Levante,846177,-16234,-1.9
+2026-09-23,Bajadas,Nteka,DL,Rayo Vallecano,848301,-16323,-1.9
+2026-09-23,Bajadas,R. Mendoza,MC,Atlético,853363,-16534,-1.9
+2026-09-23,Bajadas,Eddahchouri,DL,Deportivo,863397,-16952,-1.9
+2026-09-23,Bajadas,Á. Ortiz,DF,Real Betis,882000,-17727,-2.0
+2026-09-23,Bajadas,Martim Neto,MC,Elche CF,886597,-17918,-2.0
+2026-09-23,Bajadas,Córdoba,DF,Valencia,893257,-18196,-2.0
+2026-09-23,Bajadas,Ali Houary,DL,Elche CF,910371,-18909,-2.0
+2026-09-23,Bajadas,Pol Lozano,MC,Espanyol,924334,-18953,-2.0
+2026-09-23,Bajadas,Ximo Navarro,DF,Deportivo,4505076,-19571,-0.4
+2026-09-23,Bajadas,Raúl,DL,Osasuna,1414951,-19999,-1.4
+2026-09-23,Bajadas,Juani,DL,Málaga,939684,-20130,-2.1
+2026-09-23,Bajadas,RDT,DL,Rayo Vallecano,939684,-20130,-2.1
+2026-09-23,Bajadas,Javier Gil,DF,Atlético,939684,-20130,-2.1
+2026-09-23,Bajadas,Aznou,DF,Málaga,940316,-20157,-2.1
+2026-09-23,Bajadas,Gorosabel,DF,Espanyol,941937,-20224,-2.1
+2026-09-23,Bajadas,Van Oevelen,PT,Valencia,944074,-20313,-2.1
+2026-09-23,Bajadas,Pedro Felipe,DF,Racing,950650,-20587,-2.1
+2026-09-23,Bajadas,Iker Losada,DL,Real Betis,953144,-20691,-2.1
+2026-09-23,Bajadas,Bayindir,PT,Celta,957674,-20880,-2.1
+2026-09-23,Bajadas,Protesoni,MC,Alavés,975235,-21037,-2.1
+2026-09-23,Bajadas,Niño,DL,Málaga,979443,-21478,-2.1
+2026-09-23,Bajadas,F. Calero,DF,Málaga,980178,-21818,-2.2
+2026-09-23,Bajadas,Bardghji,DL,Barcelona,986687,-22089,-2.2
+2026-09-23,Bajadas,Yanis Musuayi,DL,Levante,1006525,-22915,-2.2
+2026-09-23,Bajadas,Morante,DL,Real Betis,1019790,-23468,-2.2
+2026-09-23,Bajadas,Boselli,DF,Getafe,1032622,-24003,-2.3
+2026-09-23,Bajadas,M. Loureiro,DF,Deportivo,1944547,-24379,-1.2
+2026-09-23,Bajadas,Pedro Díaz,MC,Rayo Vallecano,1084344,-24625,-2.2
+2026-09-23,Bajadas,Lunin,PT,Real Madrid,1081909,-25214,-2.3
+2026-09-23,Bajadas,Miguel Rodríguez,DL,Alavés,1067540,-25458,-2.3
+2026-09-23,Bajadas,Fidalgo,MC,Real Betis,1070056,-25562,-2.3
+2026-09-23,Bajadas,Oluwaseyi,DL,Villarreal,1072720,-25673,-2.3
+2026-09-23,Bajadas,Szczesny,PT,Barcelona,1259992,-26240,-2.0
+2026-09-23,Bajadas,Eriksson,PT,Racing,1088678,-26338,-2.4
+2026-09-23,Bajadas,Almeida,MC,Racing,1093778,-26552,-2.4
+2026-09-23,Bajadas,Moha Achraf,DL,Getafe,1099898,-26806,-2.4
+2026-09-23,Bajadas,Diego Conde,PT,Real Betis,1111737,-27299,-2.4
+2026-09-23,Bajadas,Kike García,DL,Espanyol,1130632,-28086,-2.4
+2026-09-23,Bajadas,Rodrygo,DL,Real Madrid,1463332,-28132,-1.9
+2026-09-23,Bajadas,Tsitaishvili,DL,Rayo Vallecano,1146633,-28753,-2.4
+2026-09-23,Bajadas,Iker Luque,DL,Racing,1155286,-29114,-2.5
+2026-09-23,Bajadas,D. Cárdenas,PT,Rayo Vallecano,1156172,-29151,-2.5
+2026-09-23,Bajadas,Matarazzo,DT,Real Sociedad,1158655,-29254,-2.5
+2026-09-23,Bajadas,Félix Correia,DL,Sevilla,5391193,-29571,-0.5
+2026-09-23,Bajadas,Jeremy Toljan,DF,Levante,1736674,-29629,-1.7
+2026-09-23,Bajadas,B. Mayoral,DL,Getafe,1192021,-30644,-2.5
+2026-09-23,Bajadas,Facu,DF,Racing,1217480,-31705,-2.5
+2026-09-23,Bajadas,Luiz Felipe,DF,Rayo Vallecano,1217711,-31715,-2.5
+2026-09-23,Bajadas,Sergio,MC,Real Madrid,1222222,-31903,-2.5
+2026-09-23,Bajadas,Redondo,MC,Elche CF,1222854,-31931,-2.5
+2026-09-23,Bajadas,Kike Barja,DL,Osasuna,1416500,-32193,-2.2
+2026-09-23,Bajadas,Davinchi,DF,Getafe,1229889,-32222,-2.6
+2026-09-23,Bajadas,Ifeanyi Ndukwe,DF,Levante,1231996,-32310,-2.6
+2026-09-23,Bajadas,Herrando,DF,Osasuna,1234258,-32404,-2.6
+2026-09-23,Bajadas,Iker Muñoz,MC,Osasuna,1884165,-32732,-1.7
+2026-09-23,Bajadas,H. Rincón,DF,Athletic Club,1273867,-34055,-2.6
+2026-09-23,Bajadas,Torró,MC,Osasuna,1278154,-34233,-2.6
+2026-09-23,Bajadas,Manuel Pellegrini,DT,Real Betis,1286754,-34592,-2.6
+2026-09-23,Bajadas,J. Vázquez,DF,Valencia,1492352,-35355,-2.3
+2026-09-23,Bajadas,Pablo Ramón,DF,Racing,1937563,-36035,-1.8
+2026-09-23,Bajadas,Junior,DF,Real Betis,1340103,-36533,-2.7
+2026-09-23,Bajadas,Alemâo,DL,Rayo Vallecano,1349971,-37226,-2.7
+2026-09-23,Bajadas,Oscar Sánchez,DT,Valencia,1389050,-38854,-2.7
+2026-09-23,Bajadas,Mantilla,DF,Racing,1471054,-39610,-2.6
+2026-09-23,Bajadas,Mella,MC,Deportivo,1556709,-41596,-2.6
+2026-09-23,Bajadas,Francho,MC,Getafe,2000349,-41745,-2.0
+2026-09-23,Bajadas,Asencio,DF,Real Madrid,1681322,-42075,-2.4
+2026-09-23,Bajadas,Pacheco,DF,Real Sociedad,1469436,-42203,-2.8
+2026-09-23,Bajadas,De Haas,DF,Valencia,3860283,-45091,-1.2
+2026-09-23,Bajadas,Maguette,MC,Racing,1654629,-45237,-2.7
+2026-09-23,Bajadas,Axel Tape,DF,Levante,1567263,-45281,-2.8
+2026-09-23,Bajadas,Vanja Drkusic,DF,Espanyol,1545887,-45389,-2.9
+2026-09-23,Bajadas,Rafita,DF,Málaga,7391400,-46427,-0.6
+2026-09-23,Bajadas,Nacho Perez,DF,Levante,2104108,-46964,-2.2
+2026-09-23,Bajadas,Riquelme,MC,Real Betis,19181625,-47061,-0.2
+2026-09-23,Bajadas,Faye,DF,Celta,1598736,-47591,-2.9
+2026-09-23,Bajadas,Thiago,MC,Levante,1958983,-48142,-2.4
+2026-09-23,Bajadas,A. Ferllo,PT,Deportivo,1680079,-49300,-2.9
+2026-09-23,Bajadas,Carmona,DF,Sevilla,1687718,-49352,-2.8
+2026-09-23,Bajadas,J. Musso,PT,Atlético,1765424,-49388,-2.7
+2026-09-23,Bajadas,Emil Audero,PT,Rayo Vallecano,5124410,-49389,-1.0
+2026-09-23,Bajadas,Kiko F.,DF,Getafe,1659141,-50108,-2.9
+2026-09-23,Bajadas,Rego,DF,Athletic Club,1671090,-50606,-2.9
+2026-09-23,Bajadas,Dieng,MC,Valencia,1819611,-50717,-2.7
+2026-09-23,Bajadas,Pau Navarro,DF,Villarreal,3668652,-51458,-1.4
+2026-09-23,Bajadas,Bil Nsongo,DL,Deportivo,7690625,-51707,-0.7
+2026-09-23,Bajadas,Simeone,DT,Atlético,1698958,-51767,-3.0
+2026-09-23,Bajadas,Guillén,MC,Sevilla,1700619,-51835,-3.0
+2026-09-23,Bajadas,V. Rosier,DF,Osasuna,1780097,-52408,-2.9
+2026-09-23,Bajadas,Mikel Rodriguez,MC,Alavés,1720902,-52560,-3.0
+2026-09-23,Bajadas,Kumbulla,DF,Rayo Vallecano,1757456,-53387,-2.9
+2026-09-23,Bajadas,J. Dominguez,DF,Atlético,1769226,-54105,-3.0
+2026-09-23,Bajadas,Carreira,DF,Celta,7754012,-54883,-0.7
+2026-09-23,Bajadas,R.P. Bigas,DF,Elche CF,1879774,-54893,-2.8
+2026-09-23,Bajadas,Ugrinic,MC,Valencia,3242190,-55027,-1.7
+2026-09-23,Bajadas,Óscar Valentín,MC,Rayo Vallecano,3104384,-55029,-1.7
+2026-09-23,Bajadas,Arguibide,DF,Osasuna,3238668,-56154,-1.7
+2026-09-23,Bajadas,Puado,MC,Espanyol,2140892,-57038,-2.6
+2026-09-23,Bajadas,V. Chust,DF,Elche CF,4124855,-57382,-1.4
+2026-09-23,Bajadas,Gorrotxa,MC,Real Sociedad,2330885,-57838,-2.4
+2026-09-23,Bajadas,Bright Ede,DF,Deportivo,3534240,-58107,-1.6
+2026-09-23,Bajadas,Alfon,DL,Sevilla,1898995,-58158,-3.0
+2026-09-23,Bajadas,Dimitrievski,PT,Valencia,21569248,-58270,-0.3
+2026-09-23,Bajadas,Peque,DL,Sevilla,2036238,-58324,-2.8
+2026-09-23,Bajadas,Aleñá,MC,Alavés,2701603,-58508,-2.1
+2026-09-23,Bajadas,Diego Rico,DF,Osasuna,1888992,-58568,-3.0
+2026-09-23,Bajadas,Cáceres,DF,Celta,4668924,-59034,-1.2
+2026-09-23,Bajadas,Rafa Rodríguez,MC,Málaga,2153283,-59965,-2.7
+2026-09-23,Bajadas,Manu Hernando,DF,Racing,2056937,-60668,-2.9
+2026-09-23,Bajadas,Hugo Duro,DL,Valencia,4544911,-61666,-1.3
+2026-09-23,Bajadas,Edin Terzic,DT,Athletic Club,1985190,-63693,-3.1
+2026-09-23,Bajadas,Mario Martín,MC,Getafe,2250989,-65771,-2.8
+2026-09-23,Bajadas,Aaron,DF,Racing,2111466,-66322,-3.0
+2026-09-23,Bajadas,Abdelkarim,DL,Barcelona,2511328,-67066,-2.6
+2026-09-23,Bajadas,Driouech,DL,Celta,2334227,-69955,-2.9
+2026-09-23,Bajadas,Joaquín,DL,Málaga,3885793,-69980,-1.8
+2026-09-23,Bajadas,Moi Gómez,MC,Osasuna,2977860,-70421,-2.3
+2026-09-23,Bajadas,Mujaid Sadick,DF,Rayo Vallecano,3078072,-71554,-2.3
+2026-09-23,Bajadas,Pablo García,DL,Racing,8196391,-72640,-0.9
+2026-09-23,Bajadas,Matteo Prati,MC,Racing,2488761,-75056,-2.9
+2026-09-23,Bajadas,Ratkov,DL,Levante,2464426,-75871,-3.0
+2026-09-23,Bajadas,Koke,MC,Atlético,16177207,-75926,-0.5
+2026-09-23,Bajadas,Hector Fort,DF,Real Sociedad,2899430,-77152,-2.6
+2026-09-23,Bajadas,Areso,DF,Athletic Club,4005257,-78322,-1.9
+2026-09-23,Bajadas,Endrick,DL,Real Madrid,2990009,-78765,-2.6
+2026-09-23,Bajadas,Sadiq,DL,Valencia,2675749,-79393,-2.9
+2026-09-23,Bajadas,Gerenabarrena,MC,Athletic Club,3731343,-80809,-2.1
+2026-09-23,Bajadas,E. Militão,DF,Real Madrid,4483600,-80813,-1.8
+2026-09-23,Bajadas,Diakhaby,DF,Valencia,2614103,-81298,-3.0
+2026-09-23,Bajadas,Asp Jensen,MC,Deportivo,3429406,-81436,-2.3
+2026-09-23,Bajadas,Belocian,DF,Racing,2841216,-82208,-2.8
+2026-09-23,Bajadas,Vivian,DF,Athletic Club,3583548,-83148,-2.3
+2026-09-23,Bajadas,Buonanotte,MC,Elche CF,3306026,-86360,-2.5
+2026-09-23,Bajadas,C. Puga,DF,Málaga,3173908,-88817,-2.7
+2026-09-23,Bajadas,Izan M.,MC,Málaga,3324402,-89168,-2.6
+2026-09-23,Bajadas,Q. Hartman,DF,Espanyol,2964018,-90017,-2.9
+2026-09-23,Bajadas,Hansi Flick,DT,Barcelona,3707182,-91030,-2.4
+2026-09-23,Bajadas,Bardeli,MC,Levante,8504678,-92022,-1.1
+2026-09-23,Bajadas,Moscardo,MC,Espanyol,3116822,-95681,-3.0
+2026-09-23,Bajadas,Williot,MC,Celta,4030793,-96376,-2.3
+2026-09-23,Bajadas,Guridi,MC,Sevilla,6525057,-97462,-1.5
+2026-09-23,Bajadas,Villalibre,DL,Racing,3258268,-98240,-2.9
+2026-09-23,Bajadas,Gudelj,MC,Getafe,5759317,-99469,-1.7
+2026-09-23,Bajadas,A. Abqar,DF,Getafe,3196693,-100151,-3.0
+2026-09-23,Bajadas,B. Sangare,DF,Elche CF,3313845,-100197,-2.9
+2026-09-23,Bajadas,Riedel,DF,Espanyol,5632827,-100280,-1.7
+2026-09-23,Bajadas,G. Villar,MC,Elche CF,9901903,-100474,-1.0
+2026-09-23,Bajadas,M. Aguado,MC,Elche CF,3427776,-100677,-2.9
+2026-09-23,Bajadas,A. Alti,DF,Deportivo,3859640,-103239,-2.6
+2026-09-23,Bajadas,Urko,MC,Espanyol,4106511,-104830,-2.5
+2026-09-23,Bajadas,Pere Milla,DL,Espanyol,3622914,-105440,-2.8
+2026-09-23,Bajadas,Dani Lorenzo,MC,Málaga,10494841,-106531,-1.0
+2026-09-23,Bajadas,P. Martínez,MC,Málaga,4315174,-107717,-2.4
+2026-09-23,Bajadas,Einar,DF,Málaga,5472306,-108076,-1.9
+2026-09-23,Bajadas,El Hilali,DF,Espanyol,15213993,-112630,-0.7
+2026-09-23,Bajadas,Isaac,DL,Sevilla,5000779,-113301,-2.2
+2026-09-23,Bajadas,Gayá,DF,Valencia,7544798,-114179,-1.5
+2026-09-23,Bajadas,Ejuke,DL,Sevilla,5686694,-115693,-2.0
+2026-09-23,Bajadas,Hinojo,DF,Espanyol,4411700,-117679,-2.6
+2026-09-23,Bajadas,Rioja,MC,Valencia,4972700,-120577,-2.4
+2026-09-23,Bajadas,Manu Sánchez,DF,Levante,4910850,-121643,-2.4
+2026-09-23,Bajadas,Kochorashvili,MC,Sevilla,6001826,-125400,-2.0
+2026-09-23,Bajadas,Maffeo,DF,Valencia,5531865,-126819,-2.2
+2026-09-23,Bajadas,Thiago Pitarch,MC,Real Madrid,4565964,-136385,-2.9
+2026-09-23,Bajadas,Guedes,DL,Real Sociedad,16384084,-139088,-0.8
+2026-09-23,Bajadas,Cala,DL,Espanyol,5486259,-141379,-2.5
+2026-09-23,Bajadas,Jorge Salinas,DF,Racing,6427603,-141738,-2.2
+2026-09-23,Bajadas,Lomonaco,DF,Elche CF,4668600,-141973,-3.0
+2026-09-23,Bajadas,Mourinho,DT,Real Madrid,4238816,-147320,-3.4
+2026-09-23,Bajadas,Sergio Gómez,DF,Real Sociedad,16298342,-147335,-0.9
+2026-09-23,Bajadas,Olasagasti,MC,Levante,8974128,-148983,-1.6
+2026-09-23,Bajadas,Peio Canales,MC,Athletic Club,5853432,-149884,-2.5
+2026-09-23,Bajadas,Cajuste,MC,Málaga,4824851,-150565,-3.0
+2026-09-23,Bajadas,Iago Aspas,DL,Celta,5198608,-150574,-2.8
+2026-09-23,Bajadas,Leo Román,PT,Deportivo,36393331,-161242,-0.4
+2026-09-23,Bajadas,Iván Martín,MC,Racing,7047091,-163719,-2.3
+2026-09-23,Bajadas,Moncayola,MC,Osasuna,6787304,-163927,-2.4
+2026-09-23,Bajadas,Dubasin,DL,Osasuna,5829194,-165900,-2.8
+2026-09-23,Bajadas,Carlos Espí,DL,Real Madrid,13742449,-165957,-1.2
+2026-09-23,Bajadas,Javi Galán,DF,Celta,6967114,-166720,-2.3
+2026-09-23,Bajadas,Juan Cruz,MC,Málaga,6076738,-169016,-2.7
+2026-09-23,Bajadas,Yeray,DF,Athletic Club,6639375,-170972,-2.5
+2026-09-23,Bajadas,Turrientes,MC,Real Sociedad,6446914,-174515,-2.6
+2026-09-23,Bajadas,Nuñez,DF,Espanyol,9386009,-176438,-1.8
+2026-09-23,Bajadas,Á. Carreras,DF,Real Madrid,9018530,-178442,-1.9
+2026-09-23,Bajadas,Camavinga,MC,Real Madrid,7788433,-184211,-2.3
+2026-09-23,Bajadas,Sato,DL,Valencia,5982736,-184720,-3.0
+2026-09-23,Bajadas,Isi,DL,Rayo Vallecano,8309738,-185481,-2.2
+2026-09-23,Bajadas,Brahim,MC,Real Madrid,6870034,-187013,-2.7
+2026-09-23,Bajadas,Sangante,DF,Sevilla,6836847,-188116,-2.7
+2026-09-23,Bajadas,Oskarsson,DL,Real Sociedad,6117663,-189256,-3.0
+2026-09-23,Bajadas,M. Casadó,MC,Deportivo,6541874,-190667,-2.8
+2026-09-23,Bajadas,Uche,DL,Getafe,6117673,-192707,-3.1
+2026-09-23,Bajadas,Cabrera,DF,Espanyol,10901096,-202368,-1.8
+2026-09-23,Bajadas,Angeliño,DF,Deportivo,6657289,-206202,-3.0
+2026-09-23,Bajadas,Javi Rodríguez,DF,Celta,7065561,-209979,-2.9
+2026-09-23,Bajadas,Guruzeta,DL,Athletic Club,6873133,-211115,-3.0
+2026-09-23,Bajadas,Berenguer,DL,Athletic Club,10954071,-214092,-1.9
+2026-09-23,Bajadas,Sorloth,DL,Atlético,7843661,-215571,-2.7
+2026-09-23,Bajadas,Aimar,MC,Osasuna,7351898,-216083,-2.9
+2026-09-23,Bajadas,Abel Bretones,DF,Osasuna,9120350,-216527,-2.3
+2026-09-23,Bajadas,Raúl Moro,DL,Osasuna,6916205,-218750,-3.1
+2026-09-23,Bajadas,Llorente,DF,Real Betis,7307096,-222578,-3.0
+2026-09-23,Bajadas,F. Bernal,MC,Real Betis,13210334,-224916,-1.7
+2026-09-23,Bajadas,Tárrega,DF,Valencia,7166336,-225366,-3.0
+2026-09-23,Bajadas,Buchanan,MC,Villarreal,10032343,-225566,-2.2
+2026-09-23,Bajadas,Christensen,DF,Barcelona,7983012,-233360,-2.8
+2026-09-23,Bajadas,Javi Hernández,MC,Espanyol,17060463,-238783,-1.4
+2026-09-23,Bajadas,Starfelt,DF,Celta,8586036,-238874,-2.7
+2026-09-23,Bajadas,F. De Jong,MC,Barcelona,8357852,-239387,-2.8
+2026-09-23,Bajadas,Mangala,MC,Getafe,10653385,-245548,-2.3
+2026-09-23,Bajadas,Foyth,DF,Villarreal,11269878,-245689,-2.1
+2026-09-23,Bajadas,Robbie Ure,DL,Sevilla,9672398,-248211,-2.5
+2026-09-23,Bajadas,Javi Guerra,MC,Valencia,19789997,-248664,-1.2
+2026-09-23,Bajadas,Dela,DF,Levante,18344050,-250852,-1.3
+2026-09-23,Bajadas,Arnau,DF,Valencia,8288423,-251064,-2.9
+2026-09-23,Bajadas,Del Castillo,DL,Osasuna,8059146,-253868,-3.1
+2026-09-23,Bajadas,Vargas,DL,Sevilla,8400418,-259353,-3.0
+2026-09-23,Bajadas,Tchouaméni,MC,Real Madrid,21363297,-262160,-1.2
+2026-09-23,Bajadas,Rubén García,MC,Osasuna,13055770,-269150,-2.0
+2026-09-23,Bajadas,M. Sarr,DF,Real Sociedad,8820240,-269533,-3.0
+2026-09-23,Bajadas,Guido Rodríguez,MC,Valencia,13691892,-277391,-2.0
+2026-09-23,Bajadas,B. Iglesias,DL,Celta,11297106,-282289,-2.4
+2026-09-23,Bajadas,Álex Balde,DF,Barcelona,9924455,-289996,-2.8
+2026-09-23,Bajadas,Jauregizar,MC,Athletic Club,12221521,-290548,-2.3
+2026-09-23,Bajadas,Tenaglia,DF,Alavés,33004346,-297597,-0.9
+2026-09-23,Bajadas,Mandi,DF,Levante,11791851,-304140,-2.5
+2026-09-23,Bajadas,Zubeldia,DF,Real Sociedad,10026464,-304190,-2.9
+2026-09-23,Bajadas,Lejeune,DF,Rayo Vallecano,18277933,-312173,-1.7
+2026-09-23,Bajadas,Andrés Martín,DL,Racing,10427769,-314582,-2.9
+2026-09-23,Bajadas,Aramburu,DF,Real Sociedad,19002909,-323682,-1.7
+2026-09-23,Bajadas,Etta Eyong,DL,Levante,10575966,-328750,-3.0
+2026-09-23,Bajadas,Harvey Elliott,MC,Valencia,10998861,-330591,-2.9
+2026-09-23,Bajadas,Fran García,DF,Real Betis,28893855,-337671,-1.2
+2026-09-23,Bajadas,Gavi,MC,Barcelona,13313499,-344733,-2.5
+2026-09-23,Bajadas,Dolan,DL,Espanyol,14526936,-345043,-2.3
+2026-09-23,Bajadas,Lo Celso,MC,Real Betis,12231224,-352645,-2.8
+2026-09-23,Bajadas,Amatucci,MC,Deportivo,16503230,-354859,-2.1
+2026-09-23,Bajadas,Bryan,DL,Espanyol,13875121,-366627,-2.6
+2026-09-23,Bajadas,Febas,MC,Celta,12572900,-367583,-2.8
+2026-09-23,Bajadas,Adama Traoré,DL,Deportivo,12943379,-368198,-2.8
+2026-09-23,Bajadas,Bordalás,DT,Getafe,9334048,-369894,-3.8
+2026-09-23,Bajadas,Noubi,DF,Deportivo,14798053,-372857,-2.5
+2026-09-23,Bajadas,Enes Ünal,DL,Getafe,15261035,-373953,-2.4
+2026-09-23,Bajadas,Iñaki Williams,DL,Athletic Club,36296471,-375212,-1.0
+2026-09-23,Bajadas,Boyomo,DF,Osasuna,12354560,-382515,-3.0
+2026-09-23,Bajadas,Eric,DF,Barcelona,43404469,-382902,-0.9
+2026-09-23,Bajadas,Álvaro García,MC,Rayo Vallecano,17150726,-385578,-2.2
+2026-09-23,Bajadas,Trent,DF,Real Madrid,20179153,-385752,-1.9
+2026-09-23,Bajadas,Parrott,DL,Real Betis,20026785,-407334,-2.0
+2026-09-23,Bajadas,Ryan,PT,Levante,29391638,-408768,-1.4
+2026-09-23,Bajadas,Blanco,MC,Alavés,18181052,-412518,-2.2
+2026-09-23,Bajadas,Ceballos,MC,Real Betis,17476843,-416293,-2.3
+2026-09-23,Bajadas,T. Martínez,DL,Alavés,16492221,-426141,-2.5
+2026-09-23,Bajadas,Comesaña,MC,Villarreal,13788694,-427815,-3.0
+2026-09-23,Bajadas,Mouriño,DF,Villarreal,15197030,-441371,-2.8
+2026-09-23,Bajadas,A. Batalla,PT,Rayo Vallecano,14294089,-443005,-3.0
+2026-09-23,Bajadas,Kubo,MC,Real Sociedad,17816731,-466152,-2.5
+2026-09-23,Bajadas,Unai Simón,PT,Athletic Club,47150983,-468698,-1.0
+2026-09-23,Bajadas,Ratiu,DF,Rayo Vallecano,21430623,-471899,-2.2
+2026-09-23,Bajadas,Stassin,DL,Sevilla,15425203,-476478,-3.0
+2026-09-23,Bajadas,Isco,MC,Real Betis,36895598,-482341,-1.3
+2026-09-23,Bajadas,Pathé I. Ciss,MC,Rayo Vallecano,24526764,-487314,-1.9
+2026-09-23,Bajadas,Mikautadze,DL,Villarreal,48783296,-493910,-1.0
+2026-09-23,Bajadas,Hjulmand,MC,Atlético,19755146,-495534,-2.4
+2026-09-23,Bajadas,Gabriel Jesus,DL,Barcelona,24019711,-496850,-2.0
+2026-09-23,Bajadas,Jon Martin,DF,Real Sociedad,22422163,-516297,-2.3
+2026-09-23,Bajadas,Yeremay,DL,Deportivo,24325488,-521621,-2.1
+2026-09-23,Bajadas,Edu Expósito,MC,Espanyol,31633387,-531194,-1.7
+2026-09-23,Bajadas,De Frutos,DL,Rayo Vallecano,22075721,-538276,-2.4
+2026-09-23,Bajadas,C. Romero,DF,Villarreal,19132247,-557551,-2.8
+2026-09-23,Bajadas,Dmitrovic,PT,Espanyol,39278771,-572464,-1.4
+2026-09-23,Bajadas,Remiro,PT,Real Sociedad,36072721,-586545,-1.6
+2026-09-23,Bajadas,Fornals,MC,Real Betis,41720756,-588402,-1.4
+2026-09-23,Bajadas,Kounde,DF,Barcelona,24208951,-596651,-2.4
+2026-09-23,Bajadas,Larrubia,MC,Málaga,22554213,-597025,-2.6
+2026-09-23,Bajadas,Pau Cubarsí,DF,Barcelona,61617749,-607424,-1.0
+2026-09-23,Bajadas,Iñigo Vicente,DL,Racing,32131404,-611528,-1.9
+2026-09-23,Bajadas,Marcos Alonso,DF,Celta,28711368,-614164,-2.1
+2026-09-23,Bajadas,Gerard,DL,Villarreal,37877205,-626443,-1.6
+2026-09-23,Bajadas,Bellingham,MC,Real Madrid,120850092,-630149,-0.5
+2026-09-23,Bajadas,Bernardo Silva,MC,Real Madrid,35727224,-633632,-1.7
+2026-09-23,Bajadas,Chupe,DL,Málaga,21937682,-635524,-2.8
+2026-09-23,Bajadas,Courtois,PT,Real Madrid,58933909,-641921,-1.1
+2026-09-23,Bajadas,Júnior R.,PT,Villarreal,21738427,-644234,-2.9
+2026-09-23,Bajadas,Canales,MC,Racing,26621362,-648052,-2.4
+2026-09-23,Bajadas,Konaté,DF,Real Madrid,36060295,-675328,-1.8
+2026-09-23,Bajadas,Dumfries,DF,Real Madrid,28854917,-696761,-2.4
+2026-09-23,Bajadas,Catena,DF,Osasuna,29038076,-730297,-2.5
+2026-09-23,Bajadas,Sergio Herrera,PT,Osasuna,29235237,-743832,-2.5
+2026-09-23,Bajadas,Gerard Martín,DF,Barcelona,46623090,-752149,-1.6
+2026-09-23,Bajadas,Pedri,MC,Barcelona,92330511,-763585,-0.8
+2026-09-23,Bajadas,Marc Pubill,DF,Atlético,38975751,-763723,-1.9
+2026-09-23,Bajadas,Julián Alvarez,DL,Atlético,39227700,-798056,-2.0
+2026-09-23,Bajadas,Oyarzabal,DL,Real Sociedad,49215035,-841503,-1.7
+2026-09-23,Bajadas,O. Sancet,MC,Athletic Club,41531664,-939519,-2.2
+2026-09-23,Bajadas,Lookman,DL,Atlético,43012828,-1009628,-2.3
+2026-09-23,Bajadas,Cucurella,DF,Real Madrid,50735204,-1048912,-2.0
+2026-09-23,Bajadas,Bartra,DF,Real Betis,36633834,-1107622,-2.9
+2026-09-23,Bajadas,Barrios,MC,Atlético,40606740,-1177197,-2.8
+2026-09-23,Bajadas,Pepe,DL,Villarreal,54318325,-1293810,-2.3
+2026-09-23,Bajadas,Valverde,MC,Real Madrid,60199276,-1461354,-2.4
+2026-09-23,Bajadas,Joan García,PT,Barcelona,63625581,-1491160,-2.3
+2026-09-23,Bajadas,Huijsen,DF,Real Madrid,50641304,-1495169,-2.9
+2026-09-23,Bajadas,Fermín,MC,Barcelona,101526753,-1634924,-1.6
+2026-09-23,Bajadas,Vini Jr.,DL,Real Madrid,99537088,-1641369,-1.6
+2026-09-23,Bajadas,Gordon,DL,Barcelona,75263398,-1664079,-2.2
