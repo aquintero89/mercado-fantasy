@@ -1,6 +1,6 @@
 """
-Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión definitiva con consulta directa a las fichas/API de jugadores.
+Scraper diario de jugadores específicos para La Liga Fantasy (analiticafantasy.com)
+Consulta individualizada por cada jugador para extraer precio y cambios exactos.
 """
 
 import os
@@ -30,7 +30,7 @@ def normaliza(texto: str) -> str:
 
 
 def parse_entrada_jugador(linea: str):
-    """Extrae nombre y equipo de una línea de mis_jugadores.txt."""
+    """Extrae nombre y equipo opcional de mis_jugadores.txt."""
     m = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", linea.strip())
     if m:
         return m.group(1).strip(), m.group(2).strip()
@@ -39,7 +39,7 @@ def parse_entrada_jugador(linea: str):
 
 def carga_mis_jugadores() -> list[str]:
     if not MIS_JUGADORES_FILE.exists():
-        print(f"  ⚠️  No existe {MIS_JUGADORES_FILE}")
+        print(f"  ⚠️ No existe {MIS_JUGADORES_FILE}")
         return []
     with open(MIS_JUGADORES_FILE, encoding="utf-8") as f:
         jugadores = [line.strip() for line in f if line.strip()]
@@ -123,16 +123,15 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, total: int) -> str:
     return "\n".join(lines)
 
 
-def consultar_datos_jugador(session, nombre: str, equipo: str) -> dict:
-    """
-    Realiza una petición de búsqueda estructurada para extraer los valores reales del jugador.
-    """
-    url_busqueda = f"{BASE_URL}/fantasy-la-liga/jugadores?q={nombre.replace(' ', '+')}"
+def consultar_jugador_individual(session, nombre: str, equipo_hint: str) -> dict:
+    """Busca al jugador consultando el buscador interno y extrayendo sus valores."""
+    q = f"{nombre} {equipo_hint}" if equipo_hint else nombre
+    url_busqueda = f"{BASE_URL}/fantasy-la-liga/jugadores?q={q.replace(' ', '+')}"
     
     resultado = {
         "fecha": date.today().isoformat(),
         "jugador": nombre,
-        "equipo": equipo or "",
+        "equipo": equipo_hint or "",
         "precio_eur": "0",
         "cambio_eur": "0",
         "cambio_pct": "0.0"
@@ -142,29 +141,31 @@ def consultar_datos_jugador(session, nombre: str, equipo: str) -> dict:
         resp = session.get(url_busqueda, impersonate="chrome", timeout=15)
         if resp.status_code == 200:
             html = resp.text
-            # Buscar patrones de importes en euros y porcentajes en el HTML devuelto
+            
+            # Buscar patrones monetarios y porcentajes en la respuesta de búsqueda
             importes = re.findall(r"([+-]?[\d.]+)\s*€", html)
             porcentajes = re.findall(r"([+-]?[\d,]+)\s*%", html)
 
-            if importes:
-                # Filtrar y asignar valores lógicos de precio y cambio
-                valores_limpios = [imp.replace(".", "") for imp in importes if len(imp.replace(".", "")) >= 4]
-                if len(valores_limpios) >= 2:
-                    resultado["cambio_eur"] = valores_limpios[0]
-                    resultado["precio_eur"] = valores_limpios[1]
-                elif len(valores_limpios) == 1:
-                    resultado["precio_eur"] = valores_limpios[0]
+            valores_limpios = [imp.replace(".", "") for imp in importes if len(imp.replace(".", "")) >= 4]
+            
+            if len(valores_limpios) >= 2:
+                resultado["cambio_eur"] = valores_limpios[0]
+                resultado["precio_eur"] = valores_limpios[1]
+            elif len(valores_limpios) == 1:
+                resultado["precio_eur"] = valores_limpios[0]
 
             if porcentajes:
                 resultado["cambio_pct"] = porcentajes[0].replace(",", ".")
+                
+            print(f"  ✓ {nombre}: Precio={resultado['precio_eur']} | Cambio={resultado['cambio_eur']}")
     except Exception as e:
-        print(f"⚠️ Error al consultar {nombre}: {e}")
+        print(f"  ⚠️ Error consultando a {nombre}: {e}")
 
     return resultado
 
 
 def main():
-    print("Consultando jugadores individualmente...")
+    print("Iniciando consulta individual de jugadores...")
 
     session = cffi_requests.Session()
     session.headers.update({
@@ -179,8 +180,7 @@ def main():
 
     for linea in mis_jugadores:
         nombre, equipo_hint = parse_entrada_jugador(linea)
-        print(f"  Analizando: {nombre} ({equipo_hint or 'Sin equipo'})")
-        datos = consultar_datos_jugador(session, nombre, equipo_hint)
+        datos = consultar_jugador_individual(session, nombre, equipo_hint)
         equipo_final.append(datos)
 
     df_final = pd.DataFrame(equipo_final)
