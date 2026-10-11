@@ -1,0 +1,773 @@
+﻿fecha,tipo,jugador,posicion,equipo,precio_eur,cambio_eur,cambio_pct
+2026-08-09,Subidas,Boyomo,DF,Osasuna,25741457,+562157,+2.2
+2026-08-09,Subidas,Ionut Radu,PT,Celta Vigo,39681613,+450302,+1.1
+2026-08-09,Subidas,O. Sancet,MC,Athletic Club,52140968,+224186,+0.4
+2026-08-09,Subidas,Isaac,DL,Sevilla,6112184,+28549,+0.5
+2026-08-09,Bajadas,FAFacu,DF,Racing Santander,3113617,-11027,-0.4
+2026-08-09,Bajadas,P. Campos,PT,Levante,1185467,-22513,-1.9
+2026-08-09,Bajadas,Pablo Durán,DL,Celta Vigo,1234551,-34495,-2.7
+2026-08-09,Bajadas,C. Puga,DF,Malaga,5598496,-59738,-1.1
+2026-08-09,Bajadas,Javi Guerra,MC,Valencia,24119208,-96430,-0.4
+2026-08-09,Bajadas,Guido Rodríguez,MC,Valencia,27106409,-451666,-1.6
+2026-08-09,Bajadas,Tchouaméni,MC,Real Madrid,45502262,-487957,-1.1
+2026-08-10,Subidas,Boyomo,DF,Osasuna,26229969,+488512,+1.9
+2026-08-10,Subidas,Ionut Radu,PT,Celta Vigo,39952903,+271290,+0.7
+2026-08-10,Subidas,Foyth,DF,Villarreal,10787841,+111889,+1.0
+2026-08-10,Subidas,Isaac,DL,Sevilla,6156018,+43834,+0.7
+2026-08-10,Bajadas,FAFacu,DF,Racing Santander,3101699,-11918,-0.4
+2026-08-10,Bajadas,O. Sancet,MC,Athletic Club,52095229,-45739,-0.1
+2026-08-10,Bajadas,C. Puga,DF,Malaga,5527794,-70702,-1.3
+2026-08-10,Bajadas,Javi Guerra,MC,Valencia,24017572,-101636,-0.4
+2026-08-10,Bajadas,Guido Rodríguez,MC,Valencia,26809289,-297120,-1.1
+2026-08-10,Bajadas,Tchouaméni,MC,Real Madrid,44986485,-515777,-1.1
+2026-08-11,Subidas,Boyomo,DF,Osasuna,26693160,+463191,+1.8
+2026-08-11,Subidas,Ionut Radu,PT,Celta Vigo,40225317,+272414,+0.7
+2026-08-11,Subidas,Foyth,DF,Villarreal,10986034,+198193,+1.8
+2026-08-11,Subidas,Isaac,DL,Sevilla,6220559,+64541,+1.0
+2026-08-11,Bajadas,FAFacu,DF,Racing Santander,3087639,-14060,-0.5
+2026-08-11,Bajadas,C. Puga,DF,Malaga,5450597,-77197,-1.4
+2026-08-11,Bajadas,Javi Guerra,MC,Valencia,23937695,-79877,-0.3
+2026-08-11,Bajadas,Guido Rodríguez,MC,Valencia,26539461,-269828,-1.0
+2026-08-11,Bajadas,Tchouaméni,MC,Real Madrid,44386765,-599720,-1.3
+2026-08-11,Bajadas,O. Sancet,MC,Athletic Club,51462751,-632478,-1.2
+2026-08-12,Subidas,Boyomo,DF,Osasuna,27133042,+439882,+1.6
+2026-08-12,Subidas,Foyth,DF,Villarreal,11223086,+237052,+2.2
+2026-08-12,Subidas,Ionut Radu,PT,Celta Vigo,40316705,+91388,+0.2
+2026-08-12,Subidas,Isaac,DL,Sevilla,6279362,+58803,+0.9
+2026-08-12,Bajadas,FAFacu,DF,Racing Santander,3071047,-16592,-0.5
+2026-08-12,Bajadas,Javi Guerra,MC,Valencia,23908125,-29570,-0.1
+2026-08-12,Bajadas,C. Puga,DF,Malaga,5401633,-48964,-0.9
+2026-08-12,Bajadas,Guido Rodríguez,MC,Valencia,26303712,-235749,-0.9
+2026-08-12,Bajadas,O. Sancet,MC,Athletic Club,50462604,-1000147,-1.9
+2026-08-13,Subidas,Boyomo,DF,Osasuna,27793967,+369734,+1.3
+2026-08-13,Subidas,Foyth,DF,Villarreal,11726580,+268180,+2.3
+2026-08-13,Subidas,Isaac,DL,Sevilla,6375345,+68186,+1.1
+2026-08-13,Subidas,Javi Guerra,MC,Valencia,23920044,+58344,+0.2
+2026-08-13,Subidas,FAFacu,DF,Racing,3059538,+5400,+0.2
+2026-08-13,Bajadas,C. Puga,DF,Málaga,5321940,-22290,-0.4
+2026-08-13,Bajadas,Guido Rodríguez,MC,Valencia,25906133,-149625,-0.6
+2026-08-13,Bajadas,Ionut Radu,PT,Celta,39711707,-349911,-0.9
+2026-08-13,Bajadas,O. Sancet,MC,Athletic Club,48416099,-926621,-1.9
+2026-08-14,Subidas,Boyomo,DF,Osasuna,27793967,+369734,+1.3
+2026-08-14,Subidas,Foyth,DF,Villarreal,11726580,+268180,+2.3
+2026-08-14,Subidas,Isaac,DL,Sevilla,6375345,+68186,+1.1
+2026-08-14,Subidas,Javi Guerra,MC,Valencia,23920044,+58344,+0.2
+2026-08-14,Subidas,FAFacu,DF,Racing,3059538,+5400,+0.2
+2026-08-14,Bajadas,C. Puga,DF,Málaga,5321940,-22290,-0.4
+2026-08-14,Bajadas,Guido Rodríguez,MC,Valencia,25906133,-149625,-0.6
+2026-08-14,Bajadas,Ionut Radu,PT,Celta,39711707,-349911,-0.9
+2026-08-14,Bajadas,O. Sancet,MC,Athletic Club,48416099,-926621,-1.9
+2026-08-15,Subidas,Foyth,DF,Villarreal,11990930,+264350,+2.3
+2026-08-15,Subidas,Boyomo,DF,Osasuna,28005862,+211895,+0.8
+2026-08-15,Subidas,Javi Guerra,MC,Valencia,24015274,+95230,+0.4
+2026-08-15,Subidas,Isaac,DL,Sevilla,6441463,+66118,+1.0
+2026-08-15,Subidas,Camello,DL,Rayo Vallecano,3100718,+10942,+0.4
+2026-08-15,Subidas,FAFacu,DF,Racing,3069922,+10384,+0.3
+2026-08-15,Subidas,Pablo Ramón,DF,Racing,514893,+1551,+0.3
+2026-08-15,Bajadas,SSSaba Sazonov,DF,Getafe,1246455,-16287,-1.3
+2026-08-15,Bajadas,D. Villares,MC,Deportivo,2517042,-16482,-0.7
+2026-08-15,Bajadas,Pablo Durán,DL,Celta,1046490,-25678,-2.4
+2026-08-15,Bajadas,C. Puga,DF,Málaga,5281655,-40285,-0.8
+2026-08-15,Bajadas,RamisDTOsasuna,,,1477812,-48609,-3.2
+2026-08-15,Bajadas,Guido Rodríguez,MC,Valencia,25736116,-170017,-0.7
+2026-08-15,Bajadas,Ionut Radu,PT,Celta,39248115,-463592,-1.2
+2026-08-16,Subidas,Foyth,DF,Villarreal,12236452,+245522,+2.0
+2026-08-16,Subidas,Javi Guerra,MC,Valencia,24183434,+168160,+0.7
+2026-08-16,Subidas,Boyomo,DF,Osasuna,28167229,+161367,+0.6
+2026-08-16,Subidas,Isaac,DL,Sevilla,6509025,+67562,+1.0
+2026-08-16,Subidas,Camello,DL,Rayo Vallecano,3109992,+9274,+0.3
+2026-08-16,Bajadas,Pablo Ramón,DF,Racing,510551,-4342,-0.8
+2026-08-16,Bajadas,FAFacu,DF,Racing,3059782,-10140,-0.3
+2026-08-16,Bajadas,SSSaba Sazonov,DF,Getafe,1224989,-21466,-1.7
+2026-08-16,Bajadas,D. Villares,MC,Deportivo,2490703,-26339,-1.0
+2026-08-16,Bajadas,Pablo Durán,DL,Celta,1019795,-26695,-2.6
+2026-08-16,Bajadas,C. Puga,DF,Málaga,5243145,-38510,-0.7
+2026-08-16,Bajadas,RamisDTOsasuna,,,1433618,-44194,-3.0
+2026-08-16,Bajadas,Guido Rodríguez,MC,Valencia,25562022,-174094,-0.7
+2026-08-16,Bajadas,Ionut Radu,PT,Celta,38934871,-313244,-0.8
+2026-08-17,Subidas,Foyth,DF,Villarreal,12566498,+330046,+2.7
+2026-08-17,Subidas,Javi Guerra,MC,Valencia,24340395,+156961,+0.6
+2026-08-17,Subidas,Boyomo,DF,Osasuna,28269599,+102370,+0.4
+2026-08-17,Bajadas,Pablo Ramón,DF,Racing,506447,-4104,-0.8
+2026-08-17,Bajadas,Pablo Durán,DL,Celta,996976,-22819,-2.2
+2026-08-17,Bajadas,Camello,DL,Rayo Vallecano,3085546,-24446,-0.8
+2026-08-17,Bajadas,RamisDTOsasuna,,,1391898,-41720,-2.9
+2026-08-17,Bajadas,D. Villares,MC,Deportivo,2442046,-48657,-2.0
+2026-08-17,Bajadas,FAFacu,DF,Racing,3003988,-55794,-1.8
+2026-08-17,Bajadas,Isaac,DL,Sevilla,6443426,-65599,-1.0
+2026-08-17,Bajadas,C. Puga,DF,Málaga,5170493,-72652,-1.4
+2026-08-17,Bajadas,Marcos Alonso,DF,Celta,28927438,-267536,-0.9
+2026-08-17,Bajadas,Guido Rodríguez,MC,Valencia,25241857,-320165,-1.3
+2026-08-17,Bajadas,Ionut Radu,PT,Celta,38485562,-449309,-1.2
+2026-08-18,Subidas,Foyth,DF,Villarreal,12898244,+331746,+2.6
+2026-08-18,Subidas,Javi Guerra,MC,Valencia,24501109,+160714,+0.7
+2026-08-18,Subidas,Boyomo,DF,Osasuna,28359962,+90363,+0.3
+2026-08-18,Subidas,Pablo Ramón,DF,Racing,524834,+18387,+3.6
+2026-08-18,Bajadas,Pablo Durán,DL,Celta,971629,-25347,-2.5
+2026-08-18,Bajadas,Camello,DL,Rayo Vallecano,3052092,-33454,-1.1
+2026-08-18,Bajadas,RamisDTOsasuna,,,1350815,-41083,-3.0
+2026-08-18,Bajadas,D. Villares,MC,Deportivo,2393361,-48685,-2.0
+2026-08-18,Bajadas,C. Puga,DF,Málaga,5102130,-68363,-1.3
+2026-08-18,Bajadas,FAFacu,DF,Racing,2925449,-78539,-2.6
+2026-08-18,Bajadas,Isaac,DL,Sevilla,6303616,-139810,-2.2
+2026-08-19,Subidas,Foyth,DF,Villarreal,13306196,+407952,+3.2
+2026-08-19,Subidas,Javi Guerra,MC,Valencia,24565065,+63956,+0.3
+2026-08-19,Subidas,Boyomo,DF,Osasuna,28402635,+42673,+0.2
+2026-08-19,Subidas,Pablo Ramón,DF,Racing,547071,+22237,+4.2
+2026-08-19,Bajadas,Pablo Durán,DL,Celta,946590,-25039,-2.6
+2026-08-19,Bajadas,RamisDTOsasuna,,,1309672,-41143,-3.0
+2026-08-19,Bajadas,Camello,DL,Rayo Vallecano,3008177,-43915,-1.4
+2026-08-19,Bajadas,D. Villares,MC,Deportivo,2329862,-63499,-2.7
+2026-08-19,Bajadas,FAFacu,DF,Racing,2843544,-81905,-2.8
+2026-08-19,Bajadas,C. Puga,DF,Málaga,5012308,-89822,-1.8
+2026-08-19,Bajadas,Isaac,DL,Sevilla,6154164,-149452,-2.4
+2026-08-20,Subidas,Foyth,DF,Villarreal,13691219,+385023,+2.9
+2026-08-20,Subidas,Boyomo,DF,Osasuna,28477473,+74838,+0.3
+2026-08-20,Subidas,Javi Guerra,MC,Valencia,24638939,+73874,+0.3
+2026-08-20,Subidas,Pablo Ramón,DF,Racing,579350,+32279,+5.9
+2026-08-20,Bajadas,Pablo Durán,DL,Celta,928019,-18571,-2.0
+2026-08-20,Bajadas,Camello,DL,Rayo Vallecano,2980452,-27725,-0.9
+2026-08-20,Bajadas,RamisDTOsasuna,,,1272877,-36795,-2.8
+2026-08-20,Bajadas,C. Puga,DF,Málaga,4962579,-49729,-1.0
+2026-08-20,Bajadas,D. Villares,MC,Deportivo,2278577,-51285,-2.2
+2026-08-20,Bajadas,FAFacu,DF,Racing,2776140,-67404,-2.4
+2026-08-20,Bajadas,Isaac,DL,Sevilla,6023939,-130225,-2.1
+2026-08-21,Subidas,Foyth,DF,Villarreal,14096483,+405264,+3.0
+2026-08-21,Subidas,Javi Guerra,MC,Valencia,24754468,+115529,+0.5
+2026-08-21,Subidas,Pablo Ramón,DF,Racing,611593,+32243,+5.6
+2026-08-21,Subidas,C. Puga,DF,Málaga,4982023,+19444,+0.4
+2026-08-21,Subidas,Camello,DL,Rayo Vallecano,2990422,+9970,+0.3
+2026-08-21,Bajadas,Pablo Durán,DL,Celta,911712,-16307,-1.8
+2026-08-21,Bajadas,RamisDTOsasuna,,,1237215,-35662,-2.8
+2026-08-21,Bajadas,D. Villares,MC,Deportivo,2236850,-41727,-1.8
+2026-08-21,Bajadas,Boyomo,DF,Osasuna,28435182,-42291,-0.1
+2026-08-21,Bajadas,FAFacu,DF,Racing,2716313,-59827,-2.2
+2026-08-21,Bajadas,Isaac,DL,Sevilla,5906241,-117698,-2.0
+2026-08-22,Subidas,Foyth,DF,Villarreal,14489632,+393149,+2.8
+2026-08-22,Subidas,Camello,DL,Rayo Vallecano,3121629,+131207,+4.4
+2026-08-22,Subidas,Javi Guerra,MC,Valencia,24792599,+38131,+0.2
+2026-08-22,Subidas,Pablo Ramón,DF,Racing,632605,+21012,+3.4
+2026-08-22,Subidas,C. Puga,DF,Málaga,4982161,+138,0.0
+2026-08-22,Bajadas,C. Rivero,PT,Valencia,465650,-2240,-0.5
+2026-08-22,Bajadas,Iñigo,DF,Racing,669091,-10716,-1.6
+2026-08-22,Bajadas,Pablo Durán,DL,Celta,891804,-19908,-2.2
+2026-08-22,Bajadas,D. Villares,MC,Deportivo,2184470,-52380,-2.3
+2026-08-22,Bajadas,Iñigo PerezDTVillarreal,,,1914306,-60493,-3.1
+2026-08-23,Subidas,15Pathé I. Ciss,MC,Rayo Vallecano,15750888,+795954,+5.3
+2026-08-23,Subidas,Foyth,DF,Villarreal,14828293,+338661,+2.3
+2026-08-23,Subidas,Camello,DL,Rayo Vallecano,3304220,+182591,+5.8
+2026-08-23,Bajadas,C. Rivero,PT,Valencia,464717,-933,-0.2
+2026-08-23,Bajadas,Alonso,DL,Rayo Vallecano,519859,-3230,-0.6
+2026-08-23,Bajadas,Iñigo,DF,Racing,660021,-9070,-1.4
+2026-08-23,Bajadas,C. Puga,DF,Málaga,4972420,-9741,-0.2
+2026-08-23,Bajadas,Marcos,DL,Espanyol,1171798,-30394,-2.5
+2026-08-23,Bajadas,Isaac,DL,Sevilla,5734152,-41543,-0.7
+2026-08-23,Bajadas,D. Villares,MC,Deportivo,2132748,-51722,-2.4
+2026-08-23,Bajadas,Iñigo Perez,DT,Villarreal,1858659,-55647,-2.9
+2026-08-23,Bajadas,Javi Guerra,MC,Valencia,24736330,-56269,-0.2
+2026-08-24,Subidas,16Pathé I. Ciss,MC,Rayo Vallecano,16537569,+786681,+5.0
+2026-08-24,Subidas,Marcos Alonso,DF,Celta,27712836,+464510,+1.7
+2026-08-24,Subidas,Foyth,DF,Villarreal,15133852,+305559,+2.1
+2026-08-24,Subidas,Guido Rodríguez,MC,Valencia,23542914,+302522,+1.3
+2026-08-24,Subidas,Isaac,DL,Sevilla,5969986,+235834,+4.1
+2026-08-24,Subidas,Camello,DL,Rayo Vallecano,3477128,+172908,+5.2
+2026-08-24,Bajadas,Rodri,MC,Barcelona,75877322,-698,0.0
+2026-08-24,Bajadas,C. Rivero,PT,Valencia,463167,-1550,-0.3
+2026-08-24,Bajadas,Alonso,DL,Rayo Vallecano,516103,-3756,-0.7
+2026-08-24,Bajadas,Iñigo,DF,Racing,650659,-9362,-1.4
+2026-08-24,Bajadas,C. Puga,DF,Málaga,4949387,-23033,-0.5
+2026-08-24,Bajadas,Marcos,DL,Espanyol,1141965,-29833,-2.5
+2026-08-24,Bajadas,D. Villares,MC,Deportivo,2081170,-51578,-2.4
+2026-08-24,Bajadas,Iñigo Perez,DT,Villarreal,1804399,-54260,-2.9
+2026-08-24,Bajadas,Ionut Radu,PT,Celta,35902314,-64668,-0.2
+2026-08-24,Bajadas,Javi Guerra,MC,Valencia,24626385,-109945,-0.4
+2026-08-25,Subidas,Pathé I. Ciss,MC,Rayo Vallecano,17171322,+698414,+4.2
+2026-08-25,Subidas,Marcos Alonso,DF,Celta,28330951,+689100,+2.5
+2026-08-25,Subidas,Guido Rodríguez,MC,Valencia,24042382,+555704,+2.4
+2026-08-25,Subidas,Isaac,DL,Sevilla,6235031,+286065,+4.8
+2026-08-25,Subidas,Zaid Romero,DF,Getafe,26537297,+225522,+0.9
+2026-08-25,Subidas,Camello,DL,Rayo Vallecano,3621624,+158395,+4.6
+2026-08-25,Subidas,Ionut Radu,PT,Celta,35842835,+3812,0.0
+2026-08-25,Bajadas,C. Rivero,PT,Valencia,459086,-3303,-0.7
+2026-08-25,Bajadas,C. Puga,DF,Málaga,4910779,-30549,-0.6
+2026-08-25,Bajadas,D. Villares,MC,Deportivo,2027430,-52264,-2.5
+2026-08-25,Bajadas,Iñigo Perez,DT,Villarreal,1749221,-54261,-3.0
+2026-08-25,Bajadas,Javi Guerra,MC,Valencia,24384675,-201568,-0.8
+2026-08-26,Subidas,Guido Rodríguez,MC,Valencia,24520433,+478051,+2.0
+2026-08-26,Subidas,Zaid Romero,DF,Getafe,26990629,+453332,+1.7
+2026-08-26,Subidas,Isaac,DL,Sevilla,6460286,+225255,+3.6
+2026-08-26,Subidas,Camello,DL,Rayo Vallecano,3766152,+144528,+4.0
+2026-08-26,Subidas,C. Puga,DF,Málaga,4914501,+3722,+0.1
+2026-08-26,Bajadas,C. Rivero,PT,Valencia,455104,-3982,-0.9
+2026-08-26,Bajadas,D. Villares,MC,Deportivo,1983113,-44317,-2.2
+2026-08-26,Bajadas,Iñigo Perez,DT,Villarreal,1693554,-55667,-3.2
+2026-08-26,Bajadas,Ionut Radu,PT,Celta,35752569,-90266,-0.3
+2026-08-27,Subidas,Zaid Romero,DF,Getafe,27444038,+453409,+1.7
+2026-08-27,Subidas,Guido Rodríguez,MC,Valencia,24944098,+423665,+1.7
+2026-08-27,Subidas,Amatucci,MC,Deportivo,14721800,+293322,+2.0
+2026-08-27,Subidas,Isaac,DL,Sevilla,6665244,+204958,+3.2
+2026-08-27,Subidas,Javi Guerra,MC,Valencia,24252929,+135461,+0.6
+2026-08-27,Subidas,Camello,DL,Rayo Vallecano,3883404,+117252,+3.1
+2026-08-27,Subidas,C. Puga,DF,Málaga,4934935,+20434,+0.4
+2026-08-27,Subidas,Denis Suárez,MC,Alavés,2533259,+13618,+0.5
+2026-08-27,Bajadas,C. Rivero,PT,Valencia,452800,-2304,-0.5
+2026-08-27,Bajadas,Iñigo,DF,Racing,618681,-9216,-1.5
+2026-08-27,Bajadas,D. Villares,MC,Deportivo,1951375,-31738,-1.6
+2026-08-27,Bajadas,Iñigo Perez,DT,Villarreal,1641712,-51842,-3.1
+2026-08-27,Bajadas,Ionut Radu,PT,Celta,35682171,-70398,-0.2
+2026-08-28,Subidas,Guido Rodríguez,MC,Valencia,25384045,+439947,+1.8
+2026-08-28,Subidas,Zaid Romero,DF,Getafe,27800272,+356234,+1.3
+2026-08-28,Subidas,Marcos Alonso,DF,Celta,29976181,+326328,+1.1
+2026-08-28,Subidas,Javi Guerra,MC,Valencia,24485913,+232984,+1.0
+2026-08-28,Subidas,Amatucci,MC,Deportivo,14928689,+206889,+1.4
+2026-08-28,Subidas,Isaac,DL,Sevilla,6865612,+200368,+3.0
+2026-08-28,Subidas,Camello,DL,Rayo Vallecano,3998675,+115271,+3.0
+2026-08-28,Subidas,C. Puga,DF,Málaga,4962087,+27152,+0.6
+2026-08-28,Subidas,Denis Suárez,MC,Alavés,2540822,+7563,+0.3
+2026-08-28,Bajadas,C. Rivero,PT,Valencia,450228,-2572,-0.6
+2026-08-28,Bajadas,Iñigo,DF,Racing,609474,-9207,-1.5
+2026-08-28,Bajadas,D. Villares,MC,Deportivo,1918468,-32907,-1.7
+2026-08-28,Bajadas,Iñigo Perez,DT,Villarreal,1591584,-50128,-3.1
+2026-08-28,Bajadas,Ionut Radu,PT,Celta,35570772,-111399,-0.3
+2026-08-29,Subidas,Zaid Romero,DF,Getafe,28121207,+330464,+1.2
+2026-08-29,Subidas,Javi Guerra,MC,Valencia,24740500,+262273,+1.1
+2026-08-29,Subidas,Amatucci,MC,Deportivo,15117272,+193660,+1.3
+2026-08-29,Subidas,Isaac,DL,Sevilla,7049892,+187263,+2.7
+2026-08-29,Subidas,Camello,DL,Rayo Vallecano,4102667,+105785,+2.6
+2026-08-29,Subidas,C. Puga,DF,Málaga,4969654,+9062,+0.2
+2026-08-29,Subidas,Denis Suárez,MC,Alavés,2548753,+8627,+0.3
+2026-08-29,Bajadas,C. Rivero,PT,Valencia,448376,-1753,-0.4
+2026-08-29,Bajadas,Iñigo,DF,Racing,601252,-8123,-1.3
+2026-08-29,Bajadas,D. Villares,MC,Deportivo,1887010,-31170,-1.6
+2026-08-29,Bajadas,Iñigo Perez,DT,Villarreal,1544078,-47407,-3.0
+2026-08-29,Bajadas,Ionut Radu,PT,Celta,35471662,-90430,-0.3
+2026-08-29,Bajadas,Guido Rodríguez,MC,Valencia,25156951,-217293,-0.9
+2026-08-29,Bajadas,Marcos Alonso,DF,Celta,29396494,-570017,-1.9
+2026-08-30,Subidas,Zaid Romero,DF,Getafe,28520444,+399237,+1.4
+2026-08-30,Subidas,Javi Guerra,MC,Valencia,24991990,+251490,+1.0
+2026-08-30,Subidas,Amatucci,MC,Deportivo,15300675,+183403,+1.2
+2026-08-30,Subidas,Isaac,DL,Sevilla,7217800,+167908,+2.4
+2026-08-30,Subidas,Camello,DL,Rayo Vallecano,4202160,+99493,+2.4
+2026-08-30,Subidas,Manu Sánchez,DF,Levante,4920675,+45569,+0.9
+2026-08-30,Subidas,C. Rivero,PT,Valencia,449354,+978,+0.2
+2026-08-30,Bajadas,C. Puga,DF,Málaga,4965067,-4587,-0.1
+2026-08-30,Bajadas,Denis Suárez,MC,Alavés,2544002,-4751,-0.2
+2026-08-30,Bajadas,D. Villares,MC,Deportivo,1847749,-39261,-2.1
+2026-08-30,Bajadas,Iñigo Perez,DT,Villarreal,1501228,-42850,-2.8
+2026-08-30,Bajadas,Canales,MC,Racing,28192032,-76878,-0.3
+2026-08-30,Bajadas,Ionut Radu,PT,Celta,35338741,-132921,-0.4
+2026-08-31,Subidas,Zaid Romero,DF,Getafe,28797657,+277213,+1.0
+2026-08-31,Subidas,Amatucci,MC,Deportivo,15424745,+124070,+0.8
+2026-08-31,Subidas,Camello,DL,Rayo Vallecano,4268600,+66440,+1.6
+2026-08-31,Subidas,Isaac,DL,Sevilla,7246625,+28825,+0.4
+2026-08-31,Subidas,Manu Sánchez,DF,Levante,4939873,+19198,+0.4
+2026-08-31,Subidas,Denis Suárez,MC,Alavés,2555256,+11254,+0.4
+2026-08-31,Subidas,C. Rivero,PT,Valencia,449883,+529,+0.1
+2026-08-31,Bajadas,C. Puga,DF,Málaga,4933367,-31700,-0.6
+2026-08-31,Bajadas,Iñigo Perez,DT,Villarreal,1459682,-41546,-2.8
+2026-08-31,Bajadas,D. Villares,MC,Deportivo,1805197,-42552,-2.3
+2026-08-31,Bajadas,Ionut Radu,PT,Celta,35195442,-143299,-0.4
+2026-08-31,Bajadas,Aimar,MC,Osasuna,14530237,-227535,-1.5
+2026-08-31,Bajadas,Canales,MC,Racing,27913436,-278596,-1.0
+2026-09-01,Subidas,Amatucci,MC,Deportivo,15699719,+274196,+1.8
+2026-09-01,Subidas,Zaid Romero,DF,Getafe,29003684,+205619,+0.7
+2026-09-01,Subidas,Camello,DL,Rayo Vallecano,4328237,+59691,+1.4
+2026-09-01,Bajadas,C. Rivero,PT,Valencia,447375,-2507,-0.6
+2026-09-01,Bajadas,Denis Suárez,MC,Alavés,2552127,-3103,-0.1
+2026-09-01,Bajadas,Manu Sánchez,DF,Levante,4930851,-9005,-0.2
+2026-09-01,Bajadas,Iñigo Perez,DT,Villarreal,1416782,-42899,-2.9
+2026-09-01,Bajadas,D. Villares,MC,Deportivo,1755014,-50180,-2.8
+2026-09-01,Bajadas,Isaac,DL,Sevilla,7179603,-66996,-0.9
+2026-09-01,Bajadas,C. Puga,DF,Málaga,4858901,-74425,-1.5
+2026-09-01,Bajadas,Ionut Radu,PT,Celta,35025327,-169953,-0.5
+2026-09-01,Bajadas,Aimar,MC,Osasuna,14280046,-250050,-1.7
+2026-09-01,Bajadas,Canales,MC,Racing,27452761,-460505,-1.6
+2026-09-02,Subidas,Gerenabarrena,MC,Athletic Club,1255090,+85948,+7.4
+2026-09-02,Subidas,Manu Sánchez,DF,Levante,4939824,+8973,+0.2
+2026-09-02,Subidas,Denis Suárez,MC,Alavés,2560066,+7939,+0.3
+2026-09-02,Bajadas,C. Rivero,PT,Valencia,445160,-2215,-0.5
+2026-09-02,Bajadas,Amatucci,MC,Deportivo,15660551,-39168,-0.2
+2026-09-02,Bajadas,Iñigo Perez,DT,Villarreal,1375790,-40992,-2.9
+2026-09-02,Bajadas,D. Villares,MC,Deportivo,1709149,-45865,-2.6
+2026-09-02,Bajadas,C. Puga,DF,Málaga,4807562,-51339,-1.1
+2026-09-02,Bajadas,C. Soler,MC,Real Sociedad,31406704,-52338,-0.2
+2026-09-02,Bajadas,Ionut Radu,PT,Celta,34923104,-102223,-0.3
+2026-09-02,Bajadas,Isaac,DL,Sevilla,7076510,-103093,-1.4
+2026-09-02,Bajadas,Canales,MC,Racing,26967839,-484922,-1.8
+2026-09-03,Subidas,Zaid Romero,DF,Getafe,30259267,+505516,+1.7
+2026-09-03,Subidas,M. Román,MC,Celta,7182033,+311661,+4.5
+2026-09-03,Subidas,Amatucci,MC,Deportivo,15899684,+239133,+1.5
+2026-09-03,Subidas,Gerenabarrena,MC,Athletic Club,1367497,+112407,+9.0
+2026-09-03,Subidas,A. Rebbach,DL,Alavés,5258132,+65472,+1.3
+2026-09-03,Subidas,Manu Sánchez,DF,Levante,4945866,+6042,+0.1
+2026-09-03,Bajadas,C. Rivero,PT,Valencia,440950,-4210,-0.9
+2026-09-03,Bajadas,Denis Suárez,MC,Alavés,2551219,-8847,-0.3
+2026-09-03,Bajadas,C. Soler,MC,Real Sociedad,31388484,-18220,-0.1
+2026-09-03,Bajadas,D. Villares,MC,Deportivo,1667734,-41415,-2.4
+2026-09-03,Bajadas,Iñigo Perez,DT,Villarreal,1334355,-41435,-3.0
+2026-09-03,Bajadas,C. Puga,DF,Málaga,4756546,-51016,-1.1
+2026-09-03,Bajadas,Ionut Radu,PT,Celta,34749017,-174087,-0.5
+2026-09-03,Bajadas,Canales,MC,Racing,26548342,-419497,-1.6
+2026-09-04,Subidas,M. Román,MC,Celta,7933560,+398142,+5.3
+2026-09-04,Subidas,Zaid Romero,DF,Getafe,31036440,+368605,+1.2
+2026-09-04,Subidas,Ionut Radu,PT,Celta,34972491,+328621,+0.9
+2026-09-04,Subidas,Amatucci,MC,Deportivo,16468845,+287260,+1.8
+2026-09-04,Subidas,Gerenabarrena,MC,Athletic Club,1600215,+112958,+7.6
+2026-09-04,Subidas,A. Rebbach,DL,Alavés,5401608,+64940,+1.2
+2026-09-04,Subidas,Denis Suárez,MC,Alavés,2599009,+30419,+1.2
+2026-09-04,Subidas,Manu Sánchez,DF,Levante,4992205,+25378,+0.5
+2026-09-04,Bajadas,C. Rivero,PT,Valencia,436620,-1536,-0.4
+2026-09-04,Bajadas,D. Villares,MC,Deportivo,1599742,-31652,-1.9
+2026-09-04,Bajadas,Iñigo Perez,DT,Villarreal,1259983,-35842,-2.8
+2026-09-04,Bajadas,C. Puga,DF,Málaga,4670319,-42954,-0.9
+2026-09-04,Bajadas,C. Soler,MC,Real Sociedad,31230518,-124554,-0.4
+2026-09-04,Bajadas,Canales,MC,Racing,25960519,-253764,-1.0
+2026-09-06,Subidas,M. Román,MC,Celta,8366026,+432466,+5.5
+2026-09-06,Subidas,Amatucci,MC,Deportivo,16794167,+325322,+2.0
+2026-09-06,Subidas,Zaid Romero,DF,Getafe,31309319,+272879,+0.9
+2026-09-06,Subidas,Gerenabarrena,MC,Athletic Club,1708181,+107966,+6.7
+2026-09-06,Subidas,A. Rebbach,DL,Alavés,5411060,+9452,+0.2
+2026-09-06,Subidas,C. Rivero,PT,Valencia,437689,+1069,+0.2
+2026-09-06,Subidas,Denis Suárez,MC,Alavés,2599878,+869,0.0
+2026-09-06,Bajadas,Iñigo Perez,DT,Villarreal,1228117,-31866,-2.5
+2026-09-06,Bajadas,D. Villares,MC,Deportivo,1562770,-36972,-2.3
+2026-09-06,Bajadas,Manu Sánchez,DF,Levante,4933060,-59145,-1.2
+2026-09-06,Bajadas,C. Puga,DF,Málaga,4573753,-96566,-2.1
+2026-09-06,Bajadas,Canales,MC,Racing,25725850,-234669,-0.9
+2026-09-06,Bajadas,C. Soler,MC,Real Sociedad,30907404,-323114,-1.0
+2026-09-07,Subidas,Ionut Radu,PT,Celta,36381052,+638076,+1.8
+2026-09-07,Subidas,M. Román,MC,Celta,8766735,+400709,+4.8
+2026-09-07,Subidas,Canales,MC,Racing,25975001,+249151,+1.0
+2026-09-07,Subidas,Amatucci,MC,Deportivo,17005629,+211462,+1.3
+2026-09-07,Subidas,Gerenabarrena,MC,Athletic Club,1900817,+192636,+11.3
+2026-09-07,Subidas,Zaid Romero,DF,Getafe,31459699,+150380,+0.5
+2026-09-07,Subidas,C. Rivero,PT,Valencia,438435,+746,+0.2
+2026-09-07,Bajadas,A. Rebbach,DL,Alavés,5402815,-8245,-0.2
+2026-09-07,Bajadas,Denis Suárez,MC,Alavés,2589940,-9938,-0.4
+2026-09-07,Bajadas,Iñigo Perez,DT,Villarreal,1197246,-30871,-2.5
+2026-09-07,Bajadas,D. Villares,MC,Deportivo,1521056,-41714,-2.7
+2026-09-07,Bajadas,Manu Sánchez,DF,Levante,4867528,-65532,-1.3
+2026-09-07,Bajadas,C. Puga,DF,Málaga,4471128,-102625,-2.2
+2026-09-07,Bajadas,C. Soler,MC,Real Sociedad,30518701,-388703,-1.3
+2026-09-08,Subidas,Ionut Radu,PT,Celta,36937756,+591755,+1.6
+2026-09-08,Subidas,M. Román,MC,Celta,9125539,+371269,+4.2
+2026-09-08,Subidas,Canales,MC,Racing,26243192,+290017,+1.1
+2026-09-08,Subidas,Amatucci,MC,Deportivo,17196826,+206344,+1.2
+2026-09-08,Subidas,Gerenabarrena,MC,Athletic Club,2091622,+195229,+10.3
+2026-09-08,Subidas,Manu Sánchez,DF,Levante,4929075,+63792,+1.3
+2026-09-08,Bajadas,C. Rivero,PT,Valencia,437600,-525,-0.1
+2026-09-08,Bajadas,Iñigo Perez,DT,Villarreal,1166059,-30877,-2.6
+2026-09-08,Bajadas,D. Villares,MC,Deportivo,1478791,-41910,-2.8
+2026-09-08,Bajadas,A. Rebbach,DL,Alavés,5332609,-66677,-1.2
+2026-09-08,Bajadas,C. Puga,DF,Málaga,4360057,-109702,-2.5
+2026-09-08,Bajadas,Zaid Romero,DF,Getafe,31265877,-169896,-0.5
+2026-09-08,Bajadas,C. Soler,MC,Real Sociedad,30073358,-431819,-1.4
+2026-09-09,Subidas,Ionut Radu,PT,Celta,37466184,+528428,+1.4
+2026-09-09,Subidas,M. Román,MC,Celta,9490745,+365206,+4.0
+2026-09-09,Subidas,Canales,MC,Racing,26566014,+322822,+1.2
+2026-09-09,Subidas,Gerenabarrena,MC,Athletic Club,2314285,+222663,+10.6
+2026-09-09,Subidas,Amatucci,MC,Deportivo,17366505,+169679,+1.0
+2026-09-09,Subidas,Manu Sánchez,DF,Levante,5033955,+104880,+2.1
+2026-09-09,Subidas,C. Soler,MC,Real Sociedad,30119615,+46257,+0.2
+2026-09-09,Bajadas,C. Rivero,PT,Valencia,436589,-1011,-0.2
+2026-09-09,Bajadas,Iñigo Perez,DT,Villarreal,1135910,-30149,-2.6
+2026-09-09,Bajadas,D. Villares,MC,Deportivo,1436998,-41793,-2.8
+2026-09-09,Bajadas,A. Rebbach,DL,Alavés,5273467,-59142,-1.1
+2026-09-09,Bajadas,C. Puga,DF,Málaga,4258344,-101713,-2.3
+2026-09-09,Bajadas,Zaid Romero,DF,Getafe,30388822,-877055,-2.8
+2026-09-10,Subidas,Ionut Radu,PT,Celta,37997072,+530888,+1.4
+2026-09-10,Subidas,M. Román,MC,Celta,9854002,+363257,+3.8
+2026-09-10,Subidas,Canales,MC,Racing,26882440,+316426,+1.2
+2026-09-10,Subidas,Gerenabarrena,MC,Athletic Club,2550856,+236571,+10.2
+2026-09-10,Subidas,Amatucci,MC,Deportivo,17582299,+215794,+1.2
+2026-09-10,Subidas,C. Soler,MC,Real Sociedad,30317807,+198192,+0.7
+2026-09-10,Subidas,Manu Sánchez,DF,Levante,5147676,+113721,+2.3
+2026-09-10,Bajadas,C. Rivero,PT,Valencia,435853,-736,-0.2
+2026-09-10,Bajadas,Iñigo Perez,DT,Villarreal,1107201,-28709,-2.5
+2026-09-10,Bajadas,D. Villares,MC,Deportivo,1398719,-38279,-2.7
+2026-09-10,Bajadas,A. Rebbach,DL,Alavés,5220164,-53303,-1.0
+2026-09-10,Bajadas,C. Puga,DF,Málaga,4168178,-90166,-2.1
+2026-09-10,Bajadas,Zaid Romero,DF,Getafe,29504964,-883858,-2.9
+2026-09-11,Subidas,Ionut Radu,PT,Celta,38444802,+447730,+1.2
+2026-09-11,Subidas,M. Román,MC,Celta,10191421,+337419,+3.4
+2026-09-11,Subidas,Canales,MC,Racing,27167572,+285132,+1.1
+2026-09-11,Subidas,C. Soler,MC,Real Sociedad,30560383,+242576,+0.8
+2026-09-11,Subidas,Gerenabarrena,MC,Athletic Club,2787904,+237048,+9.3
+2026-09-11,Subidas,Amatucci,MC,Deportivo,17736598,+154299,+0.9
+2026-09-11,Subidas,Manu Sánchez,DF,Levante,5234156,+86480,+1.7
+2026-09-11,Bajadas,C. Rivero,PT,Valencia,435724,-129,0.0
+2026-09-11,Bajadas,Iñigo Perez,DT,Villarreal,1080218,-26983,-2.4
+2026-09-11,Bajadas,A. Rebbach,DL,Alavés,5186641,-33523,-0.6
+2026-09-11,Bajadas,D. Villares,MC,Deportivo,1365177,-33542,-2.4
+2026-09-11,Bajadas,C. Puga,DF,Málaga,4085910,-82268,-2.0
+2026-09-11,Bajadas,Zaid Romero,DF,Getafe,28662117,-842847,-2.9
+2026-09-12,Subidas,Ionut Radu,PT,Celta,38901418,+456616,+1.2
+2026-09-12,Subidas,M. Román,MC,Celta,10544299,+352878,+3.5
+2026-09-12,Subidas,C. Soler,MC,Real Sociedad,30857364,+296981,+1.0
+2026-09-12,Subidas,Gerenabarrena,MC,Athletic Club,3018475,+230571,+8.3
+2026-09-12,Subidas,Canales,MC,Racing,27375954,+208382,+0.8
+2026-09-12,Subidas,Amatucci,MC,Deportivo,17867355,+130757,+0.7
+2026-09-12,Subidas,Manu Sánchez,DF,Levante,5324834,+90678,+1.7
+2026-09-12,Subidas,C. Rivero,PT,Valencia,436383,+659,+0.2
+2026-09-12,Bajadas,Iñigo Perez,DT,Villarreal,1055097,-25121,-2.3
+2026-09-12,Bajadas,D. Villares,MC,Deportivo,1336432,-28745,-2.1
+2026-09-12,Bajadas,A. Rebbach,DL,Alavés,5148609,-38032,-0.7
+2026-09-12,Bajadas,C. Puga,DF,Málaga,4017367,-68543,-1.7
+2026-09-12,Bajadas,Zaid Romero,DF,Getafe,27892212,-769905,-2.7
+2026-09-13,Subidas,Vlachodimos,PT,Sevilla,28807858,+453828,+1.6
+2026-09-13,Subidas,M. Román,MC,Celta,10916674,+372375,+3.5
+2026-09-13,Subidas,Canales,MC,Racing,27611238,+235284,+0.9
+2026-09-13,Subidas,Gerenabarrena,MC,Athletic Club,3244303,+225828,+7.5
+2026-09-13,Subidas,Amatucci,MC,Deportivo,17993830,+126475,+0.7
+2026-09-13,Subidas,C. Soler,MC,Real Sociedad,30937866,+80502,+0.3
+2026-09-13,Bajadas,Iñigo Perez,DT,Villarreal,1033581,-21516,-2.0
+2026-09-13,Bajadas,Claudio Giraldez,DT,Celta,1037014,-21659,-2.0
+2026-09-13,Bajadas,D. Villares,MC,Deportivo,1303663,-32769,-2.5
+2026-09-13,Bajadas,A. Rebbach,DL,Alavés,5099709,-48900,-0.9
+2026-09-13,Bajadas,Gudelj,MC,Getafe,6375694,-70151,-1.1
+2026-09-13,Bajadas,Zaid Romero,DF,Getafe,27214554,-677658,-2.4
+2026-09-14,Subidas,Canales,MC,Racing,28157080,+545842,+2.0
+2026-09-14,Subidas,Vlachodimos,PT,Sevilla,29326240,+518382,+1.8
+2026-09-14,Subidas,M. Román,MC,Celta,11294215,+377541,+3.5
+2026-09-14,Subidas,Gerenabarrena,MC,Athletic Club,3411703,+167400,+5.2
+2026-09-14,Subidas,Amatucci,MC,Deportivo,18099088,+105258,+0.6
+2026-09-14,Bajadas,A. Rebbach,DL,Alavés,5099455,-254,0.0
+2026-09-14,Bajadas,Iñigo Perez,DT,Villarreal,1012155,-21426,-2.1
+2026-09-14,Bajadas,Claudio Giraldez,DT,Celta,1015451,-21563,-2.1
+2026-09-14,Bajadas,D. Villares,MC,Deportivo,1271434,-32229,-2.5
+2026-09-14,Bajadas,Gudelj,MC,Getafe,6279637,-96057,-1.5
+2026-09-14,Bajadas,C. Soler,MC,Real Sociedad,30603168,-334698,-1.1
+2026-09-14,Bajadas,Zaid Romero,DF,Getafe,26523290,-691264,-2.5
+2026-09-15,Subidas,M. Román,MC,Celta,11581679,+287464,+2.5
+2026-09-15,Subidas,Vlachodimos,PT,Sevilla,29607162,+280922,+1.0
+2026-09-15,Subidas,Luismi Cruz,DL,Deportivo,9231497,+227805,+2.5
+2026-09-15,Subidas,Gerenabarrena,MC,Athletic Club,3553051,+141348,+4.1
+2026-09-15,Subidas,A. Rebbach,DL,Alavés,5134108,+34653,+0.7
+2026-09-15,Subidas,Blanco,MC,Alavés,20212320,+23912,+0.1
+2026-09-15,Subidas,Amatucci,MC,Deportivo,18106490,+7402,0.0
+2026-09-15,Bajadas,Gudelj,MC,Getafe,6274214,-5423,-0.1
+2026-09-15,Bajadas,Iñigo Perez,DT,Villarreal,988050,-24105,-2.4
+2026-09-15,Bajadas,Claudio Giraldez,DT,Celta,991213,-24238,-2.4
+2026-09-15,Bajadas,D. Villares,MC,Deportivo,1239404,-32030,-2.5
+2026-09-15,Bajadas,C. Soler,MC,Real Sociedad,30425010,-178158,-0.6
+2026-09-15,Bajadas,Zaid Romero,DF,Getafe,25995531,-527759,-2.0
+2026-09-16,Subidas,M. Román,MC,Celta,11911933,+330254,+2.9
+2026-09-16,Subidas,Luismi Cruz,DL,Deportivo,9480169,+248672,+2.7
+2026-09-16,Subidas,Vlachodimos,PT,Sevilla,29805883,+198721,+0.7
+2026-09-16,Subidas,A. Rebbach,DL,Alavés,5172521,+38413,+0.7
+2026-09-16,Subidas,Amatucci,MC,Deportivo,18127006,+20516,+0.1
+2026-09-16,Subidas,Blanco,MC,Alavés,20217292,+4972,0.0
+2026-09-16,Subidas,Gudelj,MC,Getafe,6278037,+3823,+0.1
+2026-09-16,Bajadas,Iñigo,DF,Racing,513227,-3799,-0.7
+2026-09-16,Bajadas,Iñigo Perez,DT,Villarreal,965410,-22640,-2.3
+2026-09-16,Bajadas,Claudio Giraldez,DT,Celta,968447,-22766,-2.3
+2026-09-16,Bajadas,D. Villares,MC,Deportivo,1208174,-31230,-2.5
+2026-09-16,Bajadas,Zaid Romero,DF,Getafe,25585641,-409890,-1.6
+2026-09-17,Subidas,Vlachodimos,PT,Sevilla,30032480,+227072,+0.8
+2026-09-17,Bajadas,Zaid Romero,DF,Getafe,25122809,-462730,-1.8
+2026-09-17,Bajadas,D. Villares,MC,Deportivo,1179594,-28579,-2.4
+2026-09-17,Subidas,A. Rebbach,DL,Alavés,5173068,+596,0.0
+2026-09-17,Bajadas,Iñigo Perez,DT,Villarreal,946541,-18868,-2.0
+2026-09-17,Bajadas,Amatucci,MC,Deportivo,18004485,-122479,-0.7
+2026-09-17,Subidas,M. Román,MC,Celta,12247860,+335972,+2.8
+2026-09-17,Bajadas,Gudelj,MC,Getafe,6245201,-32797,-0.5
+2026-09-17,Bajadas,Blanco,MC,Alavés,19985507,-231738,-1.1
+2026-09-17,Bajadas,Claudio Giraldez,DT,Celta,949456,-18990,-2.0
+2026-09-17,Subidas,Luismi Cruz,DL,Deportivo,9742563,+262429,+2.8
+2026-09-17,Bajadas,Iñigo,DF,Racing,512445,-781,-0.2
+2026-09-18,Subidas,Vlachodimos,PT,Sevilla,30350168,+317704,+1.1
+2026-09-18,Bajadas,Zaid Romero,DF,Getafe,24771062,-352891,-1.4
+2026-09-18,Bajadas,D. Villares,MC,Deportivo,1150022,-29572,-2.5
+2026-09-18,Subidas,A. Rebbach,DL,Alavés,5188201,+15176,+0.3
+2026-09-18,Bajadas,Iñigo Perez,DT,Villarreal,926290,-20250,-2.1
+2026-09-18,Bajadas,Amatucci,MC,Deportivo,17857115,-147364,-0.8
+2026-09-18,Subidas,M. Román,MC,Celta,12570509,+322658,+2.6
+2026-09-18,Bajadas,Gudelj,MC,Getafe,6215411,-29700,-0.5
+2026-09-18,Bajadas,Blanco,MC,Alavés,19771168,-214215,-1.1
+2026-09-18,Bajadas,Claudio Giraldez,DT,Celta,929089,-20367,-2.1
+2026-09-18,Subidas,Luismi Cruz,DL,Deportivo,9996593,+254037,+2.6
+2026-09-18,Subidas,Iñigo Vicente,DL,Racing,33261862,+331188,+1.0
+2026-09-18,Subidas,Sucic,MC,Real Sociedad,11260420,+392496,+3.6
+2026-09-18,Bajadas,Dumfries,DF,Real Madrid,32001325,-580318,-1.8
+2026-09-18,Bajadas,Aihen,DF,Real Sociedad,701921,-10902,-1.5
+2026-09-19,Subidas,Vlachodimos,PT,Sevilla,30589608,+239440,+0.8
+2026-09-19,Subidas,Zaid Romero,DF,Getafe,24838123,+67061,+0.3
+2026-09-19,Bajadas,D. Villares,MC,Deportivo,1120696,-29326,-2.6
+2026-09-19,Subidas,A. Rebbach,DL,Alavés,5188365,+164,0.0
+2026-09-19,Bajadas,Iñigo Perez,DT,Villarreal,905913,-20377,-2.2
+2026-09-19,Bajadas,Amatucci,MC,Deportivo,17714478,-142637,-0.8
+2026-09-19,Subidas,M. Román,MC,Celta,12856925,+286416,+2.3
+2026-09-19,Bajadas,Gudelj,MC,Getafe,6193931,-21480,-0.3
+2026-09-19,Bajadas,Blanco,MC,Alavés,19617105,-154063,-0.8
+2026-09-19,Bajadas,Claudio Giraldez,DT,Celta,908601,-20488,-2.2
+2026-09-19,Subidas,Luismi Cruz,DL,Deportivo,10216673,+220080,+2.2
+2026-09-19,Subidas,Iñigo Vicente,DL,Racing,33461408,+199546,+0.6
+2026-09-19,Subidas,Sucic,MC,Real Sociedad,11622902,+362482,+3.2
+2026-09-19,Bajadas,Dumfries,DF,Real Madrid,31470347,-530978,-1.7
+2026-09-19,Bajadas,Aihen,DF,Real Sociedad,690520,-11401,-1.6
+2026-09-20,Subidas,Vlachodimos,PT,Sevilla,30993888,+404280,+1.3
+2026-09-20,Subidas,Zaid Romero,DF,Getafe,24854223,+16100,+0.1
+2026-09-20,Bajadas,D. Villares,MC,Deportivo,1095131,-25565,-2.3
+2026-09-20,Bajadas,A. Rebbach,DL,Alavés,5164607,-23758,-0.5
+2026-09-20,Bajadas,Iñigo Perez,DT,Villarreal,888939,-16974,-1.9
+2026-09-20,Subidas,Yoel Lago,DF,Celta,6926753,+376120,+5.7
+2026-09-20,Bajadas,Gudelj,MC,Getafe,6073452,-120479,-1.9
+2026-09-20,Bajadas,Claudio Giraldez,DT,Celta,891520,-17081,-1.9
+2026-09-20,Subidas,Luismi Cruz,DL,Deportivo,10442984,+226311,+2.2
+2026-09-20,Subidas,Sucic,MC,Real Sociedad,11937396,+314494,+2.7
+2026-09-20,Bajadas,Dumfries,DF,Real Madrid,30866878,-603469,-1.9
+2026-09-20,Bajadas,Aihen,DF,Real Sociedad,682162,-8358,-1.2
+2026-09-21,Subidas,Vlachodimos,PT,Sevilla,31393229,+399341,+1.3
+2026-09-21,Bajadas,D. Villares,MC,Deportivo,1070106,-25025,-2.3
+2026-09-21,Subidas,A. Rebbach,DL,Alavés,5177955,+13348,+0.3
+2026-09-21,Bajadas,Iñigo Perez,DT,Villarreal,872162,-16777,-1.9
+2026-09-21,Subidas,Yoel Lago,DF,Celta,7498372,+571619,+8.3
+2026-09-21,Bajadas,Gudelj,MC,Getafe,5952860,-120592,-2.0
+2026-09-21,Bajadas,Claudio Giraldez,DT,Celta,874639,-16881,-1.9
+2026-09-21,Subidas,Luismi Cruz,DL,Deportivo,10574353,+131369,+1.3
+2026-09-21,Subidas,Sucic,MC,Real Sociedad,12181318,+243922,+2.0
+2026-09-21,Bajadas,Aihen,DF,Real Sociedad,673656,-8506,-1.2
+2026-09-21,Subidas,Germán V.,MC,Elche CF,13040820,+158095,+1.2
+2026-09-22,Subidas,Vlachodimos,PT,Sevilla,31893856,+500627,+1.6
+2026-09-22,Bajadas,D. Villares,MC,Deportivo,1058490,-11616,-1.1
+2026-09-22,Subidas,A. Rebbach,DL,Alavés,5184590,+6635,+0.1
+2026-09-22,Bajadas,Iñigo Perez,DT,Villarreal,855338,-16824,-1.9
+2026-09-22,Subidas,Yoel Lago,DF,Celta,8081540,+583168,+7.8
+2026-09-22,Bajadas,Gudelj,MC,Getafe,5858786,-94074,-1.6
+2026-09-22,Bajadas,Claudio Giraldez,DT,Celta,857716,-16923,-1.9
+2026-09-22,Subidas,Luismi Cruz,DL,Deportivo,10726657,+152304,+1.4
+2026-09-22,Subidas,Sucic,MC,Real Sociedad,12763861,+582543,+4.8
+2026-09-22,Bajadas,Aihen,DF,Real Sociedad,664773,-8883,-1.3
+2026-09-22,Subidas,Koski,DF,Alavés,16700958,+1097706,+7.0
+2026-09-22,Subidas,Germán V.,MC,Elche CF,13184424,+143604,+1.1
+2026-09-22,Subidas,Kang-In Lee,MC,Atlético,66023875,+1425405,+2.2
+2026-09-23,Subidas,Vlachodimos,PT,Sevilla,32178189,+284333,+0.9
+2026-09-23,Bajadas,D. Villares,MC,Deportivo,1046661,-11829,-1.1
+2026-09-23,Bajadas,A. Rebbach,DL,Alavés,5172574,-12016,-0.2
+2026-09-23,Bajadas,Iñigo Perez,DT,Villarreal,839387,-15951,-1.9
+2026-09-23,Subidas,Yoel Lago,DF,Celta,8650965,+569425,+7.0
+2026-09-23,Bajadas,Gudelj,MC,Getafe,5759317,-99469,-1.7
+2026-09-23,Bajadas,Claudio Giraldez,DT,Celta,841670,-16046,-1.9
+2026-09-23,Subidas,Luismi Cruz,DL,Deportivo,10885482,+158825,+1.5
+2026-09-23,Subidas,Sucic,MC,Real Sociedad,13372229,+608368,+4.8
+2026-09-23,Bajadas,Aihen,DF,Real Sociedad,656444,-8329,-1.3
+2026-09-23,Subidas,Koski,DF,Alavés,17772561,+1071603,+6.4
+2026-09-23,Subidas,Germán V.,MC,Elche CF,13274830,+90406,+0.7
+2026-09-23,Subidas,Kang-In Lee,MC,Atlético,67836543,+1812668,+2.7
+2026-09-24,Subidas,Vlachodimos,PT,Sevilla,32477824,+299635,+0.9
+2026-09-24,Bajadas,D. Villares,MC,Deportivo,1032246,-14415,-1.4
+2026-09-24,Bajadas,A. Rebbach,DL,Alavés,5145171,-27403,-0.5
+2026-09-24,Bajadas,Iñigo Perez,DT,Villarreal,824344,-15043,-1.8
+2026-09-24,Subidas,Yoel Lago,DF,Celta,9241162,+590197,+6.8
+2026-09-24,Bajadas,Gudelj,MC,Getafe,5665157,-94160,-1.6
+2026-09-24,Bajadas,Claudio Giraldez,DT,Celta,826536,-15134,-1.8
+2026-09-24,Subidas,Luismi Cruz,DL,Deportivo,11039922,+154440,+1.4
+2026-09-24,Subidas,Sucic,MC,Real Sociedad,14044561,+672332,+5.0
+2026-09-24,Bajadas,Aihen,DF,Real Sociedad,648719,-7725,-1.2
+2026-09-24,Subidas,Koski,DF,Alavés,18769528,+996967,+5.6
+2026-09-24,Subidas,Germán V.,MC,Elche CF,13334822,+59992,+0.5
+2026-09-24,Subidas,Kang-In Lee,MC,Atlético,69756991,+1920448,+2.8
+2026-09-24,Subidas,Á. Valles,PT,Real Betis,60121001,+1638886,+2.8
+2026-09-25,Subidas,Vlachodimos,PT,Sevilla,32696401,+218577,+0.7
+2026-09-25,Bajadas,D. Villares,MC,Deportivo,1018425,-13821,-1.3
+2026-09-25,Bajadas,A. Rebbach,DL,Alavés,5106891,-38280,-0.7
+2026-09-25,Bajadas,Iñigo Perez,DT,Villarreal,810046,-14298,-1.7
+2026-09-25,Subidas,Yoel Lago,DF,Celta,9804042,+562880,+6.1
+2026-09-25,Bajadas,Gudelj,MC,Getafe,5568843,-96314,-1.7
+2026-09-25,Bajadas,Claudio Giraldez,DT,Celta,812149,-14387,-1.7
+2026-09-25,Subidas,Luismi Cruz,DL,Deportivo,11192447,+152525,+1.4
+2026-09-25,Subidas,Sucic,MC,Real Sociedad,14663506,+618945,+4.4
+2026-09-25,Bajadas,Aihen,DF,Real Sociedad,641445,-7274,-1.1
+2026-09-25,Subidas,Koski,DF,Alavés,19796526,+1026998,+5.5
+2026-09-25,Subidas,Germán V.,MC,Elche CF,13396923,+62101,+0.5
+2026-09-25,Subidas,Kang-In Lee,MC,Atlético,71353671,+1596680,+2.3
+2026-09-25,Subidas,Á. Valles,PT,Real Betis,61674804,+1553803,+2.6
+2026-09-26,Subidas,Vlachodimos,PT,Sevilla,32792018,+95617,+0.3
+2026-09-26,Bajadas,D. Villares,MC,Deportivo,1003624,-14801,-1.5
+2026-09-26,Bajadas,A. Rebbach,DL,Alavés,5067395,-39496,-0.8
+2026-09-26,Bajadas,Iñigo Perez,DT,Villarreal,797295,-12751,-1.6
+2026-09-26,Subidas,Yoel Lago,DF,Celta,10303231,+499189,+5.1
+2026-09-26,Bajadas,Gudelj,MC,Getafe,5472850,-95993,-1.7
+2026-09-26,Bajadas,Claudio Giraldez,DT,Celta,799314,-12835,-1.6
+2026-09-26,Subidas,Luismi Cruz,DL,Deportivo,11318727,+126280,+1.1
+2026-09-26,Subidas,Sucic,MC,Real Sociedad,15306972,+643466,+4.4
+2026-09-26,Bajadas,Aihen,DF,Real Sociedad,635438,-6007,-0.9
+2026-09-26,Subidas,Koski,DF,Alavés,20873650,+1077124,+5.4
+2026-09-26,Subidas,Germán V.,MC,Elche CF,13440065,+43142,+0.3
+2026-09-26,Subidas,Kang-In Lee,MC,Atlético,73286439,+1932768,+2.7
+2026-09-26,Subidas,Á. Valles,PT,Real Betis,62935088,+1260284,+2.0
+2026-09-27,Subidas,Vlachodimos,PT,Sevilla,32926148,+134130,+0.4
+2026-09-27,Bajadas,D. Villares,MC,Deportivo,988010,-15614,-1.6
+2026-09-27,Bajadas,A. Rebbach,DL,Alavés,5021814,-45581,-0.9
+2026-09-27,Bajadas,Iñigo Perez,DT,Villarreal,785802,-11493,-1.4
+2026-09-27,Subidas,Yoel Lago,DF,Celta,10825329,+522098,+5.1
+2026-09-27,Bajadas,Gudelj,MC,Getafe,5373247,-99603,-1.8
+2026-09-27,Bajadas,Claudio Giraldez,DT,Celta,787741,-11573,-1.4
+2026-09-27,Subidas,Luismi Cruz,DL,Deportivo,11440568,+121841,+1.1
+2026-09-27,Subidas,Sucic,MC,Real Sociedad,15945667,+638695,+4.2
+2026-09-27,Bajadas,Aihen,DF,Real Sociedad,630420,-5018,-0.8
+2026-09-27,Subidas,Koski,DF,Alavés,21927566,+1053916,+5.0
+2026-09-27,Subidas,Germán V.,MC,Elche CF,13456262,+16197,+0.1
+2026-09-27,Subidas,Kang-In Lee,MC,Atlético,75034810,+1748371,+2.4
+2026-09-27,Subidas,Á. Valles,PT,Real Betis,64054480,+1119392,+1.8
+2026-09-28,Bajadas,D. Villares,MC,Deportivo,971666,-16344,-1.7
+2026-09-28,Bajadas,A. Rebbach,DL,Alavés,4975339,-46475,-0.9
+2026-09-28,Bajadas,Iñigo Perez,DT,Villarreal,775689,-10113,-1.3
+2026-09-28,Subidas,Yoel Lago,DF,Celta,11332965,+507636,+4.7
+2026-09-28,Bajadas,Gudelj,MC,Getafe,5280304,-92943,-1.7
+2026-09-28,Bajadas,Claudio Giraldez,DT,Celta,777551,-10190,-1.3
+2026-09-28,Subidas,Luismi Cruz,DL,Deportivo,11556822,+116254,+1.0
+2026-09-28,Subidas,Sucic,MC,Real Sociedad,16683151,+737484,+4.6
+2026-09-28,Bajadas,Aihen,DF,Real Sociedad,626522,-3898,-0.6
+2026-09-28,Subidas,Koski,DF,Alavés,22901864,+974298,+4.4
+2026-09-28,Subidas,Germán V.,MC,Elche CF,13466031,+9769,+0.1
+2026-09-28,Subidas,Kang-In Lee,MC,Atlético,76673080,+1638270,+2.2
+2026-09-28,Subidas,Á. Valles,PT,Real Betis,65238460,+1183980,+1.8
+2026-09-29,Bajadas,D. Villares,MC,Deportivo,957621,-14045,-1.4
+2026-09-29,Bajadas,A. Rebbach,DL,Alavés,4928961,-46378,-0.9
+2026-09-29,Bajadas,Iñigo Perez,DT,Villarreal,766516,-9173,-1.2
+2026-09-29,Subidas,Yoel Lago,DF,Celta,11874532,+541567,+4.8
+2026-09-29,Bajadas,Claudio Giraldez,DT,Celta,768303,-9248,-1.2
+2026-09-29,Subidas,Luismi Cruz,DL,Deportivo,11666016,+109194,+0.9
+2026-09-29,Subidas,Sucic,MC,Real Sociedad,17350982,+667831,+4.0
+2026-09-29,Subidas,Aihen,DF,Real Sociedad,631472,+4950,+0.8
+2026-09-29,Subidas,Koski,DF,Alavés,23799316,+897452,+3.9
+2026-09-29,Subidas,Germán V.,MC,Elche CF,13474278,+8247,+0.1
+2026-09-29,Subidas,Kang-In Lee,MC,Atlético,78210246,+1537166,+2.0
+2026-09-29,Subidas,Á. Valles,PT,Real Betis,66235570,+997110,+1.5
+2026-09-30,Bajadas,D. Villares,MC,Deportivo,944892,-12729,-1.3
+2026-09-30,Bajadas,A. Rebbach,DL,Alavés,4889987,-38974,-0.8
+2026-09-30,Bajadas,Iñigo Perez,DT,Villarreal,758229,-8287,-1.1
+2026-09-30,Bajadas,Claudio Giraldez,DT,Celta,759945,-8358,-1.1
+2026-09-30,Subidas,Luismi Cruz,DL,Deportivo,11796003,+129987,+1.1
+2026-09-30,Subidas,Sucic,MC,Real Sociedad,18130757,+779775,+4.5
+2026-09-30,Bajadas,Aihen,DF,Real Sociedad,628587,-2885,-0.5
+2026-09-30,Subidas,Koski,DF,Alavés,24772929,+973613,+4.1
+2026-09-30,Subidas,Germán V.,MC,Elche CF,13488943,+14665,+0.1
+2026-09-30,Subidas,Kang-In Lee,MC,Atlético,79679997,+1469751,+1.9
+2026-09-30,Subidas,Á. Valles,PT,Real Betis,67249432,+1013862,+1.5
+2026-10-01,Bajadas,D. Villares,MC,Deportivo,932513,-12379,-1.3
+2026-10-01,Bajadas,A. Rebbach,MC,Alavés,4868408,-21579,-0.4
+2026-10-01,Bajadas,Iñigo Perez,DT,Villarreal,750970,-7259,-1.0
+2026-10-01,Bajadas,Claudio Giraldez,DT,Celta,752617,-7328,-1.0
+2026-10-01,Bajadas,Aihen,DF,Real Sociedad,626514,-2073,-0.3
+2026-10-01,Subidas,Koski,DF,Alavés,25720335,+947406,+3.8
+2026-10-01,Subidas,Germán V.,MC,Elche CF,13506322,+17379,+0.1
+2026-10-01,Subidas,Kang-In Lee,MC,Atlético,81091958,+1411961,+1.8
+2026-10-01,Subidas,Á. Valles,PT,Real Betis,68071754,+822322,+1.2
+2026-10-01,Subidas,Yuri,DF,Athletic Club,18522455,+232370,+1.3
+2026-10-02,Bajadas,D. Villares,MC,Deportivo,921142,-11371,-1.2
+2026-10-02,Subidas,A. Rebbach,MC,Alavés,4876997,+8589,+0.2
+2026-10-02,Bajadas,Iñigo Perez,DT,Villarreal,744813,-6157,-0.8
+2026-10-02,Bajadas,Claudio Giraldez,DT,Celta,746394,-6223,-0.8
+2026-10-02,Bajadas,Aihen,DF,Real Sociedad,625335,-1179,-0.2
+2026-10-02,Subidas,Koski,DF,Alavés,26646871,+926536,+3.6
+2026-10-02,Subidas,Germán V.,MC,Elche CF,13535404,+29082,+0.2
+2026-10-02,Subidas,Kang-In Lee,MC,Atlético,82284945,+1192987,+1.5
+2026-10-02,Subidas,Á. Valles,PT,Real Betis,68684636,+612882,+0.9
+2026-10-02,Subidas,Yuri,DF,Athletic Club,18753665,+231210,+1.2
+2026-10-03,Bajadas,D. Villares,MC,Deportivo,897912,-10791,-1.2
+2026-10-03,Subidas,A. Rebbach,MC,Alavés,4923323,+21428,+0.4
+2026-10-03,Bajadas,Iñigo Perez,DT,Villarreal,735407,-4020,-0.5
+2026-10-03,Bajadas,Claudio Giraldez,DT,Celta,736864,-4081,-0.6
+2026-10-03,Subidas,Aihen,DF,Real Sociedad,625296,+568,+0.1
+2026-10-03,Subidas,Koski,DF,Alavés,28314122,+824092,+3.0
+2026-10-03,Subidas,Germán V.,MC,Elche CF,13600875,+27211,+0.2
+2026-10-03,Subidas,Kang-In Lee,MC,Atlético,84359837,+899751,+1.1
+2026-10-03,Subidas,Á. Valles,PT,Real Betis,69534384,+333758,+0.5
+2026-10-03,Subidas,Yuri,DF,Athletic Club,19115082,+181548,+1.0
+2026-10-03,Bajadas,Remiro,PT,Real Sociedad,30648427,-396713,-1.3
+2026-10-03,Bajadas,Larrubia,MC,Málaga,17419583,-320151,-1.8
+2026-10-04,Bajadas,D. Villares,MC,Deportivo,897912,-10791,-1.2
+2026-10-04,Subidas,A. Rebbach,MC,Alavés,4923323,+21428,+0.4
+2026-10-04,Bajadas,Iñigo Perez,DT,Villarreal,735407,-4020,-0.5
+2026-10-04,Bajadas,Claudio Giraldez,DT,Celta,736864,-4081,-0.6
+2026-10-04,Subidas,Aihen,DF,Real Sociedad,625296,+568,+0.1
+2026-10-04,Subidas,Germán V.,MC,Elche CF,13600875,+27211,+0.2
+2026-10-04,Subidas,Kang-In Lee,MC,Atlético,84359837,+899751,+1.1
+2026-10-04,Subidas,Á. Valles,PT,Real Betis,69534384,+333758,+0.5
+2026-10-04,Subidas,Yuri,DF,Athletic Club,19115082,+181548,+1.0
+2026-10-04,Bajadas,Remiro,PT,Real Sociedad,30648427,-396713,-1.3
+2026-10-04,Bajadas,Larrubia,MC,Málaga,17419583,-320151,-1.8
+2026-10-05,Bajadas,D. Villares,MC,Deportivo,888036,-9876,-1.1
+2026-10-05,Subidas,A. Rebbach,MC,Alavés,4947530,+24207,+0.5
+2026-10-05,Bajadas,Iñigo Perez,DT,Villarreal,732032,-3375,-0.5
+2026-10-05,Bajadas,Claudio Giraldez,DT,Celta,733430,-3434,-0.5
+2026-10-05,Subidas,Aihen,DF,Real Sociedad,626325,+1029,+0.2
+2026-10-05,Subidas,Germán V.,MC,Elche CF,13627570,+26695,+0.2
+2026-10-05,Subidas,Kang-In Lee,MC,Atlético,85096477,+736640,+0.9
+2026-10-05,Subidas,Yuri,DF,Athletic Club,19322018,+206936,+1.1
+2026-10-05,Bajadas,Remiro,PT,Real Sociedad,30272537,-375890,-1.2
+2026-10-05,Bajadas,Larrubia,MC,Málaga,17120858,-298725,-1.7
+2026-10-05,Subidas,Tchouaméni,MC,Real Madrid,20007183,+119922,+0.6
+2026-10-05,Bajadas,Pablo García,DL,Racing,7254861,-60267,-0.8
+2026-10-06,Bajadas,D. Villares,MC,Deportivo,878842,-9194,-1.0
+2026-10-06,Subidas,A. Rebbach,MC,Alavés,4993582,+46052,+0.9
+2026-10-06,Bajadas,Iñigo Perez,DT,Villarreal,729078,-2954,-0.4
+2026-10-06,Bajadas,Claudio Giraldez,DT,Celta,730420,-3010,-0.4
+2026-10-06,Subidas,Aihen,DF,Real Sociedad,627600,+1275,+0.2
+2026-10-06,Subidas,Yuri,DF,Athletic Club,19601399,+279381,+1.4
+2026-10-06,Bajadas,Remiro,PT,Real Sociedad,29941426,-331111,-1.1
+2026-10-06,Bajadas,Larrubia,MC,Málaga,16842369,-278489,-1.6
+2026-10-06,Subidas,Tchouaméni,MC,Real Madrid,20235402,+228219,+1.1
+2026-10-06,Bajadas,Pablo García,DL,Racing,7200965,-53896,-0.7
+2026-10-06,Bajadas,Gerard Martín,DF,Barcelona,38215740,-301936,-0.8
+2026-10-06,Bajadas,Herrera,MC,Real Sociedad,4945833,-11992,-0.2
+2026-10-06,Subidas,Agoumé,MC,Sevilla,16425843,+288265,+1.8
+2026-10-06,Bajadas,Bellerín,DF,Real Betis,19220149,-22278,-0.1
+2026-10-07,Bajadas,D. Villares,MC,Deportivo,869556,-9286,-1.1
+2026-10-07,Bajadas,Iñigo Perez,DT,Villarreal,725783,-3295,-0.5
+2026-10-07,Bajadas,Claudio Giraldez,DT,Celta,727071,-3349,-0.5
+2026-10-07,Subidas,Aihen,DF,Real Sociedad,628364,+764,+0.1
+2026-10-07,Subidas,Yuri,DF,Athletic Club,19778988,+177589,+0.9
+2026-10-07,Bajadas,Remiro,PT,Real Sociedad,29658810,-282616,-0.9
+2026-10-07,Bajadas,Larrubia,MC,Málaga,16565326,-277043,-1.6
+2026-10-07,Subidas,Tchouaméni,MC,Real Madrid,20468165,+232763,+1.2
+2026-10-07,Bajadas,Pablo García,DL,Racing,7159680,-41285,-0.6
+2026-10-07,Bajadas,Gerard Martín,DF,Barcelona,38045275,-170465,-0.4
+2026-10-07,Bajadas,Herrera,MC,Real Sociedad,4943582,-2251,0.0
+2026-10-07,Subidas,Agoumé,MC,Sevilla,16711458,+285615,+1.7
+2026-10-07,Bajadas,Bellerín,DF,Real Betis,19177814,-42335,-0.2
+2026-10-08,Bajadas,D. Villares,MC,Deportivo,860743,-8813,-1.0
+2026-10-08,Bajadas,Iñigo Perez,DT,Villarreal,722721,-3062,-0.4
+2026-10-08,Bajadas,Claudio Giraldez,DT,Celta,723958,-3113,-0.4
+2026-10-08,Subidas,Aihen,DF,Real Sociedad,629199,+835,+0.1
+2026-10-08,Subidas,Yuri,DF,Athletic Club,20003146,+224158,+1.1
+2026-10-08,Bajadas,Remiro,PT,Real Sociedad,29459173,-199637,-0.7
+2026-10-08,Bajadas,Larrubia,MC,Málaga,16331870,-233456,-1.4
+2026-10-08,Subidas,Tchouaméni,MC,Real Madrid,20673931,+205766,+1.0
+2026-10-08,Bajadas,Pablo García,DL,Racing,7147935,-11745,-0.2
+2026-10-08,Bajadas,Gerard Martín,DF,Barcelona,37953496,-91779,-0.2
+2026-10-08,Subidas,Herrera,MC,Real Sociedad,4949933,+6351,+0.1
+2026-10-08,Subidas,Agoumé,MC,Sevilla,16966785,+255327,+1.5
+2026-10-08,Bajadas,Bellerín,DF,Real Betis,19139425,-38389,-0.2
+2026-10-08,Subidas,Hancko,DF,Atlético,47379589,+319443,+0.7
+2026-10-09,Bajadas,D. Villares,MC,Deportivo,855061,-5682,-0.7
+2026-10-09,Bajadas,Iñigo Perez,DT,Villarreal,719677,-3044,-0.4
+2026-10-09,Bajadas,Claudio Giraldez,DT,Celta,720865,-3093,-0.4
+2026-10-09,Subidas,Aihen,DF,Real Sociedad,629896,+697,+0.1
+2026-10-09,Subidas,Yuri,DF,Athletic Club,20221653,+218507,+1.1
+2026-10-09,Bajadas,Remiro,PT,Real Sociedad,29275993,-183180,-0.6
+2026-10-09,Bajadas,Larrubia,MC,Málaga,16153026,-178844,-1.1
+2026-10-09,Subidas,Tchouaméni,MC,Real Madrid,20874009,+200078,+1.0
+2026-10-09,Subidas,Pablo García,DL,Racing,7166369,+18434,+0.3
+2026-10-09,Subidas,Gerard Martín,DF,Barcelona,38032542,+79046,+0.2
+2026-10-09,Subidas,Herrera,MC,Real Sociedad,4984129,+34196,+0.7
+2026-10-09,Subidas,Agoumé,MC,Sevilla,17244347,+277562,+1.6
+2026-10-09,Subidas,Bellerín,DF,Real Betis,19210929,+71504,+0.4
+2026-10-09,Subidas,Hancko,DF,Atlético,47599410,+219821,+0.5
+2026-10-10,Bajadas,D. Villares,MC,Deportivo,849006,-6055,-0.7
+2026-10-10,Bajadas,Iñigo Perez,DT,Villarreal,717173,-2504,-0.3
+2026-10-10,Bajadas,Claudio Giraldez,DT,Celta,718312,-2553,-0.4
+2026-10-10,Subidas,Aihen,DF,Real Sociedad,630983,+1087,+0.2
+2026-10-10,Subidas,Yuri,DF,Athletic Club,20348177,+126524,+0.6
+2026-10-10,Bajadas,Remiro,PT,Real Sociedad,29050479,-225514,-0.8
+2026-10-10,Bajadas,Larrubia,MC,Málaga,15998794,-154232,-1.0
+2026-10-10,Subidas,Tchouaméni,MC,Real Madrid,21026180,+152171,+0.7
+2026-10-10,Subidas,Pablo García,DL,Racing,7225282,+58913,+0.8
+2026-10-10,Subidas,Gerard Martín,DF,Barcelona,38319424,+286882,+0.8
+2026-10-10,Subidas,Herrera,MC,Real Sociedad,4992847,+8718,+0.2
+2026-10-10,Subidas,Agoumé,MC,Sevilla,17459959,+215612,+1.3
+2026-10-10,Subidas,Bellerín,DF,Real Betis,19274986,+64057,+0.3
+2026-10-10,Subidas,Hancko,DF,Atlético,47844605,+245195,+0.5
+2026-10-11,Subidas,Joan García,PT,Barcelona,53335709,+1608360,+3.1
