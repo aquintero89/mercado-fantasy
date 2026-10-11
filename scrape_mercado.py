@@ -1,7 +1,7 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
 =====================================================================
-Versión completa y robusta con camuflaje anti-bot mejorado.
+Versión completa y robusta con limpieza de banner de cookies y clics forzados.
 """
 
 import io
@@ -64,10 +64,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
     return None
 
 
-def coincide_por_palabras(nombre_lista: str, nombre_mercado: str) -> bool:
-    return puntua_coincidencia(nombre_lista, nombre_mercado) is not None
-
-
 def carga_mis_jugadores() -> list:
     if not MIS_JUGADORES_FILE.exists():
         return []
@@ -106,7 +102,7 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
         indices_elegidos.append(mejores[0][1])
 
     if ambiguos:
-        print("  Coincidencias ambiguas (añade el equipo entre paréntesis):")
+        print("  Coincidencias ambiguas:")
         for a in ambiguos:
             print(f"    {a}")
 
@@ -117,7 +113,7 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
 
 def send_telegram_message(text: str):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("Telegram no configurado (falta TELEGRAM_TOKEN o TELEGRAM_CHAT_ID). Omitido.")
+        print("Telegram no configurado. Omitido.")
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     resp = requests.post(url, data={
@@ -274,33 +270,14 @@ def abrir_pagina_con_reintentos(page, intentos=3):
     return False
 
 
-def cerrar_aviso_privacidad_si_aparece(page):
-    opciones = [
-        "Rechazar todas", "Rechazar todo", "Solo necesarias",
-        "Aceptar todas", "Aceptar todo", "Aceptar",
-        "Reject all", "Reject All", "Accept all", "Accept All",
-        "Save settings", "Guardar configuración",
-    ]
-    for texto in opciones:
-        try:
-            boton = page.get_by_role("button", name=re.compile(re.escape(texto), re.I))
-            if boton.count() and boton.first.is_visible():
-                boton.first.click(timeout=1800)
-                page.wait_for_timeout(700)
-                return
-        except Exception:
-            continue
-
-
 def seleccionar_pestana(page, tab_label: str) -> bool:
-    cerrar_aviso_privacidad_si_aparece(page)
     try:
         objetivo = page.get_by_text(tab_label, exact=True).first
         if not objetivo.count():
             print(f"  Aviso: no aparece la pestaña '{tab_label}'.")
             return False
         objetivo.scroll_into_view_if_needed(timeout=3000)
-        objetivo.click(timeout=5000)
+        objetivo.click(force=True, timeout=5000)
         page.wait_for_timeout(1000)
         return True
     except Exception as e:
@@ -324,7 +301,7 @@ def scrape_tab(page, tab_label: str, rows: list):
 
         firma = tuple(table.astype(str).fillna("").to_numpy().ravel())
         if firma in firmas_vistas:
-            print("  La tabla no ha cambiado; se detiene la paginación para evitar un bucle.")
+            print("  La tabla no ha cambiado; se detiene la paginación.")
             break
         firmas_vistas.add(firma)
 
@@ -384,7 +361,7 @@ def scrape_tab(page, tab_label: str, rows: list):
         try:
             if not siguiente.first.is_enabled():
                 break
-            siguiente.first.click()
+            siguiente.first.click(force=True)
             page.wait_for_timeout(900)
         except Exception:
             break
@@ -425,7 +402,6 @@ def main():
             timezone_id="Europe/Madrid",
             java_script_enabled=True,
         )
-        # Ocultar rastro de automatización estrictamente
         context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         
         page = context.new_page()
@@ -434,6 +410,10 @@ def main():
             print("No se pudo cargar la tabla tras varios intentos.")
             browser.close()
             sys.exit(1)
+
+        # Eliminar el banner de cookies por la fuerza para evitar intercepciones de clics
+        page.evaluate("() => { const banner = document.getElementById('qc-cmp2-container'); if (banner) banner.remove(); }")
+        page.wait_for_timeout(500)
 
         print("Extrayendo mercado...")
         scrape_tab(page, "Subidas", rows)
