@@ -54,7 +54,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if nl == nm:
         return 5
 
-    # Si el nombre de la lista es una subcadena exacta del mercado (ej. "Aihen" en "Aihen Muñoz")
     if nl in nm.split() or nl == nm:
         return 4
 
@@ -258,7 +257,6 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
             signo = "+" if es_subida else ""
             cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
             
-            # Formatear precio con puntos de millares
             precio_raw = r["precio_eur"]
             try:
                 precio_txt = f"{int(precio_raw):,}".replace(",", ".") if pd.notna(precio_raw) and str(precio_raw).strip() != "" else "?"
