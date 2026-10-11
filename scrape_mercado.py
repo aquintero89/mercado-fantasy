@@ -1,9 +1,9 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Recorre TODAS las páginas del mercado para capturar el 100% de la plantilla con datos reales.
+Extracción de datos mediante consumo del estado inyectado de Next.js / API.
 """
 
-import io
+import json
 import os
 import re
 import sys
@@ -14,13 +14,11 @@ from pathlib import Path
 import pandas as pd
 from curl_cffi import requests as cffi_requests
 
-BASE_URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
+URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
-POSITIONS = ["PT", "DF", "MC", "DL", "DT"]
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-
 MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
 
@@ -126,54 +124,49 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, total: int) -> str:
     return "\n".join(lines)
 
 
-def extrae_filas_de_html(html_content: str) -> list[dict]:
-    """Parsea el HTML de la tabla extraída."""
-    filas = []
+def extrae_jugadores_de_json(html_content: str) -> list[dict]:
+    """Extrae el catálogo de jugadores directamente del objeto __NEXT_DATA__ en el HTML."""
+    jugadores = []
+    m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html_content, re.DOTALL)
+    if not m:
+        return jugadores
+
     try:
-        tables = pd.read_html(io.StringIO(html_content))
-        if not tables:
-            return []
-        
-        table = max(tables, key=lambda t: t.shape[0])
-        columnas = {str(c).strip().lower(): c for c in table.columns}
-        
-        col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
-        col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
-        col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
+        data = json.loads(m.group(1))
+        # Recorremos recursivamente el objeto para encontrar listas de jugadores
+        def busca_jugadores(obj):
+            if isinstance(obj, dict):
+                if "nickname" in obj or ("name" in obj and ("price" in obj or "marketValue" in obj or "lastChange" in obj)):
+                    nombre = obj.get("nickname") or obj.get("name") or obj.get("nombre")
+                    precio = obj.get("marketValue") or obj.get("price") or obj.get("precio") or 0
+                    cambio = obj.get("lastChange") or obj.get("change") or obj.get("subida") or 0
+                    pct = obj.get("changePercent") or obj.get("porcentaje") or 0.0
+                    equipo = obj.get("teamName") or obj.get("team") or ""
+                    
+                    if nombre:
+                        jugadores.append({
+                            "fecha": date.today().isoformat(),
+                            "jugador": str(nombre).strip(),
+                            "equipo": str(equipo).strip(),
+                            "precio_eur": str(precio),
+                            "cambio_eur": str(cambio),
+                            "cambio_pct": str(pct),
+                        })
+                for v in obj.values():
+                    busca_jugadores(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    busca_jugadores(item)
 
-        for _, row in table.iterrows():
-            j_raw = str(row.get(col_jugador, ""))
-            c_raw = str(row.get(col_cambio, ""))
-            p_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
-
-            m_val = re.search(r"([+-]?[\d.]+)\s*€", c_raw.replace("\xa0", " "))
-            m_pct = re.search(r"([+-]?[\d,]+)\s*%", c_raw.replace("\xa0", " "))
-            m_precio = re.search(r"([\d.]+)\s*€", p_raw)
-
-            val = m_val.group(1).replace(".", "") if m_val else "0"
-            pct = m_pct.group(1).replace(",", ".") if m_pct else "0.0"
-            precio = m_precio.group(1).replace(".", "") if m_precio else "0"
-
-            nombre_limp = re.sub(r"^(PT|DF|MC|DL|DT)\s*", "", j_raw).strip()
-            nombre_limp = re.sub(r"^\d+\s*", "", nombre_limp).strip()
-
-            if not nombre_limp:
-                continue
-
-            filas.append({
-                "fecha": date.today().isoformat(),
-                "jugador": nombre_limp,
-                "precio_eur": precio,
-                "cambio_eur": val,
-                "cambio_pct": pct,
-            })
+        busca_jugadores(data)
     except Exception as e:
-        print(f"⚠️ Error al parsear tabla HTML: {e}")
-    return filas
+        print(f"⚠️ Error al parsear __NEXT_DATA__: {e}")
+
+    return jugadores
 
 
 def main():
-    print("Recorriendo todas las páginas del mercado...")
+    print("Descargando mercado desde Analítica Fantasy...")
 
     session = cffi_requests.Session()
     session.headers.update({
@@ -183,38 +176,14 @@ def main():
         "Referer": "https://www.analiticafantasy.com/",
     })
 
-    todas_las_filas = []
-    
-    # Recorrer páginas probando diferentes formatos de URL de paginación
-    for p in range(1, 20):
-        # Probar endpoints/formatos de paginación
-        urls_a_probar = [
-            f"{BASE_URL}?pagina={p}",
-            f"{BASE_URL}?p={p}",
-            f"{BASE_URL}?offset={(p-1)*20}",
-            f"{BASE_URL}?page={p}"
-        ] if p > 1 else [BASE_URL]
+    resp = session.get(URL, impersonate="chrome", timeout=30)
+    if resp.status_code != 200:
+        print(f"❌ Error HTTP {resp.status_code}")
+        sys.exit(1)
 
-        nuevas_en_esta_pagina = 0
-        for target_url in urls_a_probar:
-            try:
-                resp = session.get(target_url, impersonate="chrome", timeout=15)
-                if resp.status_code == 200:
-                    extraídas = extrae_filas_de_html(resp.text)
-                    if extraídas:
-                        todas_las_filas.extend(extraídas)
-                        nuevas_en_esta_pagina = len(extraídas)
-                        print(f"  ✓ Página {p} ({target_url}) -> {len(extraídas)} jugadores extraídos")
-                        break
-            except Exception:
-                continue
-
-        if nuevas_en_esta_pagina == 0 and p > 1:
-            print(f"  Fin de la paginación alcanzado en la página {p-1}.")
-            break
-
-    df_mercado = pd.DataFrame(todas_las_filas).drop_duplicates(subset=["jugador"]) if todas_las_filas else pd.DataFrame()
-    print(f"\n✅ Total global de jugadores recopilados en el mercado: {len(df_mercado)}")
+    jugadores_extraidos = extrae_jugadores_de_json(resp.text)
+    df_mercado = pd.DataFrame(jugadores_extraidos).drop_duplicates(subset=["jugador"]) if jugadores_extraidos else pd.DataFrame()
+    print(f"Registros parseados del estado global: {len(df_mercado)}")
 
     mis_jugadores = carga_mis_jugadores()
     equipo_final = []
@@ -233,7 +202,8 @@ def main():
 
         if match is not None:
             dic = match.to_dict()
-            dic["equipo"] = equipo_hint or ""
+            if equipo_hint:
+                dic["equipo"] = equipo_hint
             equipo_final.append(dic)
             print(f"  ✓ {nombre_busq} -> {match['jugador']} | Cambio: {match['cambio_eur']} € | Precio: {match['precio_eur']} €")
         else:
@@ -245,7 +215,7 @@ def main():
                 "cambio_eur": "0",
                 "cambio_pct": "0.0"
             })
-            print(f"  ℹ️ {nombre_busq} (no varió su valor en las páginas escaneadas)")
+            print(f"  ℹ️ {nombre_busq} (sin variación en el mercado)")
 
     df_final = pd.DataFrame(equipo_final)
     today_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
