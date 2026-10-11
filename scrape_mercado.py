@@ -1,9 +1,8 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión definitiva sin valores simulados: datos reales de mercado.
+Utiliza Playwright para renderizar la tabla dinámica mediante JavaScript.
 """
 
-import io
 import os
 import re
 import sys
@@ -12,16 +11,14 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
+from playwright.sync_api import sync_playwright
 from curl_cffi import requests as cffi_requests
 
 URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
-POSITIONS = ["PT", "DF", "MC", "DL", "DT"]
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-TOP_N = 10
-
 MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
 
@@ -53,10 +50,9 @@ def carga_mis_jugadores() -> list[str]:
 
 def send_telegram_message(text: str):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("❌ Telegram no configurado (faltan TELEGRAM_TOKEN o TELEGRAM_CHAT_ID).")
+        print("❌ Telegram no configurado.")
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    print(f"Enviando mensaje a Telegram (Chat ID: {TELEGRAM_CHAT_ID})...")
     try:
         resp = cffi_requests.post(
             url,
@@ -68,25 +64,23 @@ def send_telegram_message(text: str):
             },
             timeout=20,
         )
-        print(f"Respuesta API Telegram - Código: {resp.status_code}")
-        print(f"Respuesta API Telegram - Cuerpo: {resp.text}")
         if resp.status_code == 200:
             print("✅ Resumen enviado a Telegram correctamente.")
         else:
             print(f"❌ Error de Telegram: {resp.status_code} → {resp.text}")
     except Exception as e:
-        print(f"❌ Excepción crítica al enviar Telegram: {e}")
+        print(f"❌ Excepción al enviar Telegram: {e}")
 
 
-def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: int) -> str:
+def build_telegram_summary_mi_equipo(df: pd.DataFrame, total: int) -> str:
     hoy = date.today().isoformat()
     df = df.copy()
     df["cambio_eur_num"] = pd.to_numeric(df["cambio_eur"], errors="coerce").fillna(0)
 
-    n_subidas = int((df["tipo"] == "Subidas").sum())
-    n_bajadas = int((df["tipo"] == "Bajadas").sum())
-    suma_subidas = df.loc[df["tipo"] == "Subidas", "cambio_eur_num"].sum()
-    suma_bajadas = df.loc[df["tipo"] == "Bajadas", "cambio_eur_num"].sum()
+    n_subidas = int((df["cambio_eur_num"] > 0).sum())
+    n_bajadas = int((df["cambio_eur_num"] < 0).sum())
+    suma_subidas = df.loc[df["cambio_eur_num"] > 0, "cambio_eur_num"].sum()
+    suma_bajadas = df.loc[df["cambio_eur_num"] < 0, "cambio_eur_num"].sum()
     balance_total = df["cambio_eur_num"].sum()
 
     def fmt(n):
@@ -98,7 +92,7 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     signo_balance = "+" if balance_total >= 0 else ""
 
     lines = [
-        f"<b>⚽ Mi equipo — {hoy}</b> ({encontrados}/{total} analizados)",
+        f"<b>⚽ Mi equipo — {hoy}</b> ({len(df)}/{total} encontrados)",
         "",
         f"🟢 Subidas: {n_subidas} (+{fmt(suma_subidas)} €)    🔴 Bajadas: {n_bajadas} ({fmt(suma_bajadas)} €)",
         f"💰 Balance total: {signo_balance}{fmt(balance_total)} €",
@@ -108,158 +102,143 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     df = df.sort_values("cambio_eur_num", ascending=False)
     for _, r in df.iterrows():
         cambio = r["cambio_eur_num"]
-        es_subida = r["tipo"] == "Subidas"
-        punto = "🟢" if es_subida and cambio > 0 else ("🔴" if cambio < 0 else "⚪")
-        flecha = "↑" if es_subida and cambio > 0 else ("↓" if cambio < 0 else "•")
+        punto = "🟢" if cambio > 0 else ("🔴" if cambio < 0 else "⚪")
+        flecha = "↑" if cambio > 0 else ("↓" if cambio < 0 else "•")
         signo = "+" if cambio > 0 else ""
-        cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "0 €"
+        cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) and cambio != 0 else "0 €"
 
         precio_raw = r["precio_eur"]
         try:
-            precio_txt = f"{int(precio_raw):,}".replace(",", ".") if pd.notna(precio_raw) and str(precio_raw).strip() != "" and str(precio_raw) != "0" else "?"
+            precio_txt = f"{int(precio_raw):,}".replace(",", ".") if pd.notna(precio_raw) and str(precio_raw).strip() not in ("", "0", "None") else "?"
         except Exception:
             precio_txt = "?"
 
         equipo_str = f" ({r['equipo']})" if r['equipo'] else ""
+        pct_str = f"{r['cambio_pct']}%" if r['cambio_pct'] else "0.0%"
+
         lines.append(
             f"{punto} {flecha} <b>{r['jugador']}</b>{equipo_str}: "
-            f"{cambio_txt} ({r['cambio_pct']}%) — precio: {precio_txt} €"
+            f"{cambio_txt} ({pct_str}) — precio: {precio_txt} €"
         )
 
     return "\n".join(lines)
 
 
-def limpia_prefijo_duplicado(nombre: str) -> str:
-    nombre = re.sub(r"^\d+\s*", "", nombre).strip()
-    m = re.match(r"^([A-ZÁÉÍÓÚÑ]{1,3})([A-ZÁÉÍÓÚÑ][a-záéíóúñ].*)$", nombre)
-    if m:
-        return m.group(2)
-    return nombre
-
-
-def split_jugador_cell(text: str):
-    text = str(text).strip()
-    for pos in POSITIONS:
-        idx = text.find(pos)
-        if idx != -1:
-            nombre = limpia_prefijo_duplicado(text[:idx].strip())
-            equipo = text[idx + len(pos) :].strip()
-            return nombre, pos, equipo
-    return limpia_prefijo_duplicado(text), "", ""
-
-
-def parse_change_cell(text: str):
-    text = str(text).replace("\xa0", " ")
-    m_val = re.search(r"([+-]?[\d.]+)\s*€", text)
-    m_pct = re.search(r"([+-]?[\d,]+)\s*%", text)
-    valor = m_val.group(1).replace(".", "") if m_val else "0"
-    pct = m_pct.group(1).replace(",", ".") if m_pct else "0.0"
-    return valor, pct
-
-
-def parse_precio_cell(text: str):
-    m = re.search(r"([\d.]+)\s*€", str(text))
-    return m.group(1).replace(".", "") if m else "0"
-
-
 def main():
     rows = []
-    print(f"Consultando {URL}...")
+    print("Iniciando navegador Playwright para renderizar la tabla dinámicamente...")
 
-    session = cffi_requests.Session()
-    session.headers.update({
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-        "Referer": "https://www.analiticafantasy.com/",
-    })
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        print(f"Cargando URL: {URL}")
+        page.goto(URL, wait_until="networkidle", timeout=60000)
+        
+        # Esperar a que las filas de la tabla estén presentes en el DOM
+        try:
+            page.wait_for_selector("table tbody tr", timeout=15000)
+        except Exception:
+            print("⚠️ Timeout esperando selectores de la tabla.")
 
-    try:
-        resp = session.get(URL, impersonate="chrome", timeout=30)
-        if resp.status_code == 200:
-            html = resp.text
-            tables = pd.read_html(io.StringIO(html))
-            if tables:
-                table = max(tables, key=lambda t: t.shape[0])
-                columnas = {str(c).strip().lower(): c for c in table.columns}
-                
-                col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
-                col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
-                col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
+        tr_elements = page.query_selector_all("table tbody tr")
+        print(f"Filas detectadas en la página: {len(tr_elements)}")
 
-                for _, row in table.iterrows():
-                    jugador_raw = str(row.get(col_jugador, ""))
-                    cambio_raw = str(row.get(col_cambio, ""))
-                    precio_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
+        for tr in tr_elements:
+            texto = tr.inner_text().strip()
+            if not texto:
+                continue
 
-                    nombre, posicion, equipo = split_jugador_cell(jugador_raw)
-                    valor, pct = parse_change_cell(cambio_raw)
-                    precio = parse_precio_cell(precio_raw)
+            partes = [p.strip() for p in texto.split("\n") if p.strip()]
+            if len(partes) < 3:
+                continue
 
-                    if not nombre:
-                        continue
+            # Extraer jugador, cambio y precio usando expresiones regulares sobre el texto de la fila
+            # Ejemplo texto fila: "1\nMbappé\nDL Real Madrid\n+2.810.254 €\n+1,9%\n148.663.415 €"
+            raw_text = " ".join(partes)
+            
+            # Subida/Bajada (ejemplo: +2.810.254 € o -150.000 €)
+            m_cambio = re.search(r"([+-]?[\d.]+)\s*€\s*([+-]?[\d,]+)%", raw_text)
+            # Precio (último importe en euros)
+            m_precios = re.findall(r"([\d.]+)\s*€", raw_text)
 
-                    try:
-                        valor_num = float(valor) if valor not in (None, "") else 0.0
-                    except (TypeError, ValueError):
-                        valor_num = 0.0
+            if m_precios:
+                precio_val = m_precios[-1].replace(".", "")
+            else:
+                precio_val = "0"
 
-                    tipo_real = "Bajadas" if valor_num < 0 else "Subidas"
+            if m_cambio:
+                cambio_val = m_cambio.group(1).replace(".", "")
+                pct_val = m_cambio.group(2).replace(",", ".")
+            else:
+                cambio_val = "0"
+                pct_val = "0.0"
 
-                    rows.append({
-                        "fecha": date.today().isoformat(),
-                        "tipo": tipo_real,
-                        "jugador": nombre,
-                        "posicion": posicion,
-                        "equipo": equipo,
-                        "precio_eur": precio,
-                        "cambio_eur": valor,
-                        "cambio_pct": pct,
-                    })
-    except Exception as e:
-        print(f"⚠️ Aviso al procesar tabla general: {e}")
+            # Extraer el nombre del jugador limpiando número de posición inicial y club
+            nombre_jugador = partes[1] if len(partes) > 1 else partes[0]
+            if nombre_jugador.isdigit() and len(partes) > 2:
+                nombre_jugador = partes[2]
 
-    df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"]) if rows else pd.DataFrame(columns=["fecha", "tipo", "jugador", "posicion", "equipo", "precio_eur", "cambio_eur", "cambio_pct"])
-    print(f"Registros generales extraídos: {len(df)}")
+            # Limpiar nombre
+            nombre_jugador = re.sub(r"^\d+\s*", "", nombre_jugador).strip()
+
+            try:
+                val_num = float(cambio_val)
+            except ValueError:
+                val_num = 0.0
+
+            tipo_real = "Subidas" if val_num >= 0 else "Bajadas"
+
+            rows.append({
+                "fecha": date.today().isoformat(),
+                "tipo": tipo_real,
+                "jugador": nombre_jugador,
+                "precio_eur": precio_val,
+                "cambio_eur": cambio_val,
+                "cambio_pct": pct_val,
+            })
+
+        browser.close()
+
+    df_mercado = pd.DataFrame(rows).drop_duplicates(subset=["jugador"]) if rows else pd.DataFrame()
+    print(f"Registros de mercado extraídos correctamente: {len(df_mercado)}")
 
     mis_jugadores = carga_mis_jugadores()
-    mi_equipo_rows = []
+    equipo_final = []
 
     for linea in mis_jugadores:
         nombre_busq, equipo_hint = parse_entrada_jugador(linea)
-        
         match = None
-        for _, r in df.iterrows():
-            j_norm = normaliza(r["jugador"])
-            b_norm = normaliza(nombre_busq)
-            if b_norm == j_norm or b_norm in j_norm or j_norm in b_norm:
-                match = r
-                break
+
+        if not df_mercado.empty:
+            for _, r in df_mercado.iterrows():
+                j_norm = normaliza(r["jugador"])
+                b_norm = normaliza(nombre_busq)
+                if b_norm == j_norm or b_norm in j_norm or j_norm in b_norm:
+                    match = r
+                    break
 
         if match is not None:
-            mi_equipo_rows.append(match.to_dict())
-            print(f"  ✓ Encontrado: {nombre_busq} -> {match['jugador']} ({match['cambio_eur']}€)")
+            dic = match.to_dict()
+            dic["equipo"] = equipo_hint or ""
+            equipo_final.append(dic)
+            print(f"  ✓ {nombre_busq} -> {match['jugador']} | Cambio: {match['cambio_eur']} € | Precio: {match['precio_eur']} €")
         else:
-            # Si no aparece en las tablas principales del mercado de hoy, se asigna 0 de variación real
-            mi_equipo_rows.append({
+            equipo_final.append({
                 "fecha": date.today().isoformat(),
                 "tipo": "Subidas",
                 "jugador": nombre_busq,
-                "posicion": "",
                 "equipo": equipo_hint or "",
                 "precio_eur": "0",
                 "cambio_eur": "0",
                 "cambio_pct": "0.0"
             })
-            print(f"  ℹ️ Sin variación registrada hoy para: {nombre_busq}")
+            print(f"  ℹ️ {nombre_busq} (sin variación en el bloque capturado)")
 
-    mi_equipo_df = pd.DataFrame(mi_equipo_rows)
-    print(f"\n✅ Total plantilla procesada: {len(mi_equipo_df)}/{len(mis_jugadores)}")
-
+    df_final = pd.DataFrame(equipo_final)
     today_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
-    mi_equipo_df.to_csv(today_file, index=False, encoding="utf-8-sig")
+    df_final.to_csv(today_file, index=False, encoding="utf-8-sig")
 
-    resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mis_jugadores), len(mis_jugadores))
+    resumen = build_telegram_summary_mi_equipo(df_final, len(mis_jugadores))
     send_telegram_message(resumen)
 
 
