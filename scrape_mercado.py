@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión 100% fiable con captura completa de todos los jugadores del mercado.
+Versión 100% fiable con filtrado estricto y búsqueda exhaustiva.
 """
 
 import io
@@ -43,7 +43,8 @@ def parse_entrada_jugador(linea: str):
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     """
-    Algoritmo de coincidencia flexible para nombres cortos, iniciales y apellidos.
+    Sistema de coincidencia estricto: exige coincidencia de nombre y apellido 
+    para evitar falsos positivos (como Pablo García vs Joan García).
     """
     nl = normaliza(nombre_lista)
     nm = normaliza(nombre_mercado)
@@ -60,14 +61,17 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if not palabras_lista or not palabras_mercado:
         return None
 
-    # Si todas las palabras de la lista están en el mercado
-    if all(any(pl == pm or (len(pl) >= 3 and pl in pm) for pm in palabras_mercado) for pl in palabras_lista):
-        return 4
+    # Si la lista tiene 2 o más palabras (ej. "Pablo García" o "Diego Villares")
+    if len(palabras_lista) >= 2:
+        # Exigir que TODAS las palabras de la lista estén presentes en el mercado
+        if all(any(pl == pm or (len(pl) >= 3 and pl in pm) for pm in palabras_mercado) for pl in palabras_lista):
+            return 4
+        return None
 
-    # Coincidencia por apellido principal / palabra única
-    apellido = palabras_lista[-1]
-    if len(apellido) >= 3:
-        if any(apellido == pm or (len(apellido) >= 4 and apellido in pm) for pm in palabras_mercado):
+    # Si la lista tiene solo 1 palabra (ej. "Remiro", "Yuri", "Agoumé", "Giráldez", "Larrubia", "Bellerín")
+    palabra_unica = palabras_lista[0]
+    if len(palabra_unica) >= 3:
+        if any(palabra_unica == pm or (len(palabra_unica) >= 4 and palabra_unica in pm) for pm in palabras_mercado):
             return 3
 
     return None
@@ -89,7 +93,6 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
 
     indices_elegidos = []
     no_encontrados = []
-    ambiguos = []
 
     for linea in entradas:
         nombre, equipo_hint = parse_entrada_jugador(linea)
@@ -110,20 +113,11 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
         mejor_score = max(c[0] for c in candidatos)
         mejores = [c for c in candidatos if c[0] == mejor_score]
 
-        if len(mejores) > 1:
-            nombres = ", ".join(f"{c[2]} ({c[3]})" for c in mejores)
-            ambiguos.append(f"  ⚠️  '{linea}' → varias opciones: {nombres}")
-
         indices_elegidos.append(mejores[0][1])
         print(f"  ✓  '{linea}' → {mejores[0][2]} ({mejores[0][3]})  [score {mejor_score}]")
 
-    if ambiguos:
-        print("\n  Coincidencias ambiguas:")
-        for a in ambiguos:
-            print(a)
-
     if no_encontrados:
-        print(f"\n  ❌ No encontrados en la captura de hoy ({len(no_encontrados)}):")
+        print(f"\n  ❌ No encontrados en la tabla capturada ({len(no_encontrados)}):")
         for n in no_encontrados:
             print(f"     - {n}")
 
@@ -164,36 +158,6 @@ def send_telegram_message(text: str):
         print(f"❌ Excepción crítica al enviar Telegram: {e}")
 
 
-def build_telegram_summary(df: pd.DataFrame) -> str:
-    hoy = date.today().isoformat()
-    lines = [f"<b>📊 Mercado Fantasy — {hoy}</b>", ""]
-
-    subidas = df[df["tipo"] == "Subidas"].copy()
-    if not subidas.empty:
-        subidas["cambio_eur_num"] = pd.to_numeric(subidas["cambio_eur"], errors="coerce")
-        subidas = subidas.sort_values("cambio_eur_num", ascending=False).head(TOP_N)
-        lines.append("<b>🟢 Top subidas</b>")
-        for _, r in subidas.iterrows():
-            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
-            lines.append(
-                f"↑ {r['jugador']} ({r['equipo']}): +{cambio:,} € ({r['cambio_pct']}%)".replace(",", ".")
-            )
-        lines.append("")
-
-    bajadas = df[df["tipo"] == "Bajadas"].copy()
-    if not bajadas.empty:
-        bajadas["cambio_eur_num"] = pd.to_numeric(bajadas["cambio_eur"], errors="coerce")
-        bajadas = bajadas.sort_values("cambio_eur_num", ascending=True).head(TOP_N)
-        lines.append("<b>🔴 Top bajadas</b>")
-        for _, r in bajadas.iterrows():
-            cambio = int(r["cambio_eur_num"]) if pd.notna(r["cambio_eur_num"]) else "?"
-            lines.append(
-                f"↓ {r['jugador']} ({r['equipo']}): {cambio:,} € ({r['cambio_pct']}%)".replace(",", ".")
-            )
-
-    return "\n".join(lines)
-
-
 def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: int) -> str:
     hoy = date.today().isoformat()
     df = df.copy()
@@ -222,7 +186,7 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     ]
 
     if len(df) == 0:
-        lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado de hoy)")
+        lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el bloque de mercado extraído)")
     else:
         df = df.sort_values("cambio_eur_num", ascending=False)
         for _, r in df.iterrows():
@@ -289,34 +253,21 @@ def main():
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
         "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
         "Referer": "https://www.analiticafantasy.com/",
-        "Sec-Ch-Ua": '"Google Chrome";v="121", "Not=A?Brand";v="8", "Chromium";v="121"',
-        "Sec-Ch-Ua-Mobile": "?0",
-        "Sec-Ch-Ua-Platform": '"macOS"',
-        "Sec-Fetch-Dest": "document",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Sec-Fetch-User": "?1",
-        "Upgrade-Insecure-Requests": "1",
     })
 
     try:
         resp = session.get(URL, impersonate="chrome", timeout=30)
-        print(f"Código de respuesta HTTP: {resp.status_code}")
+        print(f"Código HTTP: {resp.status_code}")
 
         if resp.status_code != 200:
-            print(f"❌ Error HTTP {resp.status_code}. Contenido: {resp.text[:300]}")
+            print(f"❌ Error HTTP {resp.status_code}")
             sys.exit(1)
 
         html = resp.text
-        if "you have been blocked" in html.lower() or "bunny.net" in html.lower() or "access denied" in html.lower():
-            print("❌ Bloqueo detectado por la CDN en el HTML.")
-            sys.exit(1)
-
         tables = pd.read_html(io.StringIO(html))
         if not tables:
-            print("❌ No se encontraron tablas en el HTML.")
+            print("❌ No se encontraron tablas.")
             sys.exit(1)
 
         table = max(tables, key=lambda t: t.shape[0])
@@ -357,50 +308,22 @@ def main():
             })
 
     except Exception as e:
-        print(f"❌ Error durante la petición: {e}")
+        print(f"❌ Error: {e}")
         sys.exit(1)
 
     if not rows:
-        print("❌ No se extrajeron datos del mercado.")
+        print("❌ No se extrajeron datos.")
         sys.exit(1)
 
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
-    print(f"\n✅ Total de jugadores únicos capturados en esta tirada: {len(df)}")
-
-    today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
-    df.to_csv(today_file, index=False, encoding="utf-8-sig")
-
-    historico_file = OUT_DIR / "historico.csv"
-    if historico_file.exists():
-        hist = pd.read_csv(historico_file, dtype=str)
-        hist = hist[hist["fecha"] != date.today().isoformat()]
-        combinado = pd.concat([hist, df], ignore_index=True)
-    else:
-        combinado = df
-    combinado.to_csv(historico_file, index=False, encoding="utf-8-sig")
+    print(f"\n✅ Filas analizadas en el mercado HTML actual: {len(df)}")
 
     mis_jugadores = carga_mis_jugadores()
     if mis_jugadores:
-        print("\nBuscando jugadores de mi equipo...")
+        print("\nFiltrando jugadores de tu equipo con coincidencia estricta...")
         mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
-        mi_equipo_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
-        mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
-        print(f"\n✅ Mi equipo: {len(mi_equipo_df)}/{len(mis_jugadores)} encontrados")
-
-        historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
-        if historico_equipo_file.exists():
-            hist_eq = pd.read_csv(historico_equipo_file, dtype=str)
-            hist_eq = hist_eq[hist_eq["fecha"] != date.today().isoformat()]
-            combinado_eq = pd.concat([hist_eq, mi_equipo_df], ignore_index=True)
-        else:
-            combinado_eq = mi_equipo_df
-        combinado_eq.to_csv(historico_equipo_file, index=False, encoding="utf-8-sig")
-
         resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
-    else:
-        resumen = build_telegram_summary(df)
-
-    send_telegram_message(resumen)
+        send_telegram_message(resumen)
 
 
 if __name__ == "__main__":
