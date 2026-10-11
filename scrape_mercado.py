@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión 100% fiable con filtrado estricto y búsqueda exhaustiva.
+Versión completa con paginación automática para recorrer todas las páginas.
 """
 
 import io
@@ -14,7 +14,7 @@ from pathlib import Path
 import pandas as pd
 from curl_cffi import requests as cffi_requests
 
-URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
+BASE_URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
 POSITIONS = ["PT", "DF", "MC", "DL", "DT"]
 
@@ -43,8 +43,7 @@ def parse_entrada_jugador(linea: str):
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     """
-    Sistema de coincidencia estricto: exige coincidencia de nombre y apellido 
-    para evitar falsos positivos (como Pablo García vs Joan García).
+    Sistema de coincidencia estricto para evitar falsos positivos.
     """
     nl = normaliza(nombre_lista)
     nm = normaliza(nombre_mercado)
@@ -61,14 +60,11 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if not palabras_lista or not palabras_mercado:
         return None
 
-    # Si la lista tiene 2 o más palabras (ej. "Pablo García" o "Diego Villares")
     if len(palabras_lista) >= 2:
-        # Exigir que TODAS las palabras de la lista estén presentes en el mercado
         if all(any(pl == pm or (len(pl) >= 3 and pl in pm) for pm in palabras_mercado) for pl in palabras_lista):
             return 4
         return None
 
-    # Si la lista tiene solo 1 palabra (ej. "Remiro", "Yuri", "Agoumé", "Giráldez", "Larrubia", "Bellerín")
     palabra_unica = palabras_lista[0]
     if len(palabra_unica) >= 3:
         if any(palabra_unica == pm or (len(palabra_unica) >= 4 and palabra_unica in pm) for pm in palabras_mercado):
@@ -117,7 +113,7 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list[str]) -> pd.DataFrame:
         print(f"  ✓  '{linea}' → {mejores[0][2]} ({mejores[0][3]})  [score {mejor_score}]")
 
     if no_encontrados:
-        print(f"\n  ❌ No encontrados en la tabla capturada ({len(no_encontrados)}):")
+        print(f"\n  ❌ No encontrados en el mercado hoy ({len(no_encontrados)}):")
         for n in no_encontrados:
             print(f"     - {n}")
 
@@ -186,7 +182,7 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     ]
 
     if len(df) == 0:
-        lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el bloque de mercado extraído)")
+        lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado)")
     else:
         df = df.sort_values("cambio_eur_num", ascending=False)
         for _, r in df.iterrows():
@@ -246,7 +242,7 @@ def parse_precio_cell(text: str):
 
 def main():
     rows = []
-    print(f"Consultando {URL} con curl_cffi...")
+    print("Consultando el mercado con paginación automática...")
 
     session = cffi_requests.Session()
     session.headers.update({
@@ -256,71 +252,87 @@ def main():
         "Referer": "https://www.analiticafantasy.com/",
     })
 
-    try:
-        resp = session.get(URL, impersonate="chrome", timeout=30)
-        print(f"Código HTTP: {resp.status_code}")
+    page = 1
+    max_pages = 15  safety limit
 
-        if resp.status_code != 200:
-            print(f"❌ Error HTTP {resp.status_code}")
-            sys.exit(1)
+    while page <= max_pages:
+        url = f"{BASE_URL}?page={page}" if page > 1 else BASE_URL
+        print(f"Descargando página {page}: {url}")
+        
+        try:
+            resp = session.get(url, impersonate="chrome", timeout=30)
+            if resp.status_code != 200:
+                print(f"  -> Fin de páginas o error HTTP {resp.status_code}")
+                break
 
-        html = resp.text
-        tables = pd.read_html(io.StringIO(html))
-        if not tables:
-            print("❌ No se encontraron tablas.")
-            sys.exit(1)
+            html = resp.text
+            tables = pd.read_html(io.StringIO(html))
+            if not tables:
+                print("  -> No se encontraron tablas en esta página.")
+                break
 
-        table = max(tables, key=lambda t: t.shape[0])
-        columnas = {str(c).strip().lower(): c for c in table.columns}
+            table = max(tables, key=lambda t: t.shape[0])
+            if table.empty or len(table) < 2:
+                print("  -> Tabla vacía o sin registros suficientes.")
+                break
 
-        col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
-        col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
-        col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
+            columnas = {str(c).strip().lower(): c for c in table.columns}
+            col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
+            col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
+            col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
 
-        for _, row in table.iterrows():
-            jugador_raw = str(row.get(col_jugador, ""))
-            cambio_raw = str(row.get(col_cambio, ""))
-            precio_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
+            filas_antes = len(rows)
+            for _, row in table.iterrows():
+                jugador_raw = str(row.get(col_jugador, ""))
+                cambio_raw = str(row.get(col_cambio, ""))
+                precio_raw = str(row.get(col_precio, "")) if col_precio is not None else ""
 
-            nombre, posicion, equipo = split_jugador_cell(jugador_raw)
-            valor, pct = parse_change_cell(cambio_raw)
-            precio = parse_precio_cell(precio_raw)
+                nombre, posicion, equipo = split_jugador_cell(jugador_raw)
+                valor, pct = parse_change_cell(cambio_raw)
+                precio = parse_precio_cell(precio_raw)
 
-            if not nombre or not posicion:
-                continue
+                if not nombre or not posicion:
+                    continue
 
-            try:
-                valor_num = float(valor) if valor not in (None, "") else 0.0
-            except (TypeError, ValueError):
-                valor_num = 0.0
+                try:
+                    valor_num = float(valor) if valor not in (None, "") else 0.0
+                except (TypeError, ValueError):
+                    valor_num = 0.0
 
-            tipo_real = "Bajadas" if valor_num < 0 else "Subidas"
+                tipo_real = "Bajadas" if valor_num < 0 else "Subidas"
 
-            rows.append({
-                "fecha": date.today().isoformat(),
-                "tipo": tipo_real,
-                "jugador": nombre,
-                "posicion": posicion,
-                "equipo": equipo,
-                "precio_eur": precio,
-                "cambio_eur": valor,
-                "cambio_pct": pct,
-            })
+                rows.append({
+                    "fecha": date.today().isoformat(),
+                    "tipo": tipo_real,
+                    "jugador": nombre,
+                    "posicion": posicion,
+                    "equipo": equipo,
+                    "precio_eur": precio,
+                    "cambio_eur": valor,
+                    "cambio_pct": pct,
+                })
 
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        sys.exit(1)
+            # Si la página no aportó nuevos registros, terminamos
+            if len(rows) == filas_antes:
+                print("  -> No hay más registros nuevos. Fin de la paginación.")
+                break
+
+            page += 1
+
+        except Exception as e:
+            print(f"❌ Error en página {page}: {e}")
+            break
 
     if not rows:
-        print("❌ No se extrajeron datos.")
+        print("❌ No se extrajeron datos en ninguna página.")
         sys.exit(1)
 
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
-    print(f"\n✅ Filas analizadas en el mercado HTML actual: {len(df)}")
+    print(f"\n✅ Total de jugadores únicos capturados en total: {len(df)}")
 
     mis_jugadores = carga_mis_jugadores()
     if mis_jugadores:
-        print("\nFiltrando jugadores de tu equipo con coincidencia estricta...")
+        print("\nFiltrando jugadores de tu equipo...")
         mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
         resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
         send_telegram_message(resumen)
