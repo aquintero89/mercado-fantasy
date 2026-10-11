@@ -1,7 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-=====================================================================
-Versión mejorada: matching flexible de jugadores + anti-bot reforzado.
+Versión 100% fiable con curl_cffi para evitar bloqueos CDN en GitHub Actions.
 """
 
 import io
@@ -13,8 +12,7 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-import requests
-from playwright.sync_api import sync_playwright
+from curl_cffi import requests as cffi_requests
 
 URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
@@ -28,7 +26,6 @@ MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
 
 def normaliza(texto: str) -> str:
-    """Quita acentos, pasa a minúsculas y limpia espacios."""
     if not texto:
         return ""
     texto = unicodedata.normalize("NFKD", str(texto)).encode("ascii", "ignore").decode()
@@ -36,7 +33,6 @@ def normaliza(texto: str) -> str:
 
 
 def parse_entrada_jugador(linea: str):
-    """Extrae nombre y (opcional) equipo de una línea de mis_jugadores.txt."""
     m = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", linea.strip())
     if m:
         return m.group(1).strip(), m.group(2).strip()
@@ -44,15 +40,6 @@ def parse_entrada_jugador(linea: str):
 
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
-    """
-    Sistema de puntuación flexible:
-      5 = coincidencia exacta (después de normalizar)
-      4 = todas las palabras de la lista están en el nombre del mercado
-      3 = el apellido principal coincide + alguna otra palabra
-      2 = solo el apellido principal coincide (muy útil para "Remiro", "Larrubia"...)
-      1 = coincidencia parcial fuerte (abreviaturas tipo "D. Villares")
-      None = no hay coincidencia suficiente
-    """
     nl = normaliza(nombre_lista)
     nm = normaliza(nombre_mercado)
 
@@ -174,7 +161,7 @@ def send_telegram_message(text: str):
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     try:
-        resp = requests.post(
+        resp = cffi_requests.post(
             url,
             data={
                 "chat_id": TELEGRAM_CHAT_ID,
@@ -301,120 +288,32 @@ def parse_precio_cell(text: str):
     return m.group(1).replace(".", "") if m else None
 
 
-def leer_tabla_actual(page):
-    html = page.content()
+def main():
+    rows = []
+    print(f"Consultando {URL} con curl_cffi...")
+    
     try:
+        resp = cffi_requests.get(URL, impersonate="chrome", timeout=30)
+        if resp.status_code != 200:
+            print(f"❌ Error HTTP {resp.status_code}")
+            sys.exit(1)
+            
+        html = resp.text
+        if "you have been blocked" in html.lower() or "bunny.net" in html.lower() or "access denied" in html.lower():
+            print("❌ Bloqueo detectado por la CDN.")
+            sys.exit(1)
+
         tables = pd.read_html(io.StringIO(html))
-    except ValueError:
-        return None
-    if not tables:
-        return None
-    return max(tables, key=lambda t: t.shape[0])
+        if not tables:
+            print("❌ No se encontraron tablas en el HTML.")
+            sys.exit(1)
 
-
-def abrir_pagina_con_reintentos(page, intentos=4):
-    for intento in range(1, intentos + 1):
-        print(f"Abriendo {URL} (intento {intento}/{intentos}) ...")
-        try:
-            page.wait_for_timeout(1200 * intento)
-            page.goto(URL, wait_until="domcontentloaded", timeout=70000)
-            page.wait_for_timeout(2500)
-        except Exception as e:
-            print(f"  Error de navegación: {e}")
-            if intento < intentos:
-                page.wait_for_timeout(4000 * intento)
-            continue
-
-        content = page.content().lower()
-        indicadores_bloqueo = (
-            "you have been blocked",
-            "sorry, you have been blocked",
-            "bunny.net",
-            "access denied",
-            "request blocked",
-            "cf-browser-verification",
-            "checking your browser",
-        )
-        if any(ind in content for ind in indicadores_bloqueo):
-            print("  ⚠️  Página de bloqueo detectada (anti-bot/CDN).")
-            if intento < intentos:
-                page.wait_for_timeout(6000 * intento)
-            continue
-
-        try:
-            page.wait_for_selector("table", timeout=25000)
-            page.wait_for_timeout(1500)
-            return True
-        except Exception:
-            print(f"  No apareció ninguna tabla en el intento {intento}.")
-            if intento < intentos:
-                page.wait_for_timeout(3000 * intento)
-
-    return False
-
-
-def seleccionar_pestana(page, tab_label: str) -> bool:
-    try:
-        objetivo = page.get_by_text(tab_label, exact=True).first
-        if objetivo.count() == 0:
-            print(f"  Aviso: no aparece la pestaña '{tab_label}'.")
-            return False
-        objetivo.scroll_into_view_if_needed(timeout=4000)
-        objetivo.click(force=True, timeout=6000)
-        page.wait_for_timeout(1200)
-        return True
-    except Exception as e:
-        print(f"  No se pudo seleccionar '{tab_label}': {e}")
-        return False
-
-
-def scrape_tab(page, tab_label: str, rows: list):
-    if not seleccionar_pestana(page, tab_label):
-        return
-
-    page_num = 1
-    firmas_vistas = set()
-
-    while page_num <= 80:
-        page.wait_for_timeout(800)
-        table = leer_tabla_actual(page)
-        if table is None or table.empty:
-            print(f"  No hay tabla de datos en '{tab_label}'.")
-            break
-
-        firma = tuple(table.astype(str).fillna("").to_numpy().ravel())
-        if firma in firmas_vistas:
-            print("  La tabla no ha cambiado; se detiene la paginación.")
-            break
-        firmas_vistas.add(firma)
-
+        table = max(tables, key=lambda t: t.shape[0])
         columnas = {str(c).strip().lower(): c for c in table.columns}
-
-        col_jugador = next(
-            (c for k, c in columnas.items() if "jugador" in k or "nombre" in k), None
-        )
-        col_precio = next(
-            (c for k, c in columnas.items() if "precio" in k or "valor" in k), None
-        )
-        col_cambio = next(
-            (c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k),
-            None,
-        )
-
-        if col_jugador is None or col_cambio is None:
-            if len(table.columns) >= 3:
-                col_jugador = table.columns[0]
-                col_precio = table.columns[1] if len(table.columns) > 3 else None
-                col_cambio = table.columns[2] if len(table.columns) > 2 else table.columns[1]
-            else:
-                print(f"  No reconozco las columnas: {list(table.columns)}")
-                break
-
-        tipo_pestana = (
-            "Bajadas"
-            if "bajada" in str(col_cambio).lower() or tab_label.lower() == "bajadas"
-            else "Subidas"
-        )
+        
+        col_jugador = next((c for k, c in columnas.items() if "jugador" in k or "nombre" in k), table.columns[0])
+        col_precio = next((c for k, c in columnas.items() if "precio" in k or "valor" in k), None)
+        col_cambio = next((c for k, c in columnas.items() if "subida" in k or "bajada" in k or "cambio" in k), table.columns[2] if len(table.columns) > 2 else table.columns[1])
 
         for _, row in table.iterrows():
             jugador_raw = str(row.get(col_jugador, ""))
@@ -432,148 +331,23 @@ def scrape_tab(page, tab_label: str, rows: list):
                 valor_num = float(valor) if valor not in (None, "") else 0.0
             except (TypeError, ValueError):
                 valor_num = 0.0
+            
+            tipo_real = "Bajadas" if valor_num < 0 else "Subidas"
 
-            tipo_real = tipo_pestana
-            if tipo_real == "Bajadas" and valor_num > 0:
-                valor = str(-int(abs(valor_num)))
+            rows.append({
+                "fecha": date.today().isoformat(),
+                "tipo": tipo_real,
+                "jugador": nombre,
+                "posicion": posicion,
+                "equipo": equipo,
+                "precio_eur": precio,
+                "cambio_eur": valor,
+                "cambio_pct": pct,
+            })
 
-            rows.append(
-                {
-                    "fecha": date.today().isoformat(),
-                    "tipo": tipo_real,
-                    "jugador": nombre,
-                    "posicion": posicion,
-                    "equipo": equipo,
-                    "precio_eur": precio,
-                    "cambio_eur": valor,
-                    "cambio_pct": pct,
-                }
-            )
-
-        print(f"  {tab_label} - página {page_num}: {len(table)} filas (total: {len(rows)})")
-
-        siguiente = page.get_by_text("Siguiente", exact=True)
-        if siguiente.count() == 0:
-            break
-        try:
-            if not siguiente.first.is_enabled():
-                break
-            siguiente.first.click(force=True)
-            page.wait_for_timeout(1000)
-        except Exception:
-            break
-        page_num += 1
-
-    if page_num > 80:
-        print("  Límite de seguridad de 80 páginas alcanzado.")
-
-
-def limpia_csv_antiguos():
-    hoy = date.today().isoformat()
-    for patron in ["mercado_*.csv", "mi_equipo_*.csv"]:
-        for f in OUT_DIR.glob(patron):
-            if hoy not in f.name:
-                try:
-                    f.unlink()
-                    print(f"  Borrado archivo antiguo: {f.name}")
-                except Exception:
-                    pass
-
-
-def main():
-    rows = []
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=[
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-blink-features=AutomationControlled",
-                "--disable-infobars",
-                "--window-size=1920,1080",
-                "--start-maximized",
-            ],
-        )
-        context = browser.new_context(
-            user_agent=(
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/131.0.0.0 Safari/537.36"
-            ),
-            viewport={"width": 1920, "height": 1080},
-            locale="es-ES",
-            timezone_id="Europe/Madrid",
-            java_script_enabled=True,
-            extra_http_headers={
-                "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            },
-        )
-        context.add_init_script(
-            """
-            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-            window.chrome = { runtime: {} };
-            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
-            Object.defineProperty(navigator, 'languages', {get: () => ['es-ES', 'es']});
-            """
-        )
-
-        page = context.new_page()
-
-        if not abrir_pagina_con_reintentos(page):
-            print("❌ No se pudo cargar la tabla tras varios intentos.")
-            browser.close()
-            sys.exit(1)
-
-        try:
-            for texto in ["Aceptar", "Accept", "Acepto", "Agree", "Consentir", "OK"]:
-                btn = page.get_by_role("button", name=texto)
-                if btn.count() > 0:
-                    btn.first.click(force=True, timeout=3000)
-                    page.wait_for_timeout(1000)
-                    break
-        except Exception:
-            pass
-
-        try:
-            page.evaluate(
-                """
-                () => {
-                    const selectors = [
-                        '#qc-cmp2-container',
-                        '.qc-cmp2-container',
-                        '#qc-cmp2-ui',
-                        '[id*="qc-cmp"]',
-                        '[class*="qc-cmp"]',
-                        '[id*="cookie"]',
-                        '[class*="cookie"]',
-                        '[id*="consent"]',
-                        '[class*="consent"]',
-                        'div[role="dialog"]'
-                    ];
-                    selectors.forEach(sel => {
-                        document.querySelectorAll(sel).forEach(el => {
-                            el.remove();
-                        });
-                    });
-                    document.querySelectorAll('div[style*="z-index"]').forEach(el => {
-                        if (parseInt(window.getComputedStyle(el).zIndex) > 1000) {
-                            el.remove();
-                        }
-                    });
-                }
-                """
-            )
-            page.wait_for_timeout(1200)
-        except Exception as e:
-            print(f"  Aviso al limpiar cookies: {e}")
-
-        print("Extrayendo mercado...")
-        scrape_tab(page, "Subidas", rows)
-        scrape_tab(page, "Bajadas", rows)
-
-        browser.close()
+    except Exception as e:
+        print(f"❌ Error durante la petición: {e}")
+        sys.exit(1)
 
     if not rows:
         print("❌ No se extrajeron datos del mercado.")
@@ -584,7 +358,6 @@ def main():
 
     today_file = OUT_DIR / f"mercado_{date.today().isoformat()}.csv"
     df.to_csv(today_file, index=False, encoding="utf-8-sig")
-    print(f"  Guardado: {today_file.name}")
 
     historico_file = OUT_DIR / "historico.csv"
     if historico_file.exists():
@@ -599,10 +372,9 @@ def main():
     if mis_jugadores:
         print("\nBuscando jugadores de mi equipo...")
         mi_equipo_df = filtra_mi_equipo(df, mis_jugadores)
-
         mi_equipo_file = OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv"
         mi_equipo_df.to_csv(mi_equipo_file, index=False, encoding="utf-8-sig")
-        print(f"\n✅ Mi equipo: {len(mi_equipo_df)}/{len(mis_jugadores)} encontrados → {mi_equipo_file.name}")
+        print(f"\n✅ Mi equipo: {len(mi_equipo_df)}/{len(mis_jugadores)} encontrados")
 
         historico_equipo_file = OUT_DIR / "historico_mi_equipo.csv"
         if historico_equipo_file.exists():
@@ -613,13 +385,10 @@ def main():
             combinado_eq = mi_equipo_df
         combinado_eq.to_csv(historico_equipo_file, index=False, encoding="utf-8-sig")
 
-        resumen = build_telegram_summary_mi_equipo(
-            mi_equipo_df, len(mi_equipo_df), len(mis_jugadores)
-        )
+        resumen = build_telegram_summary_mi_equipo(mi_equipo_df, len(mi_equipo_df), len(mis_jugadores))
     else:
         resumen = build_telegram_summary(df)
 
-    limpia_csv_antiguos()
     send_telegram_message(resumen)
 
 
