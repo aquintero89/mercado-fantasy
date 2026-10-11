@@ -1,28 +1,20 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
 =====================================================================
+Versión completa — recorre TODAS las páginas del mercado.
 
-Qué hace:
-- Abre la página del mercado con un navegador real (headless) porque la tabla
-  usa paginación controlada por JavaScript.
-- Recorre todas las páginas del mercado completo (subidas y bajadas incluidas
-  en la misma tabla).
-- Extrae: jugador, posición, equipo, precio, subida/bajada en € y en %.
-- Guarda un CSV con la fecha del día: mercado_YYYY-MM-DD.csv
-- Actualiza histórico.csv (mercado completo) e histórico_mi_equipo.csv
-  (filtrado a los jugadores de mis_jugadores.txt).
-- Envía un resumen a Telegram si TELEGRAM_TOKEN y TELEGRAM_CHAT_ID están
-  configurados.
-- Limpia los CSV del día anterior, dejando solo el más reciente.
+Mejoras anti-bloqueo:
+- User-Agent real + viewport + locale
+- Oculta navigator.webdriver
+- Reintentos con detección de página 403
+- Esperas más robustas
 
-Cómo usarlo:
-    1. pip install playwright pandas requests lxml --break-system-packages
-    2. playwright install chromium
-    3. Configura las variables TELEGRAM_TOKEN y TELEGRAM_CHAT_ID más abajo
-       (o como variables de entorno) si quieres recibir el resumen por Telegram.
-    4. python3 scrape_mercado.py
+Instalación (una sola vez):
+    pip install playwright pandas requests lxml html5lib beautifulsoup4 --break-system-packages
+    playwright install chromium
 
-Cada día, simplemente vuelve a ejecutar el script.
+Uso:
+    python3 scrape_mercado.py
 """
 
 import io
@@ -39,7 +31,7 @@ from playwright.sync_api import sync_playwright
 
 URL = "https://www.analiticafantasy.com/fantasy-la-liga/mercado"
 OUT_DIR = Path(__file__).parent
-POSITIONS = ["PT", "DF", "MC", "DL", "DT"]  # DT = entrenador
+POSITIONS = ["PT", "DF", "MC", "DL", "DT"]
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
@@ -49,13 +41,11 @@ MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
 
 
 def normaliza(texto: str) -> str:
-    """Quita tildes/mayúsculas para comparar nombres de forma flexible."""
     texto = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
     return texto.lower().strip()
 
 
 def parse_entrada_jugador(linea: str):
-    """Permite 'Nombre' o 'Nombre (Equipo)' para desambiguar nombres genéricos."""
     m = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", linea.strip())
     if m:
         return m.group(1).strip(), m.group(2).strip()
@@ -63,16 +53,8 @@ def parse_entrada_jugador(linea: str):
 
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
-    """Devuelve una puntuación de calidad de coincidencia, o None si no hay
-    coincidencia válida. Compara por palabras completas para no confundir
-    'Rodri' con 'Rodríguez'.
-      3 = nombre idéntico            ('Marcos Alonso' == 'Marcos Alonso')
-      2 = tú abreviaste             ('Yamal' dentro de 'Lamine Yamal')
-      1 = el mercado abrevió        ('Antonio Blanco' -> aparece 'Blanco')
-    """
     palabras_lista = set(normaliza(nombre_lista).split())
     palabras_mercado = set(normaliza(nombre_mercado).split())
-
     if not palabras_lista or not palabras_mercado:
         return None
     if palabras_lista == palabras_mercado:
@@ -85,7 +67,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str):
 
 
 def coincide_por_palabras(nombre_lista: str, nombre_mercado: str) -> bool:
-    """Compatibilidad: True si hay algún tipo de coincidencia válida."""
     return puntua_coincidencia(nombre_lista, nombre_mercado) is not None
 
 
@@ -97,10 +78,6 @@ def carga_mis_jugadores() -> list:
 
 
 def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
-    """Para cada jugador de tu lista busca TODOS los candidatos del mercado
-    y se queda con el mejor (exacto > tú abreviaste > el mercado abrevió).
-    Si una entrada incluye equipo entre paréntesis, ej. 'M. Román (Celta)',
-    solo considera candidatos de ese equipo."""
     if not entradas:
         return df.iloc[0:0]
 
@@ -112,9 +89,9 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
         candidatos = []
 
         for idx, row in df.iterrows():
-            if equipo_hint and normaliza(equipo_hint) not in normaliza(row["equipo"]):
+            if equipo_hint and normaliza(equipo_hint) not in normaliza(str(row["equipo"])):
                 continue
-            score = puntua_coincidencia(nombre, row["jugador"])
+            score = puntua_coincidencia(nombre, str(row["jugador"]))
             if score is not None:
                 candidatos.append((score, idx, row["jugador"], row["equipo"]))
 
@@ -131,7 +108,7 @@ def filtra_mi_equipo(df: pd.DataFrame, entradas: list) -> pd.DataFrame:
         indices_elegidos.append(mejores[0][1])
 
     if ambiguos:
-        print("  Coincidencias ambiguas (añade el equipo entre paréntesis para fijarlas):")
+        print("  Coincidencias ambiguas (añade el equipo entre paréntesis):")
         for a in ambiguos:
             print(f"    {a}")
 
@@ -150,7 +127,7 @@ def send_telegram_message(text: str):
         "text": text,
         "parse_mode": "HTML",
         "disable_web_page_preview": True,
-    })
+    }, timeout=15)
     if resp.status_code == 200:
         print("Resumen enviado a Telegram.")
     else:
@@ -222,9 +199,6 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
 
 
 def limpia_prefijo_duplicado(nombre: str) -> str:
-    """A veces la web devuelve el nombre con basura delante: un número de
-    ranking pegado (ej. '16Koski') o 1-3 letras mayúsculas duplicadas
-    (ej. 'SSSaba Sazonov', 'FAFacu'). Limpiamos ambos casos."""
     nombre = re.sub(r"^\d+", "", nombre).strip()
     m = re.match(r"^([A-ZÁÉÍÓÚÑ]{1,3})([A-ZÁÉÍÓÚÑ][a-záéíóúñ].*)$", nombre)
     if m:
@@ -267,10 +241,41 @@ def leer_tabla_actual(page):
     return max(tables, key=lambda t: t.shape[0])
 
 
+def abrir_pagina_con_reintentos(page, intentos=4):
+    for intento in range(1, intentos + 1):
+        print(f"Abriendo {URL} (intento {intento}/{intentos}) ...")
+        try:
+            page.goto(URL, wait_until="domcontentloaded", timeout=90000)
+        except Exception as e:
+            print(f"  Error al navegar: {e}")
+            page.wait_for_timeout(2000)
+            continue
+
+        content = page.content().lower()
+        if "you have been blocked" in content or "sorry, you have been blocked" in content:
+            print("  ⚠️  Página de bloqueo anti-bot detectada (bunny.net).")
+            if intento < intentos:
+                page.wait_for_timeout(4000 + intento * 2000)
+                continue
+            return False
+
+        try:
+            page.wait_for_selector("table", timeout=50000)
+            page.wait_for_timeout(2500)
+            return True
+        except Exception:
+            print(f"  Aviso: no apareció la tabla en el intento {intento}.")
+            page.wait_for_timeout(2000)
+    return False
+
+
 def scrape_tab(page, tab_label: str, rows: list):
+    # Intentar hacer clic en el filtro (si existe)
     try:
-        page.get_by_text(tab_label, exact=True).click()
-        page.wait_for_timeout(1500)
+        btn = page.get_by_text(tab_label, exact=True)
+        if btn.count() > 0:
+            btn.first.click()
+            page.wait_for_timeout(1500)
     except Exception:
         print(f"  Aviso: no encontré el botón '{tab_label}', sigo con la vista actual.")
 
@@ -279,7 +284,7 @@ def scrape_tab(page, tab_label: str, rows: list):
     paginas_sin_avanzar = 0
 
     while True:
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(1200)
         table = leer_tabla_actual(page)
 
         if table is None or table.empty:
@@ -290,7 +295,7 @@ def scrape_tab(page, tab_label: str, rows: list):
         if first_row_sig == seen_first_row:
             paginas_sin_avanzar += 1
             if paginas_sin_avanzar <= 3:
-                page.wait_for_timeout(1500)
+                page.wait_for_timeout(1800)
                 table = leer_tabla_actual(page)
                 if table is None or table.empty:
                     break
@@ -337,13 +342,12 @@ def scrape_tab(page, tab_label: str, rows: list):
             break
         siguiente.first.click()
         page_num += 1
-        if page_num > 65:
+        if page_num > 70:
             print("  Límite de seguridad de páginas alcanzado.")
             break
 
 
 def limpia_csv_antiguos():
-    """Borra los CSV con fecha de días anteriores, deja solo los de hoy."""
     hoy = date.today().isoformat()
     for patron in ["mercado_*.csv", "mi_equipo_*.csv"]:
         for f in OUT_DIR.glob(patron):
@@ -355,15 +359,39 @@ def limpia_csv_antiguos():
 def main():
     rows = []
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        print(f"Abriendo {URL} ...")
-        page.goto(URL, wait_until="domcontentloaded", timeout=90000)
-        try:
-            page.wait_for_selector("table", timeout=30000)
-        except Exception:
-            print("Aviso: no apareció la tabla en 30s, sigo de todas formas.")
-        page.wait_for_timeout(3000)
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-infobars",
+            ],
+        )
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/129.0.0.0 Safari/537.36"
+            ),
+            viewport={"width": 1920, "height": 1080},
+            locale="es-ES",
+            timezone_id="Europe/Madrid",
+            java_script_enabled=True,
+        )
+        # Ocultar webdriver
+        context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            window.chrome = { runtime: {} };
+        """)
+        page = context.new_page()
+
+        if not abrir_pagina_con_reintentos(page):
+            print("No se pudo cargar la tabla tras varios intentos.")
+            print("Causa más probable: bloqueo anti-bot de la web.")
+            print("Prueba a ejecutarlo más tarde o desde otra red/IP.")
+            browser.close()
+            sys.exit(1)
 
         print("Extrayendo mercado completo...")
         scrape_tab(page, "Subidas", rows)
@@ -371,7 +399,7 @@ def main():
         browser.close()
 
     if not rows:
-        print("No se extrajeron datos. La estructura de la web pudo haber cambiado.")
+        print("No se extrajeron datos. La estructura de la web pudo haber cambiado o hay bloqueo.")
         sys.exit(1)
 
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
@@ -421,7 +449,6 @@ def main():
         resumen = build_telegram_summary(df)
 
     limpia_csv_antiguos()
-
     send_telegram_message(resumen)
 
 
