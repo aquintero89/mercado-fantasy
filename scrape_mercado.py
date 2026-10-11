@@ -1,6 +1,6 @@
 """
 Scraper diario del mercado de La Liga Fantasy (analiticafantasy.com)
-Versión completa con curl_cffi, cabeceras extendidas y depuración detallada de Telegram.
+Versión completa con curl_cffi, búsqueda flexible mejorada y formato de precios limpio.
 """
 
 import io
@@ -43,13 +43,7 @@ def parse_entrada_jugador(linea: str):
 
 def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     """
-    Sistema de puntuación flexible:
-      5 = coincidencia exacta (después de normalizar)
-      4 = todas las palabras de la lista están en el nombre del mercado
-      3 = el apellido principal coincide + alguna otra palabra
-      2 = solo el apellido principal coincide
-      1 = coincidencia parcial fuerte
-      None = no hay coincidencia suficiente
+    Sistema de puntuación flexible y tolerante para nombres cortos y apellidos.
     """
     nl = normaliza(nombre_lista)
     nm = normaliza(nombre_mercado)
@@ -59,6 +53,10 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
 
     if nl == nm:
         return 5
+
+    # Si el nombre de la lista es una subcadena exacta del mercado (ej. "Aihen" en "Aihen Muñoz")
+    if nl in nm.split() or nl == nm:
+        return 4
 
     palabras_lista = [p for p in nl.split() if p]
     palabras_mercado = [p for p in nm.split() if p]
@@ -74,7 +72,7 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
         apellido = max(palabras_lista, key=len)
 
     apellido_en_mercado = any(
-        apellido == pm or (len(apellido) >= 4 and (apellido in pm or pm in apellido))
+        apellido == pm or (len(apellido) >= 3 and (apellido in pm or pm in apellido))
         for pm in palabras_mercado
     )
 
@@ -95,8 +93,6 @@ def puntua_coincidencia(nombre_lista: str, nombre_mercado: str) -> int | None:
     if matches == len(palabras_lista):
         return 3
     if matches >= 1 and apellido_en_mercado:
-        if matches == 1:
-            return 2
         return 3
 
     return None
@@ -261,9 +257,17 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
             flecha = "↑" if es_subida else "↓"
             signo = "+" if es_subida else ""
             cambio_txt = f"{signo}{int(cambio):,} €".replace(",", ".") if pd.notna(cambio) else "?"
+            
+            # Formatear precio con puntos de millares
+            precio_raw = r["precio_eur"]
+            try:
+                precio_txt = f"{int(precio_raw):,}".replace(",", ".") if pd.notna(precio_raw) and str(precio_raw).strip() != "" else "?"
+            except Exception:
+                precio_txt = str(precio_raw)
+
             lines.append(
                 f"{punto} {flecha} <b>{r['jugador']}</b> ({r['equipo']}): "
-                f"{cambio_txt} ({r['cambio_pct']}%) — precio: {r['precio_eur']} €"
+                f"{cambio_txt} ({r['cambio_pct']}%) — precio: {precio_txt} €"
             )
 
     return "\n".join(lines)
