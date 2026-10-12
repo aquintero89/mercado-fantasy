@@ -19,6 +19,7 @@ Dependencias (el workflow ya las instala):
 
 import io
 import os
+import random
 import re
 import sys
 import unicodedata
@@ -37,12 +38,18 @@ OUT_DIR = Path(__file__).parent
 POSITIONS = ["PT", "DF", "MC", "DL", "DT"]  # DT = entrenador
 MAX_PAGINAS = 80  # el mercado ronda las 59 páginas
 ESPERA_TABLA_MS = int(os.environ.get("ESPERA_TABLA_MS", "45000"))
+# Pausa media entre páginas (con variación aleatoria): imita a una persona
+PAUSA_PAGINAS_MS = int(os.environ.get("PAUSA_PAGINAS_MS", "1500"))
+# NAVEGADOR_VISIBLE=1 -> Chrome real con ventana (usar con xvfb-run en servidores)
+NAVEGADOR_VISIBLE = os.environ.get("NAVEGADOR_VISIBLE", "") == "1"
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 TOP_N = 10
 
 MIS_JUGADORES_FILE = OUT_DIR / "mis_jugadores.txt"
+# Marca con la fecha de la última captura completa (para saltar reintentos)
+MARCA_COMPLETA = OUT_DIR / "ultima_captura_completa.txt"
 
 
 # --------------------------------------------------------------------------
@@ -228,7 +235,8 @@ def build_telegram_summary(df: pd.DataFrame, aviso: str = "") -> str:
 
 
 def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: int,
-                                     no_encontrados=None, aviso: str = "") -> str:
+                                     no_encontrados=None, aviso: str = "",
+                                     captura_incompleta: bool = False) -> str:
     hoy = date.today().isoformat()
     df = df.copy()
     df["cambio_eur_num"] = pd.to_numeric(df["cambio_eur"], errors="coerce")
@@ -268,7 +276,8 @@ def build_telegram_summary_mi_equipo(df: pd.DataFrame, encontrados: int, total: 
     if len(df) == 0:
         lines.append("(No se encontró ningún jugador de mis_jugadores.txt en el mercado de hoy)")
     if no_encontrados:
-        lines += ["", "❓ No encontrados: " + ", ".join(escape(n, quote=False) for n in no_encontrados)]
+        etiqueta = "Sin datos hoy (no se leyó todo el mercado)" if captura_incompleta else "No encontrados"
+        lines += ["", f"❓ {etiqueta}: " + ", ".join(escape(n, quote=False) for n in no_encontrados)]
     return "\n".join(lines)
 
 
@@ -494,19 +503,29 @@ def procesa_tabla(table, rows: list) -> bool:
 
 
 def scrape_mercado(page, rows: list):
-    """Recorre todas las páginas de la tabla (vista por defecto)."""
+    """Recorre todas las páginas de la tabla (vista por defecto).
+    Devuelve (páginas_leídas, motivo_de_bloqueo_o_None)."""
     table = leer_tabla_actual(page)
-    page_num = 1
+    leidas = 0
 
-    while table is not None and not table.empty and page_num <= MAX_PAGINAS:
+    while table is not None and not table.empty and leidas < MAX_PAGINAS:
         if not procesa_tabla(table, rows):
             break
-        print(f"  Página {page_num}: {len(table)} filas (total acumulado: {len(rows)})")
+        leidas += 1
+        print(f"  Página {leidas}: {len(table)} filas (total acumulado: {len(rows)})")
         table = avanza_pagina(page, table)
-        page_num += 1
+        if table is not None and PAUSA_PAGINAS_MS > 0:
+            page.wait_for_timeout(int(PAUSA_PAGINAS_MS * random.uniform(0.6, 1.4)))
 
-    if page_num > MAX_PAGINAS:
+    if leidas >= MAX_PAGINAS:
         print(f"  Límite de seguridad de {MAX_PAGINAS} páginas alcanzado.")
+
+    bloqueo = None
+    if table is None:  # la paginación se detuvo: ¿fin normal o bloqueo?
+        bloqueo = detecta_bloqueo(page)
+        if bloqueo:
+            print(f"  La web bloqueó el acceso tras {leidas} páginas ('{bloqueo}'): {texto_visible(page, 200)}")
+    return leidas, bloqueo
 
 
 def crea_contexto(browser):
@@ -540,15 +559,37 @@ def limpia_csv_antiguos():
                 print(f"  Borrado archivo antiguo: {f.name}")
 
 
-def acumula_historico(nombre_archivo: str, df: pd.DataFrame):
+def guarda_csv_del_dia(ruta: Path, df: pd.DataFrame, completa: bool):
+    """Una pasada incompleta no machaca el archivo de una pasada completa."""
+    if not completa and ruta.exists():
+        print(f"  Se conserva {ruta.name} (la captura de hoy está incompleta).")
+        return
+    df.to_csv(ruta, index=False, encoding="utf-8-sig")
+
+
+def acumula_historico(nombre_archivo: str, df: pd.DataFrame, completa: bool = True):
     ruta = OUT_DIR / nombre_archivo
     hoy = date.today().isoformat()
     if ruta.exists():
         hist = pd.read_csv(ruta, dtype=str)
-        hist = hist[hist["fecha"] != hoy]
-        df = pd.concat([hist, df], ignore_index=True)
+        de_hoy = hist[hist["fecha"] == hoy]
+        resto = hist[hist["fecha"] != hoy]
+        if completa:
+            df = pd.concat([resto, df], ignore_index=True)
+        else:
+            # Pasada incompleta: conservamos lo de hoy y solo añadimos lo nuevo
+            ya = set(zip(de_hoy["jugador"], de_hoy["equipo"]))
+            nuevos = df[[(j, e) not in ya for j, e in zip(df["jugador"], df["equipo"])]]
+            df = pd.concat([resto, de_hoy, nuevos], ignore_index=True)
     df.to_csv(ruta, index=False, encoding="utf-8-sig")
     print(f"Histórico actualizado: {nombre_archivo} ({len(df)} filas totales)")
+
+
+def captura_de_hoy_completa() -> bool:
+    try:
+        return MARCA_COMPLETA.read_text().strip() == date.today().isoformat()
+    except OSError:
+        return False
 
 
 def fallar(motivo: str):
@@ -561,16 +602,37 @@ def fallar(motivo: str):
     sys.exit(1)
 
 
+def lanza_navegador(p):
+    """Con NAVEGADOR_VISIBLE=1 intenta Chrome real con ventana (necesita
+    pantalla: xvfb-run en servidores); si no puede, usa Chromium headless."""
+    args = ["--no-sandbox", "--disable-dev-shm-usage",
+            "--disable-blink-features=AutomationControlled"]
+    if NAVEGADOR_VISIBLE:
+        for extra in ({"channel": "chrome"}, {}):
+            try:
+                navegador = p.chromium.launch(headless=False, args=args, **extra)
+                print("Navegador: " + ("Chrome real" if extra else "Chromium") + " con ventana.")
+                return navegador
+            except Exception as e:
+                print(f"  No se pudo abrir el navegador con ventana ({extra or 'chromium'}): "
+                      f"{(str(e).splitlines() or ['?'])[0][:120]}")
+    print("Navegador: Chromium headless.")
+    return p.chromium.launch(headless=True, args=args)
+
+
 def main():
+    # En los reintentos programados: si ya hay captura completa de hoy, no repetir
+    if os.environ.get("SALTAR_SI_COMPLETA") == "1" and captura_de_hoy_completa():
+        print("Ya hay una captura completa de hoy: no hace falta repetir.")
+        return
+
     rows = []
     esperados = None
+    bloqueo = None
+    leidas = 0
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=["--no-sandbox", "--disable-dev-shm-usage",
-                  "--disable-blink-features=AutomationControlled"],
-        )
+        browser = lanza_navegador(p)
         page = crea_contexto(browser).new_page()
 
         ok, diag = abrir_pagina_con_reintentos(page)
@@ -583,7 +645,7 @@ def main():
             print(f"La web indica {esperados} jugadores en mercado.")
 
         print("Extrayendo mercado completo...")
-        scrape_mercado(page, rows)
+        leidas, bloqueo = scrape_mercado(page, rows)
         browser.close()
 
     if not rows:
@@ -592,27 +654,34 @@ def main():
     df = pd.DataFrame(rows).drop_duplicates(subset=["fecha", "jugador", "equipo"])
     print(f"\nTotal de jugadores únicos capturados hoy: {len(df)}")
 
+    completa = not bloqueo and not (esperados and len(df) < 0.95 * esperados)
     aviso = ""
-    if esperados and len(df) < 0.95 * esperados:
-        aviso = f"⚠️ Captura incompleta: {len(df)} de {esperados} jugadores."
+    if not completa:
+        total_txt = f" de {esperados}" if esperados else ""
+        if bloqueo:
+            aviso = f"⚠️ La web bloqueó el acceso tras {leidas} páginas: solo se leyeron {len(df)}{total_txt} jugadores."
+        else:
+            aviso = f"⚠️ Captura incompleta: {len(df)}{total_txt} jugadores."
         print(aviso)
 
-    df.to_csv(OUT_DIR / f"mercado_{date.today().isoformat()}.csv", index=False, encoding="utf-8-sig")
-    acumula_historico("historico.csv", df)
+    if completa:
+        MARCA_COMPLETA.write_text(date.today().isoformat())
+    guarda_csv_del_dia(OUT_DIR / f"mercado_{date.today().isoformat()}.csv", df, completa)
+    acumula_historico("historico.csv", df, completa)
 
     mis_jugadores = carga_mis_jugadores()
     if mis_jugadores:
         mi_equipo_df, no_encontrados = filtra_mi_equipo(df, mis_jugadores)
         encontrados = len(mis_jugadores) - len(no_encontrados)
-        mi_equipo_df.to_csv(OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv",
-                            index=False, encoding="utf-8-sig")
+        guarda_csv_del_dia(OUT_DIR / f"mi_equipo_{date.today().isoformat()}.csv", mi_equipo_df, completa)
         print(f"Mi equipo: {encontrados}/{len(mis_jugadores)} encontrados")
         if no_encontrados:
             print(f"  No encontrados en el mercado de hoy: {', '.join(no_encontrados)}")
-        acumula_historico("historico_mi_equipo.csv", mi_equipo_df)
+        acumula_historico("historico_mi_equipo.csv", mi_equipo_df, completa)
 
         resumen = build_telegram_summary_mi_equipo(
-            mi_equipo_df, encontrados, len(mis_jugadores), no_encontrados, aviso)
+            mi_equipo_df, encontrados, len(mis_jugadores), no_encontrados, aviso,
+            captura_incompleta=not completa)
     else:
         print("No hay 'mis_jugadores.txt' (o está vacío): resumen general del mercado.")
         resumen = build_telegram_summary(df, aviso)
