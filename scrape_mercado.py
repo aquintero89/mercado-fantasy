@@ -25,6 +25,7 @@ import sys
 import unicodedata
 from datetime import date
 from html import escape
+from urllib.parse import urlparse
 from pathlib import Path
 
 import pandas as pd
@@ -369,12 +370,27 @@ def detecta_bloqueo(page):
     return next((i for i in INDICADORES_BLOQUEO if i in texto), None)
 
 
+JS_LIMPIA_OVERLAYS = """() => {
+  document.querySelectorAll('[id^="qc-cmp2"]').forEach(e => e.remove());
+  for (const el of document.querySelectorAll('body *')) {
+    const cs = getComputedStyle(el);
+    if (cs.position !== 'fixed') continue;
+    const r = el.getBoundingClientRect();
+    if (r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.9 && !el.querySelector('table')) el.remove();
+  }
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+  if (location.hash.includes('google_vignette')) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+}"""
+
+
 def quita_banner_cookies(page):
-    """El banner de cookies (Quantcast) puede interceptar los clics."""
+    """Quita banners de cookies y anuncios a pantalla completa que tapan la
+    página e interceptan los clics."""
     try:
-        page.evaluate(
-            "() => document.querySelectorAll('[id^=\"qc-cmp2\"]').forEach(e => e.remove())"
-        )
+        page.evaluate(JS_LIMPIA_OVERLAYS)
     except Exception:
         pass
 
@@ -423,26 +439,69 @@ def leer_total_esperado(page):
     return int(m.group(1).replace(".", "")) if m else None
 
 
-def click_siguiente(page) -> bool:
+# Marca el botón 'Siguiente' más cercano a la tabla (puede haber otros 'Siguiente'
+# en anuncios o carruseles). Devuelve 0 = no hay botón, 1 = activo, 2 = desactivado.
+JS_MARCA_SIGUIENTE = """() => {
+  document.querySelectorAll('[data-sig]').forEach(e => e.removeAttribute('data-sig'));
+  const tablas = [...document.querySelectorAll('table')];
+  if (!tablas.length) return 0;
+  tablas.sort((a, b) => b.rows.length - a.rows.length);
+  const tb = tablas[0].getBoundingClientRect();
+  const cands = [...document.querySelectorAll('button, a, [role=button], span, div, li, p')]
+    .filter(e => e.textContent.trim() === 'Siguiente'
+              && ![...e.children].some(c => c.textContent.trim() === 'Siguiente'));
+  if (!cands.length) return 0;
+  const dist = e => { const r = e.getBoundingClientRect();
+    return Math.abs(r.top - tb.bottom) + Math.abs((r.left + r.width / 2) - (tb.left + tb.width / 2)) * 0.1; };
+  cands.sort((a, b) => dist(a) - dist(b));
+  cands[0].setAttribute('data-sig', '1');
+  const btn = cands[0].closest('button') || cands[0];
+  return (btn.disabled || btn.getAttribute('aria-disabled') === 'true') ? 2 : 1;
+}"""
+
+
+def click_siguiente(page, modo: str = "js") -> str:
+    """Pulsa 'Siguiente'. Devuelve 'ok', 'desactivado' o 'no_hay'.
+    modo 'js' hace el clic desde JavaScript (no lo frena ningún anuncio encima);
+    modo 'raton' hace un clic de ratón normal."""
     quita_banner_cookies(page)
+    try:
+        estado = page.evaluate(JS_MARCA_SIGUIENTE)
+    except Exception:
+        estado = 0
+
+    if estado == 2:
+        return "desactivado"
+    if estado == 1:
+        try:
+            if modo == "js":
+                page.evaluate("() => { const e = document.querySelector('[data-sig]');"
+                              " (e.closest('button') || e).click(); }")
+            else:
+                page.locator("[data-sig]").first.click(force=True, timeout=5000)
+            return "ok"
+        except Exception:
+            return "no_hay"
+
+    # Plan B: búsqueda por texto
     boton = page.get_by_text("Siguiente", exact=True)
     if boton.count() == 0:
-        return False
+        return "no_hay"
     primero = boton.first
     try:
         if not primero.is_enabled():
-            return False
+            return "desactivado"
     except Exception:
         pass
     try:
         primero.click(force=True, timeout=5000)
-        return True
+        return "ok"
     except Exception:
         try:
             primero.evaluate("el => el.click()")
-            return True
+            return "ok"
         except Exception:
-            return False
+            return "no_hay"
 
 
 def firma_tabla(table) -> str:
@@ -450,21 +509,29 @@ def firma_tabla(table) -> str:
 
 
 def avanza_pagina(page, table_actual):
-    """Pulsa 'Siguiente' y espera a que la tabla cambie de verdad. Si el clic
-    no surte efecto (banner, carga lenta) lo reintenta una vez. Devuelve la
-    nueva tabla, o None si no hay más páginas."""
+    """Pulsa 'Siguiente' y espera a que la tabla cambie de verdad; si no
+    cambia, reintenta con otro tipo de clic. Devuelve (tabla_nueva, motivo):
+    motivo '' si avanzó; 'fin_normal' (botón desactivado), 'sin_boton' o
+    'sin_cambio' si no se pudo avanzar."""
     firma_actual = firma_tabla(table_actual)
-    for _ in range(2):
-        if not click_siguiente(page):
-            return None  # no hay botón o está desactivado: última página
-        for _ in range(16):  # hasta ~8 s esperando el cambio
+    for modo in ("js", "raton", "js"):
+        resultado = click_siguiente(page, modo)
+        if resultado == "desactivado":
+            return None, "fin_normal"
+        if resultado == "no_hay":
+            return None, "sin_boton"
+        for _ in range(12):  # hasta ~6 s esperando el cambio
             page.wait_for_timeout(500)
             nueva = leer_tabla_actual(page)
             if nueva is not None and not nueva.empty and firma_tabla(nueva) != firma_actual:
                 page.wait_for_timeout(300)  # que termine de pintarse
                 estable = leer_tabla_actual(page)
-                return estable if estable is not None and not estable.empty else nueva
-    return None
+                return (estable if estable is not None and not estable.empty else nueva), ""
+        try:
+            page.keyboard.press("Escape")  # cierra posibles ventanas emergentes
+        except Exception:
+            pass
+    return None, "sin_cambio"
 
 
 def procesa_tabla(table, rows: list) -> bool:
@@ -504,28 +571,32 @@ def procesa_tabla(table, rows: list) -> bool:
 
 def scrape_mercado(page, rows: list):
     """Recorre todas las páginas de la tabla (vista por defecto).
-    Devuelve (páginas_leídas, motivo_de_bloqueo_o_None)."""
+    Devuelve (páginas_leídas, motivo_de_parada, texto_de_bloqueo_o_None)."""
     table = leer_tabla_actual(page)
     leidas = 0
+    motivo = "fin_normal" if table is not None else "sin_tabla"
 
     while table is not None and not table.empty and leidas < MAX_PAGINAS:
         if not procesa_tabla(table, rows):
+            motivo = "columnas_desconocidas"
             break
         leidas += 1
         print(f"  Página {leidas}: {len(table)} filas (total acumulado: {len(rows)})")
-        table = avanza_pagina(page, table)
+        table, motivo = avanza_pagina(page, table)
         if table is not None and PAUSA_PAGINAS_MS > 0:
             page.wait_for_timeout(int(PAUSA_PAGINAS_MS * random.uniform(0.6, 1.4)))
 
     if leidas >= MAX_PAGINAS:
+        motivo = "limite_paginas"
         print(f"  Límite de seguridad de {MAX_PAGINAS} páginas alcanzado.")
 
     bloqueo = None
-    if table is None:  # la paginación se detuvo: ¿fin normal o bloqueo?
+    if motivo not in ("fin_normal", ""):
         bloqueo = detecta_bloqueo(page)
         if bloqueo:
             print(f"  La web bloqueó el acceso tras {leidas} páginas ('{bloqueo}'): {texto_visible(page, 200)}")
-    return leidas, bloqueo
+    print(f"  Fin del recorrido: {leidas} páginas, motivo: {motivo}")
+    return leidas, motivo, bloqueo
 
 
 def crea_contexto(browser):
@@ -585,6 +656,45 @@ def acumula_historico(nombre_archivo: str, df: pd.DataFrame, completa: bool = Tr
     print(f"Histórico actualizado: {nombre_archivo} ({len(df)} filas totales)")
 
 
+def send_telegram_photo(png: bytes, caption: str):
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+    try:
+        resp = requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto",
+            data={"chat_id": TELEGRAM_CHAT_ID, "caption": caption[:1000], "parse_mode": "HTML"},
+            files={"photo": ("pantalla.png", png, "image/png")},
+            timeout=30,
+        )
+        print("Captura de pantalla enviada a Telegram." if resp.status_code == 200
+              else f"Error enviando la captura: {resp.status_code} {resp.text[:150]}")
+    except requests.RequestException as e:
+        print(f"Error de red enviando la captura: {e}")
+
+
+def prepara_diagnostico(page, motivo: str, fallos: list):
+    """Texto + captura de pantalla de lo que ve el navegador en este momento."""
+    host = urlparse(page.url).netloc if page.url else ""
+    propios = [(s, u) for s, u in fallos if host and host in u]
+    lineas = [f"🔎 <b>Diagnóstico</b> — motivo de parada: {escape(motivo, quote=False)}"]
+    if propios:
+        lineas.append("Peticiones de la web con error: " + escape(
+            "; ".join(f"{s} {u[:80]}" for s, u in propios[-4:]), quote=False))
+    lineas.append("Texto en pantalla: " + escape(texto_visible(page, 220), quote=False))
+    try:
+        foto = page.screenshot(type="png")
+    except Exception:
+        foto = None
+    return "\n".join(lineas), foto
+
+
+def envia_diagnostico(texto: str, foto):
+    if foto:
+        send_telegram_photo(foto, texto)
+    else:
+        send_telegram_message(texto)
+
+
 def captura_de_hoy_completa() -> bool:
     try:
         return MARCA_COMPLETA.read_text().strip() == date.today().isoformat()
@@ -592,13 +702,15 @@ def captura_de_hoy_completa() -> bool:
         return False
 
 
-def fallar(motivo: str):
+def fallar(motivo: str, diagnostico=None):
     """Avisa por Telegram (para enterarte desde el móvil) y termina con error."""
     print(motivo)
     send_telegram_message(
         "⚠️ <b>Mercado Fantasy</b>: el scraper falló hoy.\n" + escape(motivo[:700], quote=False)
         + "\n\nPuedes reintentar desde GitHub → Actions → Run workflow."
     )
+    if diagnostico:
+        envia_diagnostico(*diagnostico)
     sys.exit(1)
 
 
@@ -634,18 +746,30 @@ def main():
     with sync_playwright() as p:
         browser = lanza_navegador(p)
         page = crea_contexto(browser).new_page()
+        fallos = []  # peticiones que devuelven error (403, 429...)
+        page.on("response", lambda r: fallos.append((r.status, r.url)) if r.status >= 400 else None)
 
         ok, diag = abrir_pagina_con_reintentos(page)
         if not ok:
+            diagnostico = prepara_diagnostico(page, "no_carga_tabla", fallos)
             browser.close()
-            fallar(f"No se pudo cargar la tabla tras varios intentos. {diag}")
+            fallar(f"No se pudo cargar la tabla tras varios intentos. {diag}", diagnostico)
 
         esperados = leer_total_esperado(page)
         if esperados:
             print(f"La web indica {esperados} jugadores en mercado.")
 
         print("Extrayendo mercado completo...")
-        leidas, bloqueo = scrape_mercado(page, rows)
+        leidas, motivo_parada, bloqueo = scrape_mercado(page, rows)
+        diagnostico = None
+        parada_rara = motivo_parada not in ("fin_normal", "")
+        corta = bool(esperados) and len(rows) < 0.95 * esperados
+        if bloqueo or parada_rara or corta:
+            diagnostico = prepara_diagnostico(page, motivo_parada, fallos)
+            if not bloqueo:
+                relevantes = [s for s, u in fallos if s in (403, 429) and urlparse(page.url).netloc in u]
+                if relevantes:
+                    bloqueo = f"respuestas {relevantes[-1]} de la propia web"
         browser.close()
 
     if not rows:
@@ -688,6 +812,8 @@ def main():
 
     limpia_csv_antiguos()
     send_telegram_message(resumen)
+    if diagnostico and not completa:
+        envia_diagnostico(*diagnostico)
 
 
 if __name__ == "__main__":
